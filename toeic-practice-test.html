@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEIC Practice Test · L&R</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12202e;        /* deep slate navy — board / chrome */
+  --ink-2:#1b2f42;
+  --blue:#2e6be6;       /* transit blue — primary action */
+  --blue-d:#1e51bd;
+  --amber:#f2b441;      /* signal amber — timer / accent */
+  --paper:#eef1f5;      /* app background */
+  --card:#ffffff;
+  --text:#1b2a38;
+  --muted:#67788a;
+  --line:#dbe2ea;
+  --ok:#1f9d6b;
+  --ok-bg:#e6f6ef;
+  --bad:#e05252;
+  --bad-bg:#fdecec;
+  --mark:#b8791f;
+  --mark-bg:#fdf3e0;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(18,32,46,.06),0 8px 24px rgba(18,32,46,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Inter","Noto Sans Thai",system-ui,sans-serif;
+  background:var(--paper);color:var(--text);
+  -webkit-font-smoothing:antialiased;line-height:1.55;
+}
+.mono{font-family:"IBM Plex Mono",monospace}
+.disp{font-family:"Space Grotesk","Noto Sans Thai",sans-serif}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+.hidden{display:none !important}
+
+/* ===================== START VIEW ===================== */
+#startView{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.start-wrap{width:100%;max-width:720px}
+.board{
+  background:var(--ink);border-radius:20px;overflow:hidden;color:#fff;
+  box-shadow:0 20px 50px rgba(18,32,46,.28);
+}
+.board-top{
+  display:flex;align-items:center;gap:10px;padding:14px 20px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;
+  color:#9fb3c8;text-transform:uppercase;
+}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber)}
+.board-body{padding:34px 30px 30px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.22em;color:var(--amber);text-transform:uppercase;margin-bottom:14px}
+h1.title{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:clamp(30px,7vw,46px);line-height:1.02;margin:0 0 6px}
+.title small{display:block;font-size:15px;font-weight:500;color:#9fb3c8;font-family:"Noto Sans Thai",sans-serif;margin-top:10px;letter-spacing:0}
+.flap{
+  display:inline-flex;align-items:baseline;gap:10px;margin-top:22px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;padding:12px 18px;
+}
+.flap b{font-family:"IBM Plex Mono",monospace;font-size:34px;color:var(--amber);line-height:1}
+.flap span{font-size:12px;color:#9fb3c8;font-family:"Noto Sans Thai",sans-serif}
+.start-lower{background:var(--card);padding:26px 24px 24px;}
+.sec-label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin:0 0 12px}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode{
+  text-align:left;border:1.5px solid var(--line);border-radius:var(--radius);
+  padding:14px 15px;background:#fff;transition:.15s;
+}
+.mode:hover{border-color:var(--blue);transform:translateY(-1px)}
+.mode.active{border-color:var(--blue);background:#f3f7ff;box-shadow:0 0 0 3px rgba(46,107,230,.12)}
+.mode h3{margin:0 0 3px;font-size:15px;font-family:"Space Grotesk",sans-serif;font-weight:600}
+.mode p{margin:0;font-size:12.5px;color:var(--muted)}
+.mode .cnt{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--blue);margin-top:6px}
+.part-select{margin-top:12px}
+.part-select label{font-size:12.5px;color:var(--muted);display:block;margin-bottom:6px}
+select,.setting-row select{
+  width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;
+  font-family:inherit;font-size:14px;background:#fff;color:var(--text);
+}
+.settings{margin-top:18px;border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:12px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13.5px}
+.switch{position:relative;width:44px;height:26px;flex:none}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:var(--line);border-radius:20px;transition:.2s}
+.slider::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch input:checked+.slider{background:var(--blue)}
+.switch input:checked+.slider::before{transform:translateX(18px)}
+.btn-start{
+  width:100%;margin-top:20px;background:var(--blue);color:#fff;font-weight:600;
+  font-size:16px;padding:15px;border-radius:12px;transition:.15s;font-family:"Space Grotesk",sans-serif;
+}
+.btn-start:hover{background:var(--blue-d)}
+.disclaimer{font-size:11.5px;color:var(--muted);margin-top:16px;line-height:1.5}
+
+/* ===================== EXAM VIEW ===================== */
+#examView{min-height:100vh;display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:30;background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 16px;box-shadow:0 2px 12px rgba(18,32,46,.25);
+}
+.tb-left{display:flex;align-items:center;gap:12px;min-width:0}
+.tb-brand{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:14px;letter-spacing:.02em;white-space:nowrap}
+.tb-part{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;
+  color:var(--ink);background:var(--amber);padding:4px 9px;border-radius:6px;
+  white-space:nowrap;text-transform:uppercase;font-weight:600;
+}
+.tb-right{display:flex;align-items:center;gap:14px}
+.timer{font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;color:var(--amber);letter-spacing:.04em}
+.timer.warn{color:#ff9d9d;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.tb-count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:#9fb3c8}
+.tb-btn{color:#9fb3c8;font-size:12px;display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:8px}
+.tb-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+
+.exam-main{flex:1;width:100%;max-width:900px;margin:0 auto;padding:20px 16px 120px}
+
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:16px}
+.audio-box{
+  background:linear-gradient(180deg,#f5f8ff,#eef3fd);border:1px solid #dbe6fb;
+  border-radius:12px;padding:16px;margin-bottom:18px;
+}
+.audio-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.play-btn{
+  display:inline-flex;align-items:center;gap:9px;background:var(--blue);color:#fff;
+  font-weight:600;font-size:14px;padding:11px 18px;border-radius:10px;transition:.15s;
+}
+.play-btn:hover{background:var(--blue-d)}
+.play-btn.playing{background:var(--ink)}
+.audio-note{font-size:12px;color:var(--muted)}
+.link-btn{color:var(--blue);font-size:13px;font-weight:500;text-decoration:underline;padding:4px 0}
+.transcript{
+  margin-top:12px;padding:14px;background:#fff;border:1px dashed var(--line);border-radius:10px;
+  font-size:13.5px;color:#3a4a5a;line-height:1.7;white-space:pre-wrap;
+}
+.photo-ph{
+  border:1px solid var(--line);border-radius:12px;background:#f7f9fc;
+  padding:20px;margin-bottom:16px;text-align:center;
+}
+.photo-ph .tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.photo-ph .scene{font-size:15px;color:#33475b;margin-top:8px;font-style:italic}
+
+.passage-grid{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:760px){.passage-grid.two{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}}
+.passage{
+  background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+  font-size:14px;line-height:1.72;white-space:pre-wrap;color:#2a3a49;
+}
+.passage-label{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;color:var(--blue);text-transform:uppercase;margin-bottom:8px;font-weight:600}
+.passage + .passage{margin-top:14px}
+.passage .blankmark{background:var(--amber);color:var(--ink);font-weight:600;border-radius:4px;padding:0 6px;font-family:"IBM Plex Mono",monospace;font-size:13px}
+.qcol{display:flex;flex-direction:column;gap:18px}
+
+.q{border-top:1px solid var(--line);padding-top:16px}
+.q:first-child{border-top:none;padding-top:0}
+.qhead{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.qnum{
+  flex:none;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;
+  color:#fff;background:var(--ink);border-radius:8px;padding:3px 9px;margin-top:1px;
+}
+.qstem{font-size:15.5px;font-weight:500;color:#1b2a38}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{
+  display:flex;align-items:flex-start;gap:11px;border:1.5px solid var(--line);
+  border-radius:11px;padding:12px 14px;transition:.12s;text-align:left;background:#fff;width:100%;
+  font-size:14.5px;color:#2a3a49;
+}
+.opt:hover{border-color:#b9c6d6;background:#fafcff}
+.opt.sel{border-color:var(--blue);background:#f2f7ff;box-shadow:0 0 0 2px rgba(46,107,230,.14)}
+.opt .lt{
+  flex:none;width:26px;height:26px;border-radius:7px;border:1.5px solid var(--line);
+  display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--muted);
+}
+.opt.sel .lt{background:var(--blue);border-color:var(--blue);color:#fff}
+/* review states */
+.opt.correct{border-color:var(--ok);background:var(--ok-bg)}
+.opt.correct .lt{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt.wrong .lt{background:var(--bad);border-color:var(--bad);color:#fff}
+.exp{margin-top:11px;font-size:13px;color:#3a4a5a;background:#f4f7fa;border-left:3px solid var(--blue);border-radius:8px;padding:10px 13px;line-height:1.6}
+.exp b{color:var(--ok)}
+
+/* bottom nav */
+.navbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:30;background:#fff;border-top:1px solid var(--line);
+  box-shadow:0 -4px 20px rgba(18,32,46,.06);padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom));
+}
+.navbar-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.nav-btn{
+  border:1.5px solid var(--line);border-radius:11px;padding:12px 16px;font-weight:600;font-size:14px;
+  color:var(--text);background:#fff;transition:.12s;display:flex;align-items:center;gap:7px;
+}
+.nav-btn:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.nav-btn:disabled{opacity:.4;cursor:default}
+.nav-btn.mark{margin-left:auto}
+.nav-btn.mark.on{background:var(--mark-bg);border-color:var(--mark);color:var(--mark)}
+.nav-btn.grid-b{padding:12px 14px}
+.nav-btn.next{background:var(--blue);color:#fff;border-color:var(--blue)}
+.nav-btn.next:hover{background:var(--blue-d);color:#fff}
+.nav-btn.submit{background:var(--ok);color:#fff;border-color:var(--ok)}
+
+/* palette drawer */
+.overlay{position:fixed;inset:0;background:rgba(18,32,46,.5);z-index:40;display:none}
+.overlay.show{display:block}
+.drawer{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;background:#fff;border-radius:20px 20px 0 0;
+  max-height:78vh;overflow-y:auto;transform:translateY(100%);transition:.28s;
+  padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+}
+.drawer.show{transform:translateY(0)}
+.drawer h3{margin:0 0 4px;font-family:"Space Grotesk",sans-serif;font-size:17px}
+.drawer .sub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-bottom:14px}
+.legend i{width:13px;height:13px;border-radius:4px;display:inline-block;vertical-align:-2px;margin-right:4px}
+.pal-part{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin:14px 0 8px}
+.pal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:7px}
+.pal{
+  aspect-ratio:1;border:1.5px solid var(--line);border-radius:9px;font-family:"IBM Plex Mono",monospace;
+  font-size:13px;font-weight:600;color:var(--muted);background:#fff;display:grid;place-items:center;
+}
+.pal.answered{background:var(--blue);border-color:var(--blue);color:#fff}
+.pal.marked{border-color:var(--mark);color:var(--mark);background:var(--mark-bg)}
+.pal.marked.answered{background:var(--blue);color:#fff;border-color:var(--mark);box-shadow:inset 0 0 0 2px var(--mark)}
+.pal.current{outline:3px solid var(--amber);outline-offset:1px}
+.drawer-submit{width:100%;margin-top:20px;background:var(--ok);color:#fff;font-weight:600;font-size:15px;padding:14px;border-radius:12px;font-family:"Space Grotesk",sans-serif}
+
+/* ===================== RESULT VIEW ===================== */
+#resultView{min-height:100vh;padding:24px 16px 60px}
+.res-wrap{max-width:760px;margin:0 auto}
+.res-hero{background:var(--ink);color:#fff;border-radius:20px;padding:28px 26px;box-shadow:var(--shadow);text-align:center}
+.res-hero .eyebrow{margin-bottom:8px}
+.big-score{font-family:"IBM Plex Mono",monospace;font-size:clamp(52px,15vw,84px);font-weight:600;color:var(--amber);line-height:1;margin:6px 0}
+.big-score span{font-size:24px;color:#7f93a8}
+.band{display:inline-block;margin-top:8px;font-size:13px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:20px;padding:6px 16px}
+.band b{color:#fff}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.split .cell{background:var(--card);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+.split .cell .lab{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.split .cell .val{font-family:"IBM Plex Mono",monospace;font-size:32px;font-weight:600;color:var(--ink);margin-top:4px}
+.split .cell .raw{font-size:12.5px;color:var(--muted);margin-top:2px}
+.res-section{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:20px 22px;margin-top:16px}
+.res-section h3{margin:0 0 14px;font-family:"Space Grotesk",sans-serif;font-size:16px}
+.part-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.part-row:first-of-type{border-top:none}
+.part-row .pn{flex:none;width:118px;font-size:13px}
+.part-row .pn b{display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.bar{flex:1;height:9px;background:#eef2f6;border-radius:6px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--blue);border-radius:6px}
+.part-row .frac{flex:none;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink);width:56px;text-align:right}
+.res-actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+.res-actions button{flex:1;min-width:160px;padding:14px;border-radius:12px;font-weight:600;font-size:15px;font-family:"Space Grotesk",sans-serif}
+.btn-review{background:var(--ink);color:#fff}
+.btn-restart{background:#fff;color:var(--text);border:1.5px solid var(--line)}
+.note{font-size:12px;color:var(--muted);margin-top:16px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ===================== START ===================== -->
+<div id="startView">
+  <div class="start-wrap">
+    <div class="board">
+      <div class="board-top"><span class="dot"></span> Listening &amp; Reading · Practice Terminal</div>
+      <div class="board-body">
+        <div class="eyebrow">Full-length mock exam</div>
+        <h1 class="title">TOEIC<small>แบบทดสอบจำลอง 200 ข้อ · ให้คะแนนเต็ม 990 · เนื้อหาต้นฉบับแนว TOEIC</small></h1>
+        <div class="flap"><b class="mono">990</b><span>คะแนนเต็ม<br>Listening 495 + Reading 495</span></div>
+      </div>
+      <div class="start-lower">
+        <p class="sec-label">เลือกรูปแบบ / Choose mode</p>
+        <div class="mode-grid" id="modeGrid">
+          <button class="mode active" data-mode="full">
+            <h3>เต็มรูปแบบ</h3><p>Listening + Reading</p><div class="cnt">200 ข้อ · 120 นาที</div>
+          </button>
+          <button class="mode" data-mode="listening">
+            <h3>Listening</h3><p>Part 1–4</p><div class="cnt">100 ข้อ · 45 นาที</div>
+          </button>
+          <button class="mode" data-mode="reading">
+            <h3>Reading</h3><p>Part 5–7</p><div class="cnt">100 ข้อ · 75 นาที</div>
+          </button>
+          <button class="mode" data-mode="part">
+            <h3>ฝึกทีละพาร์ท</h3><p>เลือกพาร์ทเดียว</p><div class="cnt">ไม่จับเวลา</div>
+          </button>
+        </div>
+        <div class="part-select hidden" id="partSelectWrap">
+          <label>เลือกพาร์ท / Select a part</label>
+          <select id="partSelect">
+            <option value="1">Part 1 — Photographs (6)</option>
+            <option value="2">Part 2 — Question–Response (25)</option>
+            <option value="3">Part 3 — Conversations (39)</option>
+            <option value="4">Part 4 — Talks (30)</option>
+            <option value="5">Part 5 — Incomplete Sentences (30)</option>
+            <option value="6">Part 6 — Text Completion (16)</option>
+            <option value="7">Part 7 — Reading Comprehension (54)</option>
+          </select>
+        </div>
+        <div class="settings">
+          <div class="setting-row">
+            <span>จับเวลา / Timer</span>
+            <label class="switch"><input type="checkbox" id="optTimer" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <span>เล่นเสียงอัตโนมัติเมื่อถึงข้อ Listening<br><small style="color:var(--muted)">Auto-play audio on listening items</small></span>
+            <label class="switch"><input type="checkbox" id="optAutoplay"><span class="slider"></span></label>
+          </div>
+        </div>
+        <button class="btn-start" id="btnStart">เริ่มทำข้อสอบ →</button>
+        <p class="disclaimer">เสียงส่วน Listening ใช้ระบบอ่านออกเสียงของเบราว์เซอร์ (text-to-speech) — ควรใช้ Chrome/Edge/Safari และเปิดเสียงลำโพงหรือหูฟัง · การแปลงคะแนนเป็น 990 เป็นค่าประมาณเพื่อการฝึกซ้อม ไม่ใช่คะแนน ETS อย่างเป็นทางการ</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== EXAM ===================== -->
+<div id="examView" class="hidden">
+  <div class="topbar">
+    <div class="tb-left">
+      <span class="tb-brand">TOEIC · L&amp;R</span>
+      <span class="tb-part" id="tbPart">PART 1</span>
+    </div>
+    <div class="tb-right">
+      <span class="timer" id="timer">--:--</span>
+      <span class="tb-count" id="tbCount">0/200</span>
+      <button class="tb-btn" id="btnQuit" title="ออก">✕ ออก</button>
+    </div>
+  </div>
+  <div class="exam-main"><div id="cardArea"></div></div>
+  <div class="navbar">
+    <div class="navbar-inner">
+      <button class="nav-btn prev" id="btnPrev">← ก่อนหน้า</button>
+      <button class="nav-btn grid-b" id="btnGrid">▦ ข้อ</button>
+      <button class="nav-btn mark" id="btnMark">☆ มาร์ก</button>
+      <button class="nav-btn next" id="btnNext">ถัดไป →</button>
+    </div>
+  </div>
+</div>
+
+<!-- palette drawer -->
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <h3>ตารางข้อสอบ / Question Map</h3>
+  <p class="sub" id="drawerSub"></p>
+  <div class="legend">
+    <span><i style="background:var(--blue)"></i>ตอบแล้ว</span>
+    <span><i style="background:var(--mark-bg);border:1.5px solid var(--mark)"></i>มาร์กไว้</span>
+    <span><i style="background:#fff;border:1.5px solid var(--line)"></i>ยังไม่ตอบ</span>
+  </div>
+  <div id="palette"></div>
+  <button class="drawer-submit" id="btnSubmitDrawer">ส่งคำตอบ / Submit</button>
+</div>
+
+<!-- ===================== RESULT ===================== -->
+<div id="resultView" class="hidden">
+  <div class="res-wrap" id="resWrap"></div>
+</div>
+
+<script id="examData" type="application/json">{"cards": [{"section": "L", "part": 1, "type": "photo", "scene": "A woman is standing at a desk, typing on a laptop. Papers are stacked beside her.", "audioText": "(A) She's typing on a laptop.  (B) She's talking on the phone.  (C) She's leaving the office.  (D) She's watering a plant.", "questions": [{"gnum": 1, "stem": "Which statement best describes the photo?", "options": ["She's typing on a laptop.", "She's talking on the phone.", "She's leaving the office.", "She's watering a plant."], "answer": 0, "exp": "ภาพแสดงผู้หญิงกำลังพิมพ์บนแล็ปท็อป → ตอบ (A)"}]}, {"section": "L", "part": 1, "type": "photo", "scene": "Several people are seated around a conference table, looking at a screen.", "audioText": "(A) They're eating lunch together.  (B) They're attending a meeting.  (C) They're cleaning the room.  (D) They're standing in line.", "questions": [{"gnum": 2, "stem": "Which statement best describes the photo?", "options": ["They're eating lunch together.", "They're attending a meeting.", "They're cleaning the room.", "They're standing in line."], "answer": 1, "exp": "คนนั่งรอบโต๊ะประชุมมองจอ → กำลังประชุม (B)"}]}, {"section": "L", "part": 1, "type": "photo", "scene": "A man in an apron is arranging fruit at an outdoor market stall.", "audioText": "(A) He's driving a truck.  (B) He's paying for groceries.  (C) He's arranging items for sale.  (D) He's closing the shutters.", "questions": [{"gnum": 3, "stem": "Which statement best describes the photo?", "options": ["He's driving a truck.", "He's paying for groceries.", "He's arranging items for sale.", "He's closing the shutters."], "answer": 2, "exp": "ชายจัดผลไม้เพื่อขาย → (C)"}]}, {"section": "L", "part": 1, "type": "photo", "scene": "Two workers wearing helmets are examining a document at a construction site.", "audioText": "(A) They're reviewing a document.  (B) They're painting a wall.  (C) They're operating a crane.  (D) They're taking a break.", "questions": [{"gnum": 4, "stem": "Which statement best describes the photo?", "options": ["They're reviewing a document.", "They're painting a wall.", "They're operating a crane.", "They're taking a break."], "answer": 0, "exp": "คนงานสองคนกำลังดูเอกสาร → (A)"}]}, {"section": "L", "part": 1, "type": "photo", "scene": "Passengers are waiting on a platform as a train approaches.", "audioText": "(A) The train has already left.  (B) The platform is empty.  (C) Passengers are boarding a bus.  (D) A train is approaching the platform.", "questions": [{"gnum": 5, "stem": "Which statement best describes the photo?", "options": ["The train has already left.", "The platform is empty.", "Passengers are boarding a bus.", "A train is approaching the platform."], "answer": 3, "exp": "รถไฟกำลังเข้าชานชาลา → (D)"}]}, {"section": "L", "part": 1, "type": "photo", "scene": "A chef is placing a finished dish on the counter in a kitchen.", "audioText": "(A) The chef is washing the floor.  (B) The chef is serving a dish.  (C) The customers are ordering.  (D) The kitchen is closed.", "questions": [{"gnum": 6, "stem": "Which statement best describes the photo?", "options": ["The chef is washing the floor.", "The chef is serving a dish.", "The customers are ordering.", "The kitchen is closed."], "answer": 1, "exp": "เชฟกำลังเสิร์ฟจาน → (B)"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Where is the nearest post office?", "audioText": "Where is the nearest post office?   (A) It's next to the bank.   (B) At 3 o'clock.   (C) Yes, please.", "questions": [{"gnum": 7, "stem": "Choose the best response to the question or statement.", "options": ["It's next to the bank.", "At 3 o'clock.", "Yes, please."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "When does the meeting start?", "audioText": "When does the meeting start?   (A) In the conference room.   (B) At ten thirty.   (C) It was great.", "questions": [{"gnum": 8, "stem": "Choose the best response to the question or statement.", "options": ["In the conference room.", "At ten thirty.", "It was great."], "answer": 1, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Who's giving the presentation today?", "audioText": "Who's giving the presentation today?   (A) In an hour.   (B) Ms. Tanaka is.   (C) On the projector.", "questions": [{"gnum": 9, "stem": "Choose the best response to the question or statement.", "options": ["In an hour.", "Ms. Tanaka is.", "On the projector."], "answer": 1, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Would you like some coffee?", "audioText": "Would you like some coffee?   (A) Yes, that'd be nice.   (B) It's on the desk.   (C) He likes tea.", "questions": [{"gnum": 10, "stem": "Choose the best response to the question or statement.", "options": ["Yes, that'd be nice.", "It's on the desk.", "He likes tea."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "How do I get to the airport?", "audioText": "How do I get to the airport?   (A) By around noon.   (B) You can take the express train.   (C) It's very far.", "questions": [{"gnum": 11, "stem": "Choose the best response to the question or statement.", "options": ["By around noon.", "You can take the express train.", "It's very far."], "answer": 1, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Why was the shipment delayed?", "audioText": "Why was the shipment delayed?   (A) Because of the storm.   (B) To the warehouse.   (C) Two days ago.", "questions": [{"gnum": 12, "stem": "Choose the best response to the question or statement.", "options": ["Because of the storm.", "To the warehouse.", "Two days ago."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Could you send me the report?", "audioText": "Could you send me the report?   (A) Sure, right away.   (B) It's a good report.   (C) In the printer.", "questions": [{"gnum": 13, "stem": "Choose the best response to the question or statement.", "options": ["Sure, right away.", "It's a good report.", "In the printer."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Isn't the deadline tomorrow?", "audioText": "Isn't the deadline tomorrow?   (A) No, it's next Friday.   (B) I finished it.   (C) The line is busy.", "questions": [{"gnum": 14, "stem": "Choose the best response to the question or statement.", "options": ["No, it's next Friday.", "I finished it.", "The line is busy."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "What time does the store close?", "audioText": "What time does the store close?   (A) On Main Street.   (B) At nine p.m.   (C) A new manager.", "questions": [{"gnum": 15, "stem": "Choose the best response to the question or statement.", "options": ["On Main Street.", "At nine p.m.", "A new manager."], "answer": 1, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Do you prefer the morning or afternoon session?", "audioText": "Do you prefer the morning or afternoon session?   (A) The afternoon works better.   (B) In the lobby.   (C) Yes, I do.", "questions": [{"gnum": 16, "stem": "Choose the best response to the question or statement.", "options": ["The afternoon works better.", "In the lobby.", "Yes, I do."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Where should I put these boxes?", "audioText": "Where should I put these boxes?   (A) They're heavy.   (B) In the storage room, please.   (C) Last week.", "questions": [{"gnum": 17, "stem": "Choose the best response to the question or statement.", "options": ["They're heavy.", "In the storage room, please.", "Last week."], "answer": 1, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Has the client arrived yet?", "audioText": "Has the client arrived yet?   (A) Not yet.   (B) At the front desk.   (C) A large order.", "questions": [{"gnum": 18, "stem": "Choose the best response to the question or statement.", "options": ["Not yet.", "At the front desk.", "A large order."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "How much does shipping cost?", "audioText": "How much does shipping cost?   (A) By express mail.   (B) It's fifteen dollars.   (C) Three packages.", "questions": [{"gnum": 19, "stem": "Choose the best response to the question or statement.", "options": ["By express mail.", "It's fifteen dollars.", "Three packages."], "answer": 1, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Would you rather meet on Monday or Tuesday?", "audioText": "Would you rather meet on Monday or Tuesday?   (A) Tuesday is fine.   (B) In my office.   (C) It went well.", "questions": [{"gnum": 20, "stem": "Choose the best response to the question or statement.", "options": ["Tuesday is fine.", "In my office.", "It went well."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Who ordered the extra chairs?", "audioText": "Who ordered the extra chairs?   (A) The event planner did.   (B) In the hall.   (C) About twenty.", "questions": [{"gnum": 21, "stem": "Choose the best response to the question or statement.", "options": ["The event planner did.", "In the hall.", "About twenty."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "The printer isn't working again.", "audioText": "The printer isn't working again.   (A) I'll call maintenance.   (B) On the second floor.   (C) Black and white.", "questions": [{"gnum": 22, "stem": "Choose the best response to the question or statement.", "options": ["I'll call maintenance.", "On the second floor.", "Black and white."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Can you recommend a good hotel downtown?", "audioText": "Can you recommend a good hotel downtown?   (A) The Grand Plaza is excellent.   (B) For three nights.   (C) I'll check in later.", "questions": [{"gnum": 23, "stem": "Choose the best response to the question or statement.", "options": ["The Grand Plaza is excellent.", "For three nights.", "I'll check in later."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Why don't we take a short break?", "audioText": "Why don't we take a short break?   (A) That's a good idea.   (B) In the break room.   (C) He broke it.", "questions": [{"gnum": 24, "stem": "Choose the best response to the question or statement.", "options": ["That's a good idea.", "In the break room.", "He broke it."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Where did you leave the keys?", "audioText": "Where did you leave the keys?   (A) On the kitchen counter.   (B) Yesterday morning.   (C) They're new.", "questions": [{"gnum": 25, "stem": "Choose the best response to the question or statement.", "options": ["On the kitchen counter.", "Yesterday morning.", "They're new."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Do you know when the flight lands?", "audioText": "Do you know when the flight lands?   (A) At gate twelve.   (B) Around six p.m.   (C) It's a long trip.", "questions": [{"gnum": 26, "stem": "Choose the best response to the question or statement.", "options": ["At gate twelve.", "Around six p.m.", "It's a long trip."], "answer": 1, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Should I email or call the supplier?", "audioText": "Should I email or call the supplier?   (A) Email is faster.   (B) A new supplier.   (C) They're closed.", "questions": [{"gnum": 27, "stem": "Choose the best response to the question or statement.", "options": ["Email is faster.", "A new supplier.", "They're closed."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "How was the training session?", "audioText": "How was the training session?   (A) Very informative.   (B) In room B.   (C) Next week.", "questions": [{"gnum": 28, "stem": "Choose the best response to the question or statement.", "options": ["Very informative.", "In room B.", "Next week."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Whose laptop is this on the table?", "audioText": "Whose laptop is this on the table?   (A) I think it's Mr. Lee's.   (B) It's turned off.   (C) At noon.", "questions": [{"gnum": 29, "stem": "Choose the best response to the question or statement.", "options": ["I think it's Mr. Lee's.", "It's turned off.", "At noon."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "Aren't you coming to the party?", "audioText": "Aren't you coming to the party?   (A) I'd love to, but I'm busy.   (B) It's on Saturday.   (C) A birthday cake.", "questions": [{"gnum": 30, "stem": "Choose the best response to the question or statement.", "options": ["I'd love to, but I'm busy.", "It's on Saturday.", "A birthday cake."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 2, "type": "qr", "prompt": "What's the best way to increase sales?", "audioText": "What's the best way to increase sales?   (A) We could offer discounts.   (B) Last quarter.   (C) In the store.", "questions": [{"gnum": 31, "stem": "Choose the best response to the question or statement.", "options": ["We could offer discounts.", "Last quarter.", "In the store."], "answer": 0, "exp": "ฟังคำถาม/ประโยค แล้วเลือกคำตอบที่เหมาะสมที่สุด"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "M: Hi, I'm calling about the conference room I reserved for Thursday afternoon. I was told it holds twenty people, but our team has grown to thirty. W: Let me check. Yes, I see your reservation. Unfortunately, that room only fits twenty. However, the main hall on the third floor can hold up to fifty. M: That would be perfect. Can you switch my booking to the main hall? W: Of course. I'll update it now and send you a confirmation email.", "questions": [{"gnum": 32, "stem": "Why is the man calling?", "options": ["To cancel a reservation", "To change a room booking", "To order equipment", "To report a problem"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 33, "stem": "How many people are on the man's team now?", "options": ["Twenty", "Thirty", "Fifty", "Forty"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 34, "stem": "What will the woman do next?", "options": ["Send a confirmation email", "Call the manager", "Cancel the event", "Visit the third floor"], "answer": 0, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "W: Excuse me, I bought this jacket last week, but the zipper is broken. Can I get a refund? M: I'm sorry about that. Do you have your receipt with you? W: Yes, here it is. I paid by credit card. M: Thank you. Since it's a defect, I can process a full refund to your card. It should appear within three business days.", "questions": [{"gnum": 35, "stem": "What is the woman's problem?", "options": ["The jacket is too small", "The zipper is broken", "She lost the receipt", "The color is wrong"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 36, "stem": "What does the man ask for?", "options": ["A credit card number", "Her phone number", "The receipt", "The jacket size"], "answer": 2, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 37, "stem": "When will the refund appear?", "options": ["Immediately", "Within three business days", "Next week", "In one month"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "W: Team, we need to finalize the marketing budget by Friday. Any thoughts on where to focus? M1: I think we should invest more in social media. Our online sales doubled last quarter. M2: Agreed, but let's not cut the print ads entirely. Some of our older customers still respond to them. W: Good points. Let's shift twenty percent from print to social media and review the results next month.", "questions": [{"gnum": 38, "stem": "What are the speakers discussing?", "options": ["A hiring plan", "A marketing budget", "A product launch", "An office move"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 39, "stem": "Why does the first man suggest social media?", "options": ["It's cheaper", "Online sales doubled", "Print ads failed", "A client requested it"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 40, "stem": "What will the team do next month?", "options": ["Review the results", "Hire a designer", "Cancel print ads", "Increase the budget"], "answer": 0, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "M: Good morning. I have a ten o'clock appointment with Dr. Reyes for a dental check-up. W: Welcome. Could you fill out this form while you wait? The doctor is running about fifteen minutes behind. M: No problem. Actually, could I reschedule my next visit for the afternoon instead of the morning? W: Sure. How about next Tuesday at two p.m.?", "questions": [{"gnum": 41, "stem": "Where does this conversation take place?", "options": ["At a dental clinic", "At a pharmacy", "At a gym", "At a hotel"], "answer": 0, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 42, "stem": "Why is there a delay?", "options": ["The form is long", "The doctor is behind schedule", "The man is late", "The clinic is closing"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 43, "stem": "What does the man want to change?", "options": ["His appointment time", "His doctor", "His address", "His payment method"], "answer": 0, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "W: Have you finished reviewing the quarterly figures? The director wants them by noon. M: Almost. I found an error in the travel expenses column. Some receipts were entered twice. W: Good catch. Can you fix it before you send the file? M: Yes, I'll correct the duplicates and email you the final version in about half an hour.", "questions": [{"gnum": 44, "stem": "What is the man reviewing?", "options": ["A marketing plan", "Quarterly figures", "A travel itinerary", "A contract"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 45, "stem": "What problem did the man find?", "options": ["Missing receipts", "Duplicate entries", "A wrong date", "A broken formula"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 46, "stem": "When will the man send the file?", "options": ["By noon", "In half an hour", "Tomorrow", "After lunch"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "M: Welcome to Sunrise Car Rentals. How can I help you? W: I reserved a compact car online for three days, but I'd like to upgrade to an SUV if possible. M: Let me see. Yes, we have an SUV available. The upgrade adds twenty dollars per day. Would you like insurance as well? W: Yes, please add full coverage.", "questions": [{"gnum": 47, "stem": "What did the woman reserve online?", "options": ["An SUV", "A compact car", "A van", "A motorcycle"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 48, "stem": "How much is the upgrade per day?", "options": ["Ten dollars", "Twenty dollars", "Thirty dollars", "Forty dollars"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 49, "stem": "What else does the woman request?", "options": ["A map", "A driver", "Full insurance coverage", "An extra day"], "answer": 2, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "W: I heard the new software update is causing the system to crash. Is that true? M: Yes, several people reported it this morning. The IT team is working on a fix. W: In the meantime, should we avoid installing the update? M: Exactly. They'll send an email once it's safe to install.", "questions": [{"gnum": 50, "stem": "What is the problem?", "options": ["A software update causes crashes", "The internet is down", "Emails are missing", "A printer is broken"], "answer": 0, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 51, "stem": "Who is fixing the problem?", "options": ["The sales team", "The IT team", "The manager", "A vendor"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 52, "stem": "What should employees do for now?", "options": ["Restart their computers", "Avoid installing the update", "Call the vendor", "Work from home"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "M: I'd like to sign up for the photography workshop. Which sessions are still open? W: The beginner session on Saturday is full, but we have openings in the intermediate class on Sunday. M: I'm a beginner, though. Is there another beginner session? W: There's one next month. I can put you on the waiting list for this Saturday in case someone cancels.", "questions": [{"gnum": 53, "stem": "What does the man want to do?", "options": ["Cancel a class", "Join a photography workshop", "Teach a session", "Get a refund"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 54, "stem": "Why can't the man take Saturday's class?", "options": ["It's too expensive", "It's full", "It's canceled", "It's for experts"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 55, "stem": "What does the woman offer?", "options": ["A private lesson", "A refund", "A spot on the waiting list", "A discount"], "answer": 2, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "W: Thanks for coming in for the interview. I see you've worked in logistics for five years. M: Yes, mostly managing warehouse operations and coordinating shipments. W: Great. This role would also involve supervising a team of ten. Are you comfortable with that? M: Absolutely. I led a team of eight in my previous position.", "questions": [{"gnum": 56, "stem": "What is the purpose of the conversation?", "options": ["A job interview", "A performance review", "A sales call", "A training session"], "answer": 0, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 57, "stem": "What is the man's area of experience?", "options": ["Marketing", "Logistics", "Finance", "Design"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 58, "stem": "How many people would the man supervise?", "options": ["Five", "Eight", "Ten", "Twelve"], "answer": 2, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "M: The caterer just called. They can't deliver the food until one o'clock, but the event starts at noon. W: That's a problem. Can we serve drinks and appetizers first to keep the guests happy? M: Good idea. I'll ask the venue if they can provide some snacks in the meantime. W: Perfect. Let's also update the schedule and push the lunch to one fifteen.", "questions": [{"gnum": 59, "stem": "What is the problem?", "options": ["The venue is closed", "The food will arrive late", "The guests canceled", "The drinks ran out"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 60, "stem": "What does the woman suggest?", "options": ["Canceling the event", "Serving drinks and appetizers first", "Finding a new caterer", "Delaying by a day"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 61, "stem": "What will the man do?", "options": ["Call the guests", "Ask the venue for snacks", "Pick up the food", "Cancel the caterer"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "W: Did you get a chance to look at the apartment listing I sent you? M: I did. The location is great, but the rent is a bit high. Does it include utilities? W: The listing says water is included, but electricity is separate. M: In that case, let's schedule a viewing for this weekend before we decide.", "questions": [{"gnum": 62, "stem": "What are the speakers discussing?", "options": ["A vacation", "An apartment", "A restaurant", "A car"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 63, "stem": "What is the man's concern?", "options": ["The location", "The rent", "The size", "The neighbors"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 64, "stem": "What will they do this weekend?", "options": ["Sign a lease", "Move in", "Visit the apartment", "Meet the landlord"], "answer": 2, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "M1: Our flight to Chicago was just delayed by two hours due to weather. M2: That's frustrating. We'll miss the connecting flight in Denver. W: Let me check other options. There's a direct flight leaving at four p.m. with two seats available. M1: Let's book those instead. Better than risking the connection.", "questions": [{"gnum": 65, "stem": "Why was the flight delayed?", "options": ["A mechanical issue", "The weather", "A crew shortage", "A security check"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 66, "stem": "What is the travelers' concern?", "options": ["Missing a connecting flight", "Losing luggage", "A high fare", "A canceled hotel"], "answer": 0, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 67, "stem": "What do they decide to do?", "options": ["Wait for the delayed flight", "Book a direct flight", "Rent a car", "Stay overnight"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 3, "type": "conv", "audioText": "W: The new employee, Daniel, starts on Monday. Have we set up his workstation? M: Almost. His computer is ready, but we're still waiting on his ID badge and email account. W: Can you follow up with HR today? He'll need those on his first day. M: Sure, I'll email them right after this meeting.", "questions": [{"gnum": 68, "stem": "Who is Daniel?", "options": ["A client", "A new employee", "A manager", "A vendor"], "answer": 1, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 69, "stem": "What is still not ready?", "options": ["His computer", "His desk", "His ID badge and email", "His parking pass"], "answer": 2, "exp": "อ้างอิงจากบทสนทนา"}, {"gnum": 70, "stem": "What will the man do after the meeting?", "options": ["Email HR", "Set up the computer", "Meet Daniel", "Call the manager"], "answer": 0, "exp": "อ้างอิงจากบทสนทนา"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "Attention passengers. The 3:45 express train to Boston has been delayed by approximately twenty minutes due to a signal problem. We apologize for the inconvenience. Passengers with connecting trains should speak to a staff member at the information desk on platform two. Updated departure times will be announced shortly.", "questions": [{"gnum": 71, "stem": "Where would this announcement be heard?", "options": ["At an airport", "At a train station", "On a bus", "At a hotel"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 72, "stem": "Why is the train delayed?", "options": ["Bad weather", "A signal problem", "A crew shortage", "Heavy traffic"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 73, "stem": "What should passengers with connections do?", "options": ["Wait on the train", "Buy new tickets", "Go to the information desk", "Leave the station"], "answer": 2, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "Hi, this is Karen from Bright Design Studio. I'm calling about the logo drafts we sent over on Tuesday. We'd love your feedback by Thursday so we can finalize the design before the launch. If you have any changes, just reply to my email or give me a call. Thanks, and I look forward to hearing from you.", "questions": [{"gnum": 74, "stem": "Why is Karen calling?", "options": ["To request feedback", "To cancel a meeting", "To send an invoice", "To reschedule a launch"], "answer": 0, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 75, "stem": "When does she need a response?", "options": ["Tuesday", "Wednesday", "Thursday", "Friday"], "answer": 2, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 76, "stem": "What can the listener do to respond?", "options": ["Visit the studio", "Reply by email or call", "Mail a letter", "Fill out a form"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "Are you tired of long lines at the grocery store? Try FreshCart, the new delivery service that brings groceries to your door in under an hour. This month only, first-time customers get free delivery on orders over thirty dollars. Download the FreshCart app today and use code FRESH at checkout. Fresh food, no waiting.", "questions": [{"gnum": 77, "stem": "What is being advertised?", "options": ["A restaurant", "A grocery delivery service", "A cooking class", "A farm"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 78, "stem": "What is the special offer?", "options": ["A free meal", "Free delivery on orders over thirty dollars", "Half-price groceries", "A free app"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 79, "stem": "How can customers get the discount?", "options": ["Visit a store", "Call a number", "Use a promo code", "Sign a contract"], "answer": 2, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "Welcome to the National History Museum. Our tour today will last about ninety minutes and cover three floors. Please keep your ticket with you, as you'll need it to re-enter after the lunch break. Photography is allowed, but flash is not permitted in the art gallery. We'll begin here on the ground floor with the ancient civilizations exhibit.", "questions": [{"gnum": 80, "stem": "How long is the tour?", "options": ["Sixty minutes", "Ninety minutes", "Two hours", "Thirty minutes"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 81, "stem": "What is not allowed in the art gallery?", "options": ["Photography", "Flash photography", "Talking", "Food"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 82, "stem": "Where does the tour begin?", "options": ["On the top floor", "In the art gallery", "On the ground floor", "In the cafeteria"], "answer": 2, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "Before we wrap up, I want to remind everyone that the deadline for submitting your project proposals is next Friday. Please send them directly to me, and include a budget estimate. I'll review each one over the weekend and announce the approved projects at Monday's meeting. If you have questions, my door is always open.", "questions": [{"gnum": 83, "stem": "What is the deadline for?", "options": ["Budget reports", "Project proposals", "Vacation requests", "Time sheets"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 84, "stem": "What must be included?", "options": ["A budget estimate", "A resume", "A signature", "A photo"], "answer": 0, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 85, "stem": "When will approved projects be announced?", "options": ["Friday", "Saturday", "Monday", "Next month"], "answer": 2, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "In local business news, the tech company Innovex announced today that it will open a new office downtown, creating around two hundred jobs over the next year. The company specializes in renewable energy software. City officials welcomed the news, calling it a boost for the local economy. Innovex plans to begin hiring in the spring.", "questions": [{"gnum": 86, "stem": "What did Innovex announce?", "options": ["A new product", "A new office", "A merger", "Layoffs"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 87, "stem": "How many jobs will be created?", "options": ["One hundred", "Two hundred", "Three hundred", "Fifty"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 88, "stem": "When will hiring begin?", "options": ["In the winter", "In the spring", "In the summer", "Immediately"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "Thank you for purchasing our coffee maker. Before first use, please rinse the water tank and run one cycle with plain water only. Do not add coffee grounds during this first cycle. For best results, use filtered water and clean the machine once a week. If you have any issues, our support line is open weekdays from nine to five.", "questions": [{"gnum": 89, "stem": "What is the speaker explaining?", "options": ["How to fix a machine", "How to use a coffee maker", "How to order coffee", "How to return a product"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 90, "stem": "What should you do during the first cycle?", "options": ["Add coffee grounds", "Use plain water only", "Add filters", "Clean with soap"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 91, "stem": "When is the support line open?", "options": ["Weekends", "Weekdays nine to five", "Twenty-four hours", "Evenings only"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "Good morning, everyone. Just a quick reminder that the office will be closed this Friday for the national holiday. Any deliveries scheduled for that day have been moved to Monday. Also, the parking garage will undergo maintenance next week, so please use the street parking or the lot across the road. Thank you for your cooperation.", "questions": [{"gnum": 92, "stem": "Why will the office be closed Friday?", "options": ["For maintenance", "For a holiday", "For a meeting", "For renovations"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 93, "stem": "What happened to Friday's deliveries?", "options": ["They were canceled", "Moved to Monday", "Moved to Thursday", "Sent early"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 94, "stem": "What is happening to the parking garage?", "options": ["Closing permanently", "Under maintenance", "Being expanded", "Now free"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "I'd like to welcome you all to today's seminar on effective time management. Over the next two hours, we'll explore practical techniques to prioritize tasks and reduce stress at work. There will be a short break halfway through, and handouts are available at the back of the room. Feel free to ask questions at any point during the session.", "questions": [{"gnum": 95, "stem": "What is the seminar about?", "options": ["Public speaking", "Time management", "Team building", "Sales"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 96, "stem": "How long will the seminar last?", "options": ["One hour", "Two hours", "Three hours", "Ninety minutes"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 97, "stem": "Where can attendees find handouts?", "options": ["At the front", "At the back of the room", "Online", "At the entrance"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "L", "part": 4, "type": "talk", "audioText": "Thank you for calling City Bank. Our offices are currently closed. Our regular hours are Monday through Friday, eight a.m. to six p.m. To report a lost or stolen card, press one. For account balances and recent transactions, press two. To speak with a representative during business hours, press zero. You can also manage your account anytime through our mobile app.", "questions": [{"gnum": 98, "stem": "What kind of message is this?", "options": ["A sales pitch", "An automated phone message", "A radio ad", "A personal voicemail"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 99, "stem": "What should you press to report a lost card?", "options": ["One", "Two", "Zero", "Nine"], "answer": 0, "exp": "อ้างอิงจากบทพูด"}, {"gnum": 100, "stem": "What alternative is mentioned?", "options": ["Visiting a branch", "Using the mobile app", "Sending an email", "Writing a letter"], "answer": 1, "exp": "อ้างอิงจากบทพูด"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 101, "stem": "The manager asked all employees ______ their reports by Friday.", "options": ["submit", "to submit", "submitting", "submitted"], "answer": 1, "exp": "asked + someone + to V → to submit"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 102, "stem": "Sales have increased ______ since the new campaign launched.", "options": ["significant", "significance", "significantly", "signify"], "answer": 2, "exp": "ขยายกริยา increased ต้องใช้ adverb → significantly"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 103, "stem": "______ the rain, the outdoor event was held as planned.", "options": ["Although", "Despite", "However", "Because"], "answer": 1, "exp": "Despite + คำนาม (the rain)"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 104, "stem": "The new policy will affect ______ employee in the company.", "options": ["every", "all", "most", "few"], "answer": 0, "exp": "every + นามนับเอกพจน์ (employee)"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 105, "stem": "Ms. Lopez is responsible ______ managing the marketing team.", "options": ["of", "for", "to", "with"], "answer": 1, "exp": "responsible for + V-ing"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 106, "stem": "If you have any questions, please ______ free to contact us.", "options": ["feel", "feeling", "felt", "feels"], "answer": 0, "exp": "please + V infinitive → feel free"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 107, "stem": "The shipment ______ arrive next week if there are no delays.", "options": ["will", "has", "was", "is"], "answer": 0, "exp": "future → will arrive"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 108, "stem": "The report must be reviewed ______ it is submitted.", "options": ["during", "before", "among", "despite"], "answer": 1, "exp": "conjunction เชื่อมประโยค → before"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 109, "stem": "Our company offers a ______ range of products.", "options": ["wide", "widely", "width", "widen"], "answer": 0, "exp": "adjective ขยายนาม range → wide"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 110, "stem": "The CEO, ______ founded the company in 1990, is retiring this year.", "options": ["which", "who", "whom", "whose"], "answer": 1, "exp": "who แทนคน + เป็นประธานของ founded"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 111, "stem": "Employees are encouraged to ______ in the training program.", "options": ["participate", "participation", "participant", "participated"], "answer": 0, "exp": "to + V infinitive → participate"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 112, "stem": "The meeting has been ______ until next Monday.", "options": ["postponed", "postpone", "postponing", "postpones"], "answer": 0, "exp": "has been + V3 (passive) → postponed"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 113, "stem": "Please make sure the door is locked ______ you leave.", "options": ["when", "while", "during", "since"], "answer": 0, "exp": "when you leave = ตอนที่คุณออกไป"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 114, "stem": "The proposal was approved ______ the board of directors.", "options": ["by", "for", "to", "with"], "answer": 0, "exp": "passive + by ผู้กระทำ"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 115, "stem": "This model is more energy-efficient than the ______ one.", "options": ["previous", "previously", "previews", "preview"], "answer": 0, "exp": "adjective ขยาย one → previous"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 116, "stem": "The technician will ______ the equipment tomorrow morning.", "options": ["inspect", "inspection", "inspecting", "inspects"], "answer": 0, "exp": "will + V infinitive → inspect"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 117, "stem": "______ of the two proposals offers clear benefits.", "options": ["Each", "Both", "Many", "Several"], "answer": 0, "exp": "Each of + ... + กริยาเอกพจน์ offers"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 118, "stem": "The customer complained ______ the poor service.", "options": ["about", "of", "on", "for"], "answer": 0, "exp": "complain about something"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 119, "stem": "We need to hire additional staff to ______ the growing demand.", "options": ["meet", "meeting", "met", "meets"], "answer": 0, "exp": "to + V infinitive → meet the demand"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 120, "stem": "The instructions were so ______ that everyone understood them.", "options": ["clear", "clearly", "clarity", "cleared"], "answer": 0, "exp": "so + adjective → clear"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 121, "stem": "Neither the manager ______ the assistant was available.", "options": ["or", "nor", "and", "but"], "answer": 1, "exp": "Neither ... nor ..."}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 122, "stem": "The company plans to ______ its operations to Asia next year.", "options": ["expand", "expansion", "expanding", "expands"], "answer": 0, "exp": "plans to + V → expand"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 123, "stem": "All applicants must submit their documents ______ person.", "options": ["on", "in", "at", "by"], "answer": 1, "exp": "in person = ด้วยตนเอง"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 124, "stem": "The new software is ______ easier to use than the old version.", "options": ["much", "many", "more", "very"], "answer": 0, "exp": "much + comparative (easier)"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 125, "stem": "Profits rose sharply ______ the third quarter.", "options": ["during", "while", "since", "among"], "answer": 0, "exp": "during + ช่วงเวลา (the quarter)"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 126, "stem": "The award was given to the employee ______ performance was outstanding.", "options": ["who", "whose", "which", "whom"], "answer": 1, "exp": "whose + นาม (performance)"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 127, "stem": "Please ______ the attached file for more details.", "options": ["refer to", "refer", "referring", "referred"], "answer": 0, "exp": "refer to = อ้างอิงถึง"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 128, "stem": "The factory produces ______ thousand units per day.", "options": ["severally", "several", "severe", "severity"], "answer": 1, "exp": "several = หลาย (adjective)"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 129, "stem": "We apologize for any inconvenience this may have ______.", "options": ["caused", "cause", "causing", "causes"], "answer": 0, "exp": "may have + V3 → caused"}]}, {"section": "R", "part": 5, "type": "single", "questions": [{"gnum": 130, "stem": "The presentation was well ______ and easy to follow.", "options": ["organized", "organize", "organizing", "organization"], "answer": 0, "exp": "well + V3 (adjective) → organized"}]}, {"section": "R", "part": 6, "type": "cloze", "passageTitle": "Email — Membership approval", "passageText": "Dear Mr. Carter,\n\nThank you for your interest in our premium membership. We are pleased to (1)____ you that your application has been approved. As a premium member, you will (2)____ exclusive discounts and early access to new products. (3)____ Your membership card, (4)____ contains your member ID, will arrive within seven business days.\n\nBest regards,\nMembership Services", "questions": [{"gnum": 131, "stem": "(1)", "options": ["inform", "information", "informative", "informed"], "answer": 0, "exp": "pleased to inform you"}, {"gnum": 132, "stem": "(2)", "options": ["receive", "received", "receiving", "receipt"], "answer": 0, "exp": "will + V infinitive → receive"}, {"gnum": 133, "stem": "(3)", "options": ["We regret that the offer has ended.", "Please find your invoice attached.", "These benefits begin immediately upon activation.", "Your account has been suspended."], "answer": 2, "exp": "ต้องเชื่อมกับสิทธิประโยชน์ที่กล่าวถึง"}, {"gnum": 134, "stem": "(4)", "options": ["which", "who", "it", "that"], "answer": 0, "exp": "non-restrictive clause หลัง comma → which"}]}, {"section": "R", "part": 6, "type": "cloze", "passageTitle": "Notice — Water maintenance", "passageText": "Attention all residents:\n\nThe building's water supply will be temporarily shut off on Saturday for scheduled maintenance. The work is (1)____ to take about four hours, from 9 a.m. to 1 p.m. We recommend that you store some water (2)____ this period. (3)____ We apologize for any inconvenience and (4)____ your patience.\n\nBuilding Management", "questions": [{"gnum": 135, "stem": "(1)", "options": ["expected", "expecting", "expect", "expects"], "answer": 0, "exp": "is expected to = คาดว่าจะ"}, {"gnum": 136, "stem": "(2)", "options": ["during", "while", "since", "among"], "answer": 0, "exp": "during + ช่วงเวลา (this period)"}, {"gnum": 137, "stem": "(3)", "options": ["The elevator will also be out of service.", "Normal service will resume once the work is complete.", "Rent is due at the end of the month.", "Please recycle your bottles."], "answer": 1, "exp": "เชื่อมกับเรื่องน้ำที่ถูกตัด"}, {"gnum": 138, "stem": "(4)", "options": ["appreciate", "appreciation", "appreciated", "appreciating"], "answer": 0, "exp": "and (we) appreciate your patience"}]}, {"section": "R", "part": 6, "type": "cloze", "passageTitle": "Article — Remote work", "passageText": "Remote work has become increasingly popular in recent years. Many companies now offer flexible schedules, (1)____ employees to work from home several days a week. Studies show that remote workers are often more (2)____ than those in traditional offices. (3)____ However, some managers worry about maintaining team communication. To address this, businesses are (4)____ new tools that make virtual collaboration easier.", "questions": [{"gnum": 139, "stem": "(1)", "options": ["allowing", "allow", "allowed", "allows"], "answer": 0, "exp": "V-ing ขยายประโยค → allowing employees to..."}, {"gnum": 140, "stem": "(2)", "options": ["productive", "productively", "production", "produce"], "answer": 0, "exp": "more + adjective → productive"}, {"gnum": 141, "stem": "(3)", "options": ["This flexibility can also reduce commuting stress.", "Offices are becoming larger.", "Salaries have decreased.", "Printers are rarely used."], "answer": 0, "exp": "ต่อเนื่องเรื่องข้อดีของ remote work"}, {"gnum": 142, "stem": "(4)", "options": ["adopting", "adopt", "adopted", "adopts"], "answer": 0, "exp": "are + V-ing → adopting"}]}, {"section": "R", "part": 6, "type": "cloze", "passageTitle": "Memo — Product launch", "passageText": "To: All Sales Staff\nFrom: Regional Manager\n\nRegarding the upcoming product launch, please note the following. First, all sales representatives (1)____ attend the training session on Monday. Second, updated brochures (2)____ be distributed by the end of the week. (3)____ Finally, remember that customer feedback is essential, so please record any comments (4)____. Thank you for your cooperation.", "questions": [{"gnum": 143, "stem": "(1)", "options": ["must", "can", "might", "would"], "answer": 0, "exp": "ข้อบังคับ → must attend"}, {"gnum": 144, "stem": "(2)", "options": ["will", "were", "had", "are being"], "answer": 0, "exp": "future passive → will be distributed"}, {"gnum": 145, "stem": "(3)", "options": ["A copy of the schedule is attached to this memo.", "The office will close early.", "Sales dropped last month.", "Please bring your lunch."], "answer": 0, "exp": "เข้ากับบริบทการอบรม/กำหนดการ"}, {"gnum": 146, "stem": "(4)", "options": ["accurately", "accurate", "accuracy", "accurateness"], "answer": 0, "exp": "adverb ขยาย record → accurately"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Email", "text": "From: events@greenfield.com\nTo: All Staff\nSubject: Annual Company Picnic\n\nDear team,\n\nWe're excited to announce that our annual company picnic will take place on Saturday, July 18, at Riverside Park from 11 a.m. to 4 p.m. This year's event will feature a barbecue lunch, team games, and live music. Family members are welcome. Please RSVP by July 10 so we can arrange enough food and seating. If you'd like to help organize activities, contact Maria in HR.\n\nWe look forward to seeing you there!"}], "questions": [{"gnum": 147, "stem": "What is the purpose of the email?", "options": ["To announce a company picnic", "To cancel an event", "To request a payment", "To hire staff"], "answer": 0, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 148, "stem": "What is NOT mentioned as part of the event?", "options": ["A barbecue lunch", "Team games", "A photo contest", "Live music"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 149, "stem": "What should employees do by July 10?", "options": ["Pay a fee", "RSVP", "Bring food", "Contact the park"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Advertisement", "text": "GRAND OPENING — Bella's Bakery!\n\nJoin us this Friday for the grand opening of Bella's Bakery on Oak Street. Enjoy free samples of our fresh pastries and a 20% discount on all purchases over $15. The first 50 customers will receive a free reusable tote bag. Open daily from 7 a.m. to 7 p.m.\n\nCome taste the difference!"}], "questions": [{"gnum": 150, "stem": "What is offered to the first 50 customers?", "options": ["A free coffee", "A free tote bag", "A discount coupon", "A gift card"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 151, "stem": "To get the 20% discount, customers must spend at least —", "options": ["$10", "$15", "$20", "$50"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Notice", "text": "NOTICE\n\nThe library's third floor will be closed from March 3 to March 7 for the installation of new study pods. During this time, reference materials from the third floor can be requested at the main desk on the first floor. We appreciate your understanding.\n\n— City Library"}], "questions": [{"gnum": 152, "stem": "Why will the third floor be closed?", "options": ["For cleaning", "To install study pods", "For an event", "Due to damage"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 153, "stem": "Where can reference materials be requested?", "options": ["The second floor", "The main desk", "Online", "Another library"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Memo", "text": "To: Marketing Department\nFrom: David Kim, Director\nDate: October 2\nSubject: New Reporting System\n\nStarting next Monday, we will switch to a new online reporting system called TrackPro. All weekly reports must be submitted through TrackPro instead of email. A training video has been shared in the team folder — please watch it before Monday. If you experience any technical issues, contact the IT help desk at extension 245.\n\nThank you for adapting to this change."}], "questions": [{"gnum": 154, "stem": "What is the memo about?", "options": ["A new reporting system", "A holiday schedule", "A budget cut", "An office relocation"], "answer": 0, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 155, "stem": "How should reports be submitted from Monday?", "options": ["By email", "Through TrackPro", "In print", "By fax"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 156, "stem": "What should employees do before Monday?", "options": ["Contact IT", "Watch a training video", "Submit a report", "Attend a meeting"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Text messages", "text": "Jenna (9:02 a.m.): Hi Tom, are the samples ready for the client meeting at 2?\nTom (9:05 a.m.): Almost. I'm waiting on the printer for the final brochures.\nJenna (9:06 a.m.): Okay. The client just emailed — they're arriving 30 minutes early.\nTom (9:08 a.m.): Got it. I'll have everything ready by 1. Can you set up the meeting room?\nJenna (9:09 a.m.): Sure, I'll do that now."}], "questions": [{"gnum": 157, "stem": "Why does Jenna message Tom?", "options": ["To ask about samples", "To cancel a meeting", "To order brochures", "To reschedule"], "answer": 0, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 158, "stem": "At 9:08, what does Tom most likely mean by \"Got it\"?", "options": ["He received a package", "He understands the schedule change", "He finished printing", "He found the room"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 159, "stem": "What will Jenna do next?", "options": ["Print brochures", "Email the client", "Set up the meeting room", "Pick up samples"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Schedule", "text": "Riverside Community Center — Weekend Class Schedule\n\nSATURDAY\n- Yoga: 9:00–10:00 (Room A)\n- Pottery: 10:30–12:00 (Room B)\n- Cooking: 1:00–3:00 (Kitchen)\n\nSUNDAY\n- Painting: 9:30–11:00 (Room A)\n- Dance: 11:30–1:00 (Hall)\n- Photography: 2:00–4:00 (Room C)\n\nNote: Pre-registration required. Members receive a 10% discount."}], "questions": [{"gnum": 160, "stem": "Which class is held in the Kitchen?", "options": ["Yoga", "Pottery", "Cooking", "Dance"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 161, "stem": "What time does the Sunday painting class start?", "options": ["9:00", "9:30", "10:30", "11:30"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 162, "stem": "What is required to join a class?", "options": ["A uniform", "Pre-registration", "A membership", "Equipment"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Letter", "text": "Dear Ms. Alvarez,\n\nThank you for your application for the position of Senior Accountant at Meridian Corporation. We were impressed by your qualifications and experience. We would like to invite you to a second interview on Thursday, May 14, at 10 a.m. at our downtown office. The interview will include a brief skills assessment, so please allow about two hours.\n\nKindly confirm your availability by replying to this email. If the proposed time is inconvenient, let us know and we will arrange an alternative.\n\nSincerely,\nRobert Chen, HR Manager"}], "questions": [{"gnum": 163, "stem": "Why was the letter written?", "options": ["To offer a job", "To invite Ms. Alvarez to an interview", "To reject an application", "To request documents"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 164, "stem": "What position did Ms. Alvarez apply for?", "options": ["HR Manager", "Senior Accountant", "Office Assistant", "Sales Director"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 165, "stem": "How long should the interview take?", "options": ["One hour", "About two hours", "Half a day", "Thirty minutes"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 166, "stem": "What is Ms. Alvarez asked to do?", "options": ["Bring documents", "Confirm her availability", "Call the office", "Complete an online form"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Article", "text": "Local Café Goes Green\n\nSunrise Café, a popular downtown coffee shop, has announced a series of eco-friendly changes. Starting this month, the café will replace all plastic straws and cups with compostable alternatives. Owner Lisa Park said the switch was inspired by customer feedback and a desire to reduce waste. In addition, the café now offers a small discount to customers who bring their own reusable cups. Park hopes other local businesses will follow her example. 'Every small step counts,' she said. The café also plans to install a recycling station near its entrance by the end of the year."}], "questions": [{"gnum": 167, "stem": "What is the main topic of the article?", "options": ["A café's eco-friendly changes", "A new coffee product", "A grand opening", "A price increase"], "answer": 0, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 168, "stem": "What inspired the changes?", "options": ["A new law", "Customer feedback", "A competitor", "Higher profits"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 169, "stem": "What do customers get for bringing reusable cups?", "options": ["A free drink", "A discount", "A gift", "Extra points"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 170, "stem": "What does the café plan to do by year's end?", "options": ["Open a new branch", "Hire more staff", "Install a recycling station", "Change its menu"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Product review", "text": "Product Review — Titan Wireless Headphones  ★★★★☆ (4/5)\nReviewer: Mark T. | Verified Purchase\n\nI've been using these headphones for a month and I'm mostly happy. The sound quality is excellent and the battery lasts all day. The noise cancellation works well on my commute. My only complaint is that they feel a bit tight after a few hours. Customer service was helpful when I asked about the warranty. Overall, I'd recommend them, especially at this price."}], "questions": [{"gnum": 171, "stem": "How long has the reviewer used the headphones?", "options": ["One week", "One month", "One year", "A few days"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 172, "stem": "What is the reviewer's main complaint?", "options": ["Poor sound", "Short battery life", "They feel tight", "Bad service"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 173, "stem": "What is implied about the price?", "options": ["It is too high", "It offers good value", "It recently increased", "It includes a warranty fee"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "single", "passages": [{"label": "Job posting", "text": "Now Hiring: Part-Time Barista — Cornerstone Coffee\n\nWe're looking for a friendly, reliable barista to join our team. Responsibilities include preparing drinks, handling payments, and keeping the space clean. Prior experience is preferred but not required; training is provided. Must be available weekends.\n\nApply in person or send your résumé to jobs@cornerstonecoffee.com."}], "questions": [{"gnum": 174, "stem": "What is required for the job?", "options": ["Prior experience", "Weekend availability", "A college degree", "A driver's license"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 175, "stem": "How can someone apply?", "options": ["By phone", "In person or by email", "Online form only", "By mail"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "double", "passages": [{"label": "Email 1", "text": "From: t.wong@brightmedia.com\nTo: support@techsolutions.com\nSubject: Projector Issue\n\nHello,\n\nWe purchased ten X200 projectors from your company last month for our conference rooms. Recently, three of them have been shutting down unexpectedly after about an hour of use. We've checked the cables and ventilation, but the problem persists. Could you advise us on how to resolve this? We have an important client presentation next week and need them working.\n\nThank you,\nTerry Wong, Office Manager"}, {"label": "Email 2 (Reply)", "text": "From: support@techsolutions.com\nTo: t.wong@brightmedia.com\nSubject: RE: Projector Issue\n\nDear Mr. Wong,\n\nThank you for reaching out. The issue you describe is often caused by an outdated firmware version, which can lead to overheating shutdowns. Please update the firmware using the instructions in the attached guide. If the problem continues after updating, we will arrange free replacements, as your units are under warranty. Given your deadline, we can also ship loaner units within two days if you prefer.\n\nBest regards,\nTech Solutions Support"}], "questions": [{"gnum": 176, "stem": "Why did Mr. Wong write the first email?", "options": ["To order projectors", "To report a technical problem", "To request a refund", "To cancel an order"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 177, "stem": "How many projectors are affected?", "options": ["One", "Three", "Five", "Ten"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 178, "stem": "What does the support team suggest as the likely cause?", "options": ["Faulty cables", "Poor ventilation", "Outdated firmware", "A power surge"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 179, "stem": "What is offered if the problem continues after updating?", "options": ["A full refund", "Free replacements", "A discount", "A repair fee"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 180, "stem": "What can be shipped within two days?", "options": ["A new guide", "Loaner units", "Spare cables", "A technician"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "double", "passages": [{"label": "Advertisement", "text": "Summit Conference Center — Event Space Rental\n\nHost your next corporate event at Summit! We offer three packages:\n\n• Basic ($500/day): Main hall, seating for 100, basic A/V.\n• Plus ($800/day): Everything in Basic, plus catering for 100 and Wi-Fi.\n• Premium ($1,200/day): Everything in Plus, plus a dedicated event coordinator and evening reception.\n\nBook two or more days and receive 15% off. Contact us at events@summitcenter.com."}, {"label": "Email", "text": "From: r.patel@novacorp.com\nTo: events@summitcenter.com\nSubject: Booking Inquiry\n\nHello,\n\nWe're planning a two-day training event for about 90 employees in September. We'll need catering and Wi-Fi, but we don't require an event coordinator or an evening reception. Could you confirm which package suits us and the total cost after any discount? We'd also like to know if the space can be arranged in a classroom style.\n\nThank you,\nRina Patel"}], "questions": [{"gnum": 181, "stem": "Which package best fits Rina's needs?", "options": ["Basic", "Plus", "Premium", "None of them"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 182, "stem": "What discount applies to her booking?", "options": ["None", "10%", "15%", "20%"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 183, "stem": "What would the total cost be after the discount?", "options": ["$1,600", "$1,360", "$1,000", "$2,040"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 184, "stem": "What does Rina NOT need?", "options": ["Catering", "Wi-Fi", "An event coordinator", "Seating"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 185, "stem": "What additional request does Rina make?", "options": ["A classroom-style setup", "A projector", "A parking pass", "A menu change"], "answer": 0, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "triple", "passages": [{"label": "Itinerary", "text": "Business Trip Itinerary — Alan Foster\n\nMon, June 8: Flight AA210, Depart New York 8:00 a.m. → Arrive Chicago 9:30 a.m. Hotel: Lakeside Inn.\nTue, June 9: 10:00 a.m. Meeting with Regional Team (Chicago office).\nWed, June 10: 2:00 p.m. Client presentation (Downtown Convention Center).\nThu, June 11: Flight AA455, Depart Chicago 6:00 p.m. → Arrive New York 8:30 p.m."}, {"label": "Email 1", "text": "From: assistant@company.com\nTo: a.foster@company.com\nSubject: Itinerary Update\n\nHi Alan,\n\nSmall change: the client presentation on Wednesday has been moved from 2:00 p.m. to 4:00 p.m. at the client's request. Everything else stays the same. Also, I've arranged airport pickup for Monday — the driver will meet you at baggage claim. Safe travels!\n\n— Dana"}, {"label": "Email 2 (Reply)", "text": "From: a.foster@company.com\nTo: assistant@company.com\nSubject: RE: Itinerary Update\n\nThanks, Dana. The new presentation time works fine. One request: since I'll have some free time Wednesday morning, could you book a meeting room at the hotel from 9 to 11 a.m. so I can prepare? Also, please confirm the driver's phone number in case I can't find them.\n\nThanks,\nAlan"}], "questions": [{"gnum": 186, "stem": "How is Alan traveling to Chicago?", "options": ["By car", "By train", "By plane", "By bus"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 187, "stem": "What change did Dana make to the schedule?", "options": ["Moved the presentation to 4 p.m.", "Canceled the meeting", "Changed the hotel", "Rebooked the flight"], "answer": 0, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 188, "stem": "What did Dana arrange for Monday?", "options": ["A rental car", "Airport pickup", "A dinner", "A meeting room"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 189, "stem": "What does Alan ask Dana to book?", "options": ["A flight", "A hotel meeting room", "A restaurant", "A taxi"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 190, "stem": "Why does Alan want the driver's phone number?", "options": ["To cancel the pickup", "In case he can't find the driver", "To change hotels", "To tip the driver"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "triple", "passages": [{"label": "Job posting", "text": "Position: Graphic Designer — Pixel Studio\n\nWe seek a creative Graphic Designer with at least three years of experience. Skills required: Adobe Creative Suite, strong portfolio, ability to meet deadlines. Bonus: experience with motion graphics. Full-time, hybrid (3 days in office). To apply, email your résumé and portfolio link to hr@pixelstudio.com by April 30."}, {"label": "Application email", "text": "From: j.moreno@email.com\nTo: hr@pixelstudio.com\nSubject: Graphic Designer Application\n\nDear Hiring Team,\n\nI'm excited to apply for the Graphic Designer position. I have four years of experience in branding and print design, and I'm proficient in the Adobe Creative Suite. While I have limited experience with motion graphics, I'm eager to learn. My portfolio is available at the link below.\n\nThank you for considering my application.\nBest,\nJulia Moreno"}, {"label": "Response", "text": "From: hr@pixelstudio.com\nTo: j.moreno@email.com\nSubject: RE: Graphic Designer Application\n\nDear Ms. Moreno,\n\nThank you for applying. Your portfolio impressed our team. We'd like to invite you for an interview next Wednesday at 11 a.m. Please note the role involves some motion graphics work, so we'll discuss a short training plan during the interview. Could you confirm your attendance?\n\nBest regards,\nPixel Studio HR"}], "questions": [{"gnum": 191, "stem": "What is a required skill for the position?", "options": ["Motion graphics", "Adobe Creative Suite", "Web coding", "Photography"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 192, "stem": "How much experience does Julia have?", "options": ["Three years", "Four years", "Five years", "Two years"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 193, "stem": "What is Julia's weakness for this role?", "options": ["No portfolio", "Limited motion graphics experience", "Missing the deadline", "No Adobe skills"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 194, "stem": "What impressed the hiring team?", "options": ["Her cover letter", "Her portfolio", "Her references", "Her degree"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 195, "stem": "What will be discussed at the interview?", "options": ["Salary only", "A training plan for motion graphics", "Relocation", "A design test"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}, {"section": "R", "part": 7, "type": "reading", "kind": "triple", "passages": [{"label": "Invoice", "text": "INVOICE #4521 — Office Depot Supplies\nBill to: Horizon Marketing\nDate: Feb 12\n\nItems:\n- Printer paper (10 boxes): $120\n- Ink cartridges (5): $250\n- Desk chairs (2): $300\n\nSubtotal: $670\nShipping: $30\nTotal: $700\n\nPayment due within 30 days."}, {"label": "Email", "text": "From: accounts@horizonmarketing.com\nTo: billing@officedepot.com\nSubject: Invoice #4521 Question\n\nHello,\n\nWe received Invoice #4521. However, we only ordered one desk chair, not two. Could you please issue a corrected invoice? Also, our records show the ink cartridges should be $200, not $250, based on the quote we received. Please advise.\n\nThank you,\nGrace Lim"}, {"label": "Reply", "text": "From: billing@officedepot.com\nTo: accounts@horizonmarketing.com\nSubject: RE: Invoice #4521 Question\n\nDear Ms. Lim,\n\nThank you for pointing this out. You are correct on both counts. We've removed one desk chair ($150) and adjusted the ink cartridges to the quoted price. A corrected invoice is attached, with a new total of $500. We apologize for the errors. The 30-day payment window will start from today's date.\n\nRegards,\nBilling Department"}], "questions": [{"gnum": 196, "stem": "Which company was billed?", "options": ["Office Depot", "Horizon Marketing", "Pixel Studio", "Summit Center"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 197, "stem": "What were the two errors on the invoice?", "options": ["Wrong address and date", "An extra chair and the wrong ink price", "Missing items", "Wrong shipping cost"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 198, "stem": "How much is one desk chair?", "options": ["$100", "$150", "$300", "$200"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 199, "stem": "What is the corrected total?", "options": ["$700", "$670", "$500", "$550"], "answer": 2, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}, {"gnum": 200, "stem": "When does the payment window start?", "options": ["From the invoice date", "From today's date", "In 30 days", "Immediately upon order"], "answer": 1, "exp": "อ้างอิงจากเนื้อเรื่องที่ให้"}]}], "total": 200}</script>
+<script>
+"use strict";
+const DATA = JSON.parse(document.getElementById('examData').textContent);
+const CARDS = DATA.cards;
+
+/* ---------- scoring conversion tables (approximate) ---------- */
+const L_TABLE=[[0,5],[5,25],[10,55],[15,80],[20,110],[25,140],[30,175],[35,205],[40,235],[45,265],[50,290],[55,315],[60,340],[65,365],[70,390],[75,410],[80,430],[85,450],[90,470],[95,485],[100,495]];
+const R_TABLE=[[0,5],[5,25],[10,50],[15,75],[20,100],[25,130],[30,160],[35,190],[40,215],[45,245],[50,270],[55,295],[60,320],[65,345],[70,370],[75,395],[80,420],[85,445],[90,465],[95,485],[100,495]];
+function scale(raw,table){
+  if(raw<=0)return table[0][1];
+  if(raw>=100)return table[table.length-1][1];
+  for(let i=0;i<table.length-1;i++){
+    const [x0,y0]=table[i],[x1,y1]=table[i+1];
+    if(raw>=x0&&raw<=x1){return Math.round(y0+(y1-y0)*(raw-x0)/(x1-x0));}
+  }
+  return 5;
+}
+function band(total){
+  if(total>=905)return["International Professional","ใช้ภาษาได้ระดับมืออาชีพสากล"];
+  if(total>=785)return["Working Proficiency Plus","ทำงานด้วยภาษาอังกฤษได้คล่อง"];
+  if(total>=605)return["Limited Working","ใช้ทำงานได้ในระดับจำกัด"];
+  if(total>=405)return["Elementary Plus","พื้นฐานค่อนข้างดี"];
+  if(total>=255)return["Basic","ระดับพื้นฐาน"];
+  return["Novice","ระดับเริ่มต้น"];
+}
+
+const PART_NAMES={1:"Part 1 · Photographs",2:"Part 2 · Question–Response",3:"Part 3 · Conversations",4:"Part 4 · Talks",5:"Part 5 · Incomplete Sentences",6:"Part 6 · Text Completion",7:"Part 7 · Reading Comprehension"};
+const MODE_MIN={full:120,listening:45,reading:75};
+
+/* ---------- state ---------- */
+let state={mode:'full',part:1,timer:true,autoplay:false,
+  active:[],       // active cards
+  cur:0,           // index in active
+  answers:{},      // gnum -> selected idx
+  marked:new Set(),
+  reviewMode:false,
+  timeLeft:0,timerId:null,elapsed:0};
+
+/* ---------- start screen wiring ---------- */
+const modeGrid=document.getElementById('modeGrid');
+const partSelectWrap=document.getElementById('partSelectWrap');
+modeGrid.addEventListener('click',e=>{
+  const b=e.target.closest('.mode');if(!b)return;
+  [...modeGrid.children].forEach(m=>m.classList.remove('active'));
+  b.classList.add('active');
+  state.mode=b.dataset.mode;
+  partSelectWrap.classList.toggle('hidden',state.mode!=='part');
+});
+document.getElementById('btnStart').addEventListener('click',startExam);
+
+/* ---------- build active card list ---------- */
+function buildActive(){
+  let filter;
+  if(state.mode==='full')filter=()=>true;
+  else if(state.mode==='listening')filter=c=>c.section==='L';
+  else if(state.mode==='reading')filter=c=>c.section==='R';
+  else{const p=+document.getElementById('partSelect').value;state.part=p;filter=c=>c.part===p;}
+  state.active=CARDS.filter(filter);
+}
+function totalQ(){return state.active.reduce((s,c)=>s+c.questions.length,0);}
+function answeredCount(){return state.active.reduce((s,c)=>s+c.questions.filter(q=>state.answers[q.gnum]!=null).length,0);}
+
+/* ---------- start ---------- */
+function startExam(){
+  state.timer=document.getElementById('optTimer').checked;
+  state.autoplay=document.getElementById('optAutoplay').checked;
+  state.answers={};state.marked=new Set();state.cur=0;state.reviewMode=false;state.elapsed=0;
+  buildActive();
+  document.getElementById('startView').classList.add('hidden');
+  document.getElementById('resultView').classList.add('hidden');
+  document.getElementById('examView').classList.remove('hidden');
+  // timer setup
+  const showTimer=state.timer&&MODE_MIN[state.mode]!=null;
+  if(showTimer){state.timeLeft=MODE_MIN[state.mode]*60;startTimer();document.getElementById('timer').style.display='';}
+  else{document.getElementById('timer').style.display='none';}
+  renderCard();
+  window.scrollTo(0,0);
+}
+function startTimer(){
+  clearInterval(state.timerId);
+  updateTimerDisplay();
+  state.timerId=setInterval(()=>{
+    state.timeLeft--;state.elapsed++;
+    updateTimerDisplay();
+    if(state.timeLeft<=0){clearInterval(state.timerId);submitExam();}
+  },1000);
+}
+function updateTimerDisplay(){
+  const t=document.getElementById('timer');
+  const m=Math.floor(state.timeLeft/60),s=state.timeLeft%60;
+  t.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  t.classList.toggle('warn',state.timeLeft<=300);
+}
+
+/* ---------- speech ---------- */
+let speaking=false;
+function speak(text,btn){
+  if(!('speechSynthesis'in window)){alert('เบราว์เซอร์นี้ไม่รองรับเสียงอ่าน (text-to-speech)');return;}
+  if(speaking){window.speechSynthesis.cancel();speaking=false;document.querySelectorAll('.play-btn.playing').forEach(b=>{b.classList.remove('playing');b.querySelector('.plabel').textContent='เล่นเสียง';});return;}
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-US';u.rate=0.95;u.pitch=1;
+  const voices=window.speechSynthesis.getVoices();
+  const en=voices.find(v=>/en[-_]US/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang));
+  if(en)u.voice=en;
+  u.onend=()=>{speaking=false;if(btn){btn.classList.remove('playing');btn.querySelector('.plabel').textContent='เล่นอีกครั้ง';}};
+  u.onerror=()=>{speaking=false;if(btn)btn.classList.remove('playing');};
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);speaking=true;
+  if(btn){btn.classList.add('playing');btn.querySelector('.plabel').textContent='■ หยุด';}
+}
+if('speechSynthesis'in window){window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
+
+/* ---------- render a card ---------- */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function optLetter(i){return String.fromCharCode(65+i);}
+
+function renderCard(){
+  const card=state.active[state.cur];
+  const area=document.getElementById('cardArea');
+  document.getElementById('tbPart').textContent='PART '+card.part;
+  document.getElementById('tbCount').textContent=answeredCount()+'/'+totalQ();
+
+  let html='<div class="card">';
+
+  // ---- LISTENING audio / photo ----
+  if(card.section==='L'){
+    if(card.type==='photo'){
+      html+=`<div class="photo-ph"><div class="tag">Photograph · Part 1</div><div class="scene">${esc(card.scene)}</div></div>`;
+    }
+    const transcriptId='tr'+card.cur;
+    html+=`<div class="audio-box">
+      <div class="audio-row">
+        <button class="play-btn" data-audio="${encodeURIComponent(card.audioText)}"><span>▶</span><span class="plabel">เล่นเสียง</span></button>
+        <span class="audio-note">🔊 เสียงอ่านจากเบราว์เซอร์</span>
+      </div>
+      <button class="link-btn" data-transcript>แสดง/ซ่อนสคริปต์ (Transcript)</button>
+      <div class="transcript hidden">${esc(card.audioText)}</div>
+    </div>`;
+  }
+
+  // ---- READING passages ----
+  if(card.type==='reading'){
+    const two=card.questions.length>2?'two':'';
+    html+=`<div class="passage-grid ${two}"><div>`;
+    card.passages.forEach(p=>{
+      html+=`<div class="passage"><div class="passage-label">${esc(p.label)}</div>${esc(p.text)}</div>`;
+    });
+    html+=`</div><div class="qcol">`;
+    card.questions.forEach(q=>html+=renderQuestion(q,card));
+    html+=`</div></div>`;
+  }
+  else if(card.type==='cloze'){
+    let ptext=esc(card.passageText).replace(/\((\d)\)/g,'<span class="blankmark">($1)</span>');
+    html+=`<div class="passage-grid two"><div><div class="passage"><div class="passage-label">${esc(card.passageTitle)}</div>${ptext}</div></div><div class="qcol">`;
+    card.questions.forEach(q=>html+=renderQuestion(q,card));
+    html+=`</div></div>`;
+  }
+  else{
+    // photo / qr / conv / talk / single -> just stacked questions
+    card.questions.forEach(q=>html+=renderQuestion(q,card));
+  }
+
+  html+='</div>';
+  area.innerHTML=html;
+
+  // wire audio + transcript
+  area.querySelectorAll('.play-btn').forEach(b=>{
+    b.addEventListener('click',()=>speak(decodeURIComponent(b.dataset.audio),b));
+  });
+  area.querySelectorAll('[data-transcript]').forEach(b=>{
+    b.addEventListener('click',()=>b.parentElement.querySelector('.transcript').classList.toggle('hidden'));
+  });
+  // wire options
+  area.querySelectorAll('.opt').forEach(o=>{
+    o.addEventListener('click',()=>{
+      if(state.reviewMode)return;
+      const g=+o.dataset.g,idx=+o.dataset.i;
+      state.answers[g]=idx;
+      o.parentElement.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+      o.classList.add('sel');
+      document.getElementById('tbCount').textContent=answeredCount()+'/'+totalQ();
+    });
+  });
+
+  updateNav();
+  // autoplay
+  if(state.autoplay&&card.section==='L'&&!state.reviewMode){
+    const pb=area.querySelector('.play-btn');if(pb)setTimeout(()=>speak(decodeURIComponent(pb.dataset.audio),pb),300);
+  }
+}
+
+function renderQuestion(q,card){
+  const sel=state.answers[q.gnum];
+  let stem=q.stem;
+  // For cloze, stem is just the blank label like (1)
+  let h=`<div class="q"><div class="qhead"><span class="qnum">${q.gnum}</span><span class="qstem">${esc(stem)}</span></div><div class="opts">`;
+  q.options.forEach((o,i)=>{
+    let cls='opt';
+    if(state.reviewMode){
+      if(i===q.answer)cls+=' correct';
+      else if(sel===i)cls+=' wrong';
+    }else if(sel===i)cls+=' sel';
+    h+=`<button class="${cls}" data-g="${q.gnum}" data-i="${i}"><span class="lt">${optLetter(i)}</span><span>${esc(o)}</span></button>`;
+  });
+  h+='</div>';
+  if(state.reviewMode){
+    const ok=sel===q.answer;
+    const you=sel==null?'ไม่ได้ตอบ':optLetter(sel);
+    h+=`<div class="exp"><b>${ok?'✓ ถูกต้อง':'เฉลย: '+optLetter(q.answer)}</b> · คุณตอบ: ${you}<br>${esc(q.exp)}</div>`;
+  }
+  h+='</div>';
+  return h;
+}
+
+/* ---------- nav ---------- */
+function updateNav(){
+  const card=state.active[state.cur];
+  document.getElementById('btnPrev').disabled=state.cur===0;
+  const last=state.cur===state.active.length-1;
+  const nextBtn=document.getElementById('btnNext');
+  if(state.reviewMode){
+    nextBtn.textContent=last?'จบรีวิว':'ถัดไป →';nextBtn.className='nav-btn next';
+    document.getElementById('btnMark').style.display='none';
+  }else{
+    if(last){nextBtn.textContent='ส่งคำตอบ ✓';nextBtn.className='nav-btn submit';}
+    else{nextBtn.textContent='ถัดไป →';nextBtn.className='nav-btn next';}
+    // mark toggles per first question of card
+    const g=card.questions[0].gnum;
+    const mb=document.getElementById('btnMark');mb.style.display='';
+    mb.classList.toggle('on',state.marked.has(g));
+    mb.textContent=state.marked.has(g)?'★ มาร์กแล้ว':'☆ มาร์ก';
+  }
+}
+document.getElementById('btnPrev').addEventListener('click',()=>{if(state.cur>0){state.cur--;renderCard();window.scrollTo(0,0);}});
+document.getElementById('btnNext').addEventListener('click',()=>{
+  if(state.reviewMode){
+    if(state.cur===state.active.length-1){showResult();}
+    else{state.cur++;renderCard();window.scrollTo(0,0);}
+    return;
+  }
+  if(state.cur===state.active.length-1){confirmSubmit();}
+  else{state.cur++;renderCard();window.scrollTo(0,0);}
+});
+document.getElementById('btnMark').addEventListener('click',()=>{
+  const g=state.active[state.cur].questions[0].gnum;
+  if(state.marked.has(g))state.marked.delete(g);else state.marked.add(g);
+  updateNav();
+});
+document.getElementById('btnQuit').addEventListener('click',()=>{
+  if(confirm('ออกจากข้อสอบ? ความคืบหน้าจะหายไป')){
+    clearInterval(state.timerId);window.speechSynthesis&&window.speechSynthesis.cancel();
+    document.getElementById('examView').classList.add('hidden');
+    document.getElementById('startView').classList.remove('hidden');
+  }
+});
+
+/* ---------- palette drawer ---------- */
+const overlay=document.getElementById('overlay'),drawer=document.getElementById('drawer');
+document.getElementById('btnGrid').addEventListener('click',openDrawer);
+overlay.addEventListener('click',closeDrawer);
+function openDrawer(){renderPalette();overlay.classList.add('show');drawer.classList.add('show');}
+function closeDrawer(){overlay.classList.remove('show');drawer.classList.remove('show');}
+function renderPalette(){
+  const wrap=document.getElementById('palette');
+  document.getElementById('drawerSub').textContent=`ตอบแล้ว ${answeredCount()} จาก ${totalQ()} ข้อ`;
+  // group by part
+  const parts={};
+  state.active.forEach((c,ci)=>{c.questions.forEach(q=>{(parts[c.part]=parts[c.part]||[]).push({q,ci});});});
+  let html='';
+  Object.keys(parts).sort((a,b)=>a-b).forEach(p=>{
+    html+=`<div class="pal-part">${PART_NAMES[p]}</div><div class="pal-grid">`;
+    parts[p].forEach(({q,ci})=>{
+      let cls='pal';
+      if(state.answers[q.gnum]!=null)cls+=' answered';
+      if(state.marked.has(q.gnum))cls+=' marked';
+      if(ci===state.cur)cls+=' current';
+      html+=`<button class="${cls}" data-ci="${ci}">${q.gnum}</button>`;
+    });
+    html+='</div>';
+  });
+  wrap.innerHTML=html;
+  wrap.querySelectorAll('.pal').forEach(b=>b.addEventListener('click',()=>{
+    state.cur=+b.dataset.ci;closeDrawer();renderCard();window.scrollTo(0,0);
+  }));
+}
+document.getElementById('btnSubmitDrawer').addEventListener('click',()=>{closeDrawer();confirmSubmit();});
+
+/* ---------- submit + scoring ---------- */
+function confirmSubmit(){
+  const unanswered=totalQ()-answeredCount();
+  let msg='ส่งคำตอบและดูผล?';
+  if(unanswered>0)msg=`ยังเหลืออีก ${unanswered} ข้อที่ยังไม่ได้ตอบ\nต้องการส่งคำตอบเลยไหม?`;
+  if(confirm(msg))submitExam();
+}
+function submitExam(){
+  clearInterval(state.timerId);
+  window.speechSynthesis&&window.speechSynthesis.cancel();
+  showResult();
+}
+
+function computeStats(){
+  const perPart={};let Lraw=0,Rraw=0;
+  state.active.forEach(c=>{
+    perPart[c.part]=perPart[c.part]||{correct:0,total:0};
+    c.questions.forEach(q=>{
+      perPart[c.part].total++;
+      if(state.answers[q.gnum]===q.answer){
+        perPart[c.part].correct++;
+        if(c.section==='L')Lraw++;else Rraw++;
+      }
+    });
+  });
+  return{perPart,Lraw,Rraw};
+}
+
+function showResult(){
+  const {perPart,Lraw,Rraw}=computeStats();
+  const hasL=state.active.some(c=>c.section==='L');
+  const hasR=state.active.some(c=>c.section==='R');
+  let html='';
+
+  if(state.mode==='full'||state.mode==='listening'||state.mode==='reading'){
+    const Ls=hasL?scale(Lraw,L_TABLE):0;
+    const Rs=hasR?scale(Rraw,R_TABLE):0;
+    const total=Ls+Rs;
+    const [bandEn,bandTh]=band(state.mode==='full'?total:(hasL?Ls*2:Rs*2));
+    const shownTotal=state.mode==='full'?total:(hasL?Ls:Rs);
+    const maxShown=state.mode==='full'?990:495;
+    html+=`<div class="res-hero">
+      <div class="eyebrow">Your estimated score</div>
+      <div class="big-score">${shownTotal}<span> / ${maxShown}</span></div>
+      <div class="band">ระดับ: <b>${bandEn}</b> — ${bandTh}</div>
+    </div>`;
+    if(state.mode==='full'){
+      html+=`<div class="split">
+        <div class="cell"><div class="lab">Listening</div><div class="val">${Ls}</div><div class="raw">${Lraw}/100 ข้อถูก · เต็ม 495</div></div>
+        <div class="cell"><div class="lab">Reading</div><div class="val">${Rs}</div><div class="raw">${Rraw}/100 ข้อถูก · เต็ม 495</div></div>
+      </div>`;
+    }
+  }else{
+    // single part practice — raw only
+    const p=state.part,st=perPart[p]||{correct:0,total:0};
+    const pct=st.total?Math.round(st.correct/st.total*100):0;
+    html+=`<div class="res-hero">
+      <div class="eyebrow">${PART_NAMES[p]}</div>
+      <div class="big-score">${st.correct}<span> / ${st.total}</span></div>
+      <div class="band">ความถูกต้อง <b>${pct}%</b></div>
+    </div>`;
+  }
+
+  // per-part breakdown
+  html+=`<div class="res-section"><h3>สรุปรายพาร์ท / By part</h3>`;
+  Object.keys(perPart).sort((a,b)=>a-b).forEach(p=>{
+    const s=perPart[p];const pct=s.total?Math.round(s.correct/s.total*100):0;
+    html+=`<div class="part-row">
+      <div class="pn">${PART_NAMES[p].split(' · ')[0]}<b>${PART_NAMES[p].split(' · ')[1]||''}</b></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="frac">${s.correct}/${s.total}</div>
+    </div>`;
+  });
+  html+='</div>';
+
+  const timeUsed=state.elapsed;
+  const tm=Math.floor(timeUsed/60),ts=timeUsed%60;
+
+  html+=`<div class="res-actions">
+    <button class="btn-review" id="btnDoReview">ดูเฉลย + คำอธิบาย</button>
+    <button class="btn-restart" id="btnRestart">ทำใหม่ / เปลี่ยนโหมด</button>
+  </div>
+  <p class="note">⏱ ใช้เวลา ${tm} นาที ${ts} วินาที · การแปลงคะแนนเป็นสเกล 990 เป็นค่าประมาณเพื่อฝึกซ้อม ไม่ใช่คะแนนทางการของ ETS · ข้อสอบทั้งหมดเป็นเนื้อหาต้นฉบับที่แต่งขึ้นในแนว TOEIC</p>`;
+
+  document.getElementById('resWrap').innerHTML=html;
+  document.getElementById('examView').classList.add('hidden');
+  document.getElementById('resultView').classList.remove('hidden');
+  window.scrollTo(0,0);
+
+  document.getElementById('btnDoReview').addEventListener('click',enterReview);
+  document.getElementById('btnRestart').addEventListener('click',()=>{
+    document.getElementById('resultView').classList.add('hidden');
+    document.getElementById('startView').classList.remove('hidden');
+  });
+}
+
+function enterReview(){
+  state.reviewMode=true;state.cur=0;
+  document.getElementById('resultView').classList.add('hidden');
+  document.getElementById('examView').classList.remove('hidden');
+  document.getElementById('timer').style.display='none';
+  renderCard();window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
