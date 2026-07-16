@@ -97,6 +97,11 @@ select,.setting-row select{
 }
 .btn-start:hover{background:var(--blue-d)}
 .disclaimer{font-size:11.5px;color:var(--muted);margin-top:16px;line-height:1.5}
+.version-tag{
+  font-size:11px;color:var(--blue);background:#eef4ff;border:1px solid #d7e5ff;border-radius:8px;
+  padding:9px 12px;margin-top:12px;line-height:1.6;font-family:"IBM Plex Mono",monospace;
+}
+.version-tag b{color:var(--blue-d)}
 
 /* ===================== EXAM VIEW ===================== */
 #examView{min-height:100vh;display:flex;flex-direction:column}
@@ -360,6 +365,7 @@ select,.setting-row select{
         </div>
         <button class="btn-start" id="btnStart">เริ่มทำข้อสอบ →</button>
         <p class="disclaimer">เสียงส่วน Listening ใช้ระบบอ่านออกเสียงของเบราว์เซอร์ (text-to-speech) — ควรใช้ Chrome/Edge/Safari และเปิดเสียงลำโพงหรือหูฟัง · การแปลงคะแนนเป็น 990 เป็นค่าประมาณเพื่อการฝึกซ้อม ไม่ใช่คะแนน ETS อย่างเป็นทางการ</p>
+        <p class="version-tag">🔄 เวอร์ชันล่าสุด: <b>16 ก.ค. 2569, 22:40 น.</b> — เพิ่มการ์ดความรู้ไวยากรณ์ + ประโยคเต็ม/คำแปล<br>ถ้าเห็นวันที่ไม่ตรงกับที่ควรจะเป็น ให้ล้างแคช (Ctrl+Shift+R) หรือเปิดหน้าต่าง Incognito ใหม่</p>
       </div>
     </div>
   </div>
@@ -819,7 +825,8 @@ function showResult(){
     <button class="btn-review" id="btnDoReview">ดูเฉลย + คำอธิบาย</button>
     <button class="btn-restart" id="btnRestart">ทำใหม่ / เปลี่ยนโหมด</button>
   </div>
-  <p class="note">⏱ ใช้เวลา ${tm} นาที ${ts} วินาที · การแปลงคะแนนเป็นสเกล 990 เป็นค่าประมาณเพื่อฝึกซ้อม ไม่ใช่คะแนนทางการของ ETS · ข้อสอบทั้งหมดเป็นเนื้อหาต้นฉบับที่แต่งขึ้นในแนว TOEIC</p>`;
+  <p class="note">⏱ ใช้เวลา ${tm} นาที ${ts} วินาที · การแปลงคะแนนเป็นสเกล 990 เป็นค่าประมาณเพื่อฝึกซ้อม ไม่ใช่คะแนนทางการของ ETS · ข้อสอบทั้งหมดเป็นเนื้อหาต้นฉบับที่แต่งขึ้นในแนว TOEIC</p>
+  <p class="note">🔄 เวอร์ชันแอปนี้: 16 ก.ค. 2569, 22:40 น.</p>`;
 
   document.getElementById('resWrap').innerHTML=html;
   document.getElementById('examView').classList.add('hidden');
