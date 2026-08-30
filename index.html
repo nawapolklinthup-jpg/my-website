@@ -918,18 +918,6 @@ footer{border-top:1px solid var(--line);padding:34px 0 40px}
 <script>
 const nav=document.getElementById('nav');
 addEventListener('scroll',()=>nav.classList.toggle('scrolled', scrollY>10),{passive:true});
-
-// simple visit counter — free, no signup, counts each page load
-fetch('https://api.countapi.xyz/hit/sonesolow-portfolio-nawapol/views')
-  .then(r=>r.json())
-  .then(data=>{
-    const el = document.getElementById('visitCount');
-    if(el) el.textContent = data.value.toLocaleString();
-  })
-  .catch(()=>{
-    const el = document.getElementById('visitCount');
-    if(el) el.textContent = '—';
-  });
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1681,6 +1669,40 @@ window.addEventListener('resize',()=>{
 },{passive:true});
 
 })();
+</script>
+<script type="module">
+  const el = document.getElementById('visitCount');
+  let settled = false;
+  setTimeout(() => { if (!settled && el) el.textContent = '—'; }, 6000);
+
+  (async () => {
+    try {
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
+      const { getFirestore, doc, setDoc, getDoc, increment } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCjNekQSaju03RToaYZQRFDKMPj_YC8r4g",
+        authDomain: "sonesolow-toeic.firebaseapp.com",
+        projectId: "sonesolow-toeic",
+        storageBucket: "sonesolow-toeic.firebasestorage.app",
+        messagingSenderId: "930724059823",
+        appId: "1:930724059823:web:3083bbde4c8dc5b3d0525a"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const ref = doc(db, "counters", "portfolio_visits");
+      await setDoc(ref, { count: increment(1) }, { merge: true });
+      const snap = await getDoc(ref);
+      settled = true;
+      if (el && snap.exists()) el.textContent = snap.data().count.toLocaleString();
+      else if (el) el.textContent = '—';
+    } catch (e) {
+      settled = true;
+      console.warn('visit counter unavailable:', e.message);
+      if (el) el.textContent = '—';
+    }
+  })();
 </script>
 </body>
 </html>
