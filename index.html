@@ -204,6 +204,11 @@ h1.name{
 .contact-link.primary svg{color:#fff}
 .contact-link.primary:hover{background:#2870e0}
 
+.visit-counter{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted-2);
+  display:inline-flex;align-items:center;gap:5px;
+}
+
 /* ---------- experience ---------- */
 .exp-employer{
   display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--line);
@@ -906,14 +911,25 @@ footer{border-top:1px solid var(--line);padding:34px 0 40px}
         <a href="https://github.com/nawapolklinthup-jpg" target="_blank" rel="noopener">GitHub</a>
       </div>
     </div>
-    <div class="foot-note">© 2026 Sonesolow · built line by line, one gate at a time</div>
+    <div class="foot-note">© 2026 Sonesolow · built line by line, one gate at a time · <span class="visit-counter">👀 <span id="visitCount">···</span> visits</span></div>
   </div>
 </footer>
 
 <script>
 const nav=document.getElementById('nav');
 addEventListener('scroll',()=>nav.classList.toggle('scrolled', scrollY>10),{passive:true});
-</script>
+
+// simple visit counter — free, no signup, counts each page load
+fetch('https://api.countapi.xyz/hit/sonesolow-portfolio-nawapol/views')
+  .then(r=>r.json())
+  .then(data=>{
+    const el = document.getElementById('visitCount');
+    if(el) el.textContent = data.value.toLocaleString();
+  })
+  .catch(()=>{
+    const el = document.getElementById('visitCount');
+    if(el) el.textContent = '—';
+  });
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
