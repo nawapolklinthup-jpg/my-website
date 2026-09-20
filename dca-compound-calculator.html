@@ -77,6 +77,26 @@
     margin:0;
     font-weight: 400;
   }
+  .clear-data-btn{
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    z-index: 2;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.35);
+    color: #CBE0CB;
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 6px 11px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .clear-data-btn:hover{ background: rgba(255,255,255,0.24); color:#fff; }
+  @media (max-width: 560px){
+    .clear-data-btn{ position: static; display:inline-block; margin-bottom:10px; }
+  }
 
   /* ---- Asset picker ---- */
   .asset-panel{
@@ -1076,12 +1096,18 @@
   .table-scroll{
     max-height: 320px;
     overflow-y:auto;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
   }
   table{
     width:100%;
     border-collapse: collapse;
     font-size: 13px;
   }
+  /* the history table has 7 columns (added plan/actual-invest tracking) — too
+     narrow to fit at 100% width on phones, so give it a min-width and let
+     .table-scroll's overflow-x handle horizontal scrolling instead of clipping */
+  #historyBox table{ min-width: 620px; }
   thead th{
     position: sticky;
     top:0;
@@ -1137,12 +1163,43 @@
   .pct-btn:active, .budget-addbtn:active, .use-btn:active:not(:disabled){
     transform: scale(0.97);
   }
+
+  /* ---- history table: actual-vs-plan columns ---- */
+  .hist-actual-input{
+    width: 66px;
+    padding: 3px 5px;
+    border: 1.5px solid var(--paper-line);
+    border-radius: 5px;
+    background: #fff;
+    font-family: 'IBM Plex Mono','Consolas',monospace;
+    font-size: 10.5px;
+    text-align: right;
+    outline: none;
+  }
+  .hist-actual-input:focus{ border-color: var(--green); }
+
+  /* ---- printable one-page summary (hidden on screen, shown via window.print()) ---- */
+  #printSummary{ display:none; }
+  #printSummary h1{ font-size:19px; margin:0 0 2px; color:#2F5233; }
+  #printSummary .ps-date{ font-size:11px; color:#777; margin:0 0 16px; }
+  #printSummary h2{ font-size:13.5px; margin:20px 0 8px; color:#2F5233; border-bottom:1.5px solid #cfd9c9; padding-bottom:4px; }
+  #printSummary h2:first-of-type{ margin-top:0; }
+  #printSummary .ps-table{ width:100%; border-collapse:collapse; font-size:12px; }
+  #printSummary .ps-table td{ padding:5px 4px; border-bottom:1px solid #eee; vertical-align:top; }
+  #printSummary .ps-table td:last-child{ text-align:right; font-family:'IBM Plex Mono','Consolas',monospace; white-space:nowrap; padding-left:12px; }
+  #printSummary .budget-ledger{ margin-bottom:4px; }
+  #printSummary .ps-foot{ margin-top:24px; font-size:10px; color:#999; border-top:1px solid #eee; padding-top:8px; }
+  @media print{
+    .wrap{ display:none !important; }
+    #printSummary{ display:block !important; padding: 10px 4px; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="book-header">
+    <button type="button" class="clear-data-btn" onclick="clearAllToolData()" title="ล้างข้อมูลที่กรอกไว้ทั้งหมดในเบราว์เซอร์นี้ — เบราว์เซอร์/เครื่องอื่นไม่โดนกระทบ">🗑️ ล้างข้อมูลของฉัน</button>
     <div class="book-eyebrow">SAVINGS &amp; INVESTMENT PASSBOOK</div>
     <h1 class="book-title">🌱 Compound / DCA Calculator</h1>
     <p class="book-sub">คำนวณการเติบโตของเงินลงทุนแบบทบต้น พร้อมออมเงินรายเดือน (Dollar-Cost Averaging)</p>
@@ -1176,12 +1233,15 @@
                 <th>รายจ่าย</th>
                 <th>เหลือ</th>
                 <th>อัตราออม</th>
+                <th>แผนลงทุน</th>
+                <th>ลงทุนจริง</th>
                 <th></th>
               </tr>
             </thead>
             <tbody id="historyTableBody"></tbody>
           </table>
         </div>
+        <p class="hint" id="actualVsPlanSummary" style="margin-top:8px;"></p>
       </div>
 
       <div class="budget-cols">
@@ -1728,11 +1788,34 @@
 
 </div>
 
+<!-- one-page summary, invisible on screen — filled by buildPrintSummary() and shown only via window.print() -->
+<div id="printSummary"></div>
+
 <script>
 function fmtMoney(n){
   const sign = n < 0 ? "-" : "";
   n = Math.abs(n);
   return sign + "฿" + n.toLocaleString('en-US', {maximumFractionDigits:0});
+}
+
+// wipes every localStorage key this tool owns (budget history, goals, API key,
+// price caches) — for demoing this page on a shared/public device without
+// leaving personal numbers behind. Data in OTHER people's own browsers is
+// already completely separate (localStorage is per-browser, per-site) — this
+// button only matters when someone is using THIS SAME browser after you did.
+function clearAllToolData(){
+  const ok = confirm('ล้างข้อมูลที่กรอกไว้ทั้งหมดของเครื่องมือนี้ในเบราว์เซอร์นี้ (งบรายเดือน, เป้าหมาย, ประวัติที่บันทึกไว้, API key ที่จำไว้)?\n\nเบราว์เซอร์/เครื่องอื่นไม่โดนกระทบ เพราะข้อมูลเก็บแยกเป็นของแต่ละเบราว์เซอร์อยู่แล้ว — กดแล้วกู้คืนไม่ได้');
+  if (!ok) return;
+  try{
+    const exactKeys = ['avApiKey', 'dcaGoalsV1', 'dcaBudgetHistoryV1'];
+    const prefixes = ['avCache_', 'avCandles3_', 'avOverview_'];
+    Object.keys(localStorage).forEach(k => {
+      if (exactKeys.indexOf(k) !== -1 || prefixes.some(p => k.indexOf(p) === 0)){
+        localStorage.removeItem(k);
+      }
+    });
+  }catch(e){ /* private browsing etc — ignore */ }
+  location.reload();
 }
 
 document.getElementById('stepupToggle').addEventListener('change', function(){
@@ -1846,18 +1929,9 @@ function updateInjectionTotalHint(){
   }
 }
 
-function calc(){
-  const initial   = parseFloat(document.getElementById('initial').value) || 0;
-  const monthly   = parseFloat(document.getElementById('monthly').value) || 0;
-  const rate      = parseFloat(document.getElementById('rate').value) || 0;
-  const { currentAge, retireAge, years } = getHorizon();
-  const stepupOn  = document.getElementById('stepupToggle').checked;
-  const stepup    = stepupOn ? (parseFloat(document.getElementById('stepup').value) || 0) : 0;
-  const inflation = parseFloat(document.getElementById('inflation').value) || 0;
-  const injections = getInjections();
-
-  document.getElementById('outFinalLabel').textContent = `🏆 มูลค่าตอนเกษียณ (อายุ ${retireAge})`;
-
+// runs the year-by-year compounding loop for a single fixed annual rate —
+// factored out of calc() so the same math can run 3x (base/optimistic/pessimistic)
+function runProjection(rate, monthly, stepup, injections, initial, years, currentAge){
   const monthlyRate = rate / 100 / 12;
   let balance = initial;
   let cumulative = initial;
@@ -1903,9 +1977,33 @@ function calc(){
       balance: balance
     });
   }
+  return yearly;
+}
 
-  const finalBalance = balance;
-  const totalContrib = cumulative;
+function calc(){
+  const initial   = parseFloat(document.getElementById('initial').value) || 0;
+  const monthly   = parseFloat(document.getElementById('monthly').value) || 0;
+  const rate      = parseFloat(document.getElementById('rate').value) || 0;
+  const { currentAge, retireAge, years } = getHorizon();
+  const stepupOn  = document.getElementById('stepupToggle').checked;
+  const stepup    = stepupOn ? (parseFloat(document.getElementById('stepup').value) || 0) : 0;
+  const inflation = parseFloat(document.getElementById('inflation').value) || 0;
+  const injections = getInjections();
+  const volOn = document.getElementById('volToggle').checked;
+  const vol = volOn ? Math.max(0, parseFloat(document.getElementById('volatility').value) || 0) : 0;
+
+  document.getElementById('outFinalLabel').textContent = `🏆 มูลค่าตอนเกษียณ (อายุ ${retireAge})`;
+
+  const yearly = runProjection(rate, monthly, stepup, injections, initial, years, currentAge);
+  let optimistic = null, pessimistic = null;
+  if (volOn && vol > 0){
+    optimistic  = runProjection(rate + vol, monthly, stepup, injections, initial, years, currentAge);
+    pessimistic = runProjection(Math.max(rate - vol, -99), monthly, stepup, injections, initial, years, currentAge);
+  }
+
+  const last = yearly[yearly.length - 1];
+  const finalBalance = last ? last.balance : initial;
+  const totalContrib = last ? last.cumulative : initial;
   const totalGain = finalBalance - totalContrib;
   const realValue = finalBalance / Math.pow(1 + inflation/100, years);
 
@@ -1914,11 +2012,27 @@ function calc(){
   document.getElementById('outGain').textContent     = fmtMoney(totalGain);
   document.getElementById('outReal').textContent     = fmtMoney(realValue);
 
-  drawChart(yearly, initial);
+  const rangeNote = document.getElementById('outRangeNote');
+  const rangeLegendItem = document.getElementById('rangeLegendItem');
+  if (optimistic && pessimistic){
+    const hi = optimistic[optimistic.length - 1].balance;
+    const lo = pessimistic[pessimistic.length - 1].balance;
+    rangeNote.style.display = 'block';
+    rangeNote.textContent = `กรอบกรณีดี/แย่ (±${vol}%/ปี): ${fmtMoney(lo)} – ${fmtMoney(hi)}`;
+    rangeLegendItem.style.display = '';
+  } else {
+    rangeNote.style.display = 'none';
+    rangeNote.textContent = '';
+    rangeLegendItem.style.display = 'none';
+  }
+
+  drawChart(yearly, initial, optimistic, pessimistic);
   fillLedger(yearly);
+  updateFireProgress();
+  updateMilestones(yearly, initial);
 }
 
-function drawChart(yearly, initial){
+function drawChart(yearly, initial, optimistic, pessimistic){
   const svg = document.getElementById('chart');
   svg.innerHTML = '';
   const W = 600, H = 220;
@@ -1926,7 +2040,10 @@ function drawChart(yearly, initial){
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
 
-  const maxVal = Math.max(...yearly.map(d => d.balance), initial, 1);
+  const allVals = yearly.map(d => d.balance);
+  if (optimistic) allVals.push(...optimistic.map(d => d.balance));
+  if (pessimistic) allVals.push(...pessimistic.map(d => d.balance));
+  const maxVal = Math.max(...allVals, initial, 1);
   const n = yearly.length;
 
   function x(i){ return padL + (i/(n)) * plotW; }
@@ -1973,6 +2090,32 @@ function drawChart(yearly, initial){
       label.textContent = 'อายุ' + yearly[i].age;
       svg.appendChild(label);
     }
+  }
+
+  // optimistic/pessimistic band (± volatility) — drawn first so it sits behind everything else
+  if (optimistic && pessimistic){
+    let hiPts = [[x(0), y(initial)]];
+    optimistic.forEach((d, i) => hiPts.push([x(i+1), y(d.balance)]));
+    let loPts = [[x(0), y(initial)]];
+    pessimistic.forEach((d, i) => loPts.push([x(i+1), y(d.balance)]));
+
+    const bandPath = 'M' + hiPts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L')
+                    + ' L' + loPts.slice().reverse().map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L') + ' Z';
+    const band = document.createElementNS(ns, 'path');
+    band.setAttribute('d', bandPath);
+    band.setAttribute('fill', '#7C9E7F');
+    band.setAttribute('opacity', '0.18');
+    svg.appendChild(band);
+
+    [hiPts, loPts].forEach(pts => {
+      const line = document.createElementNS(ns, 'path');
+      line.setAttribute('d', 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'));
+      line.setAttribute('fill', 'none');
+      line.setAttribute('stroke', '#7C9E7F');
+      line.setAttribute('stroke-width', '1.5');
+      line.setAttribute('stroke-dasharray', '4 3');
+      svg.appendChild(line);
+    });
   }
 
   // contributed area/line (dashed gold)
@@ -2045,8 +2188,15 @@ function switchAssetTab(tab){
   if (tab === 'funds') renderFundTable();
 }
 
-function applyRate(pct){
+function applyRate(pct, vol){
   document.getElementById('rate').value = pct;
+  // when a real volatility figure comes along (from the Alpha Vantage fetch),
+  // auto-fill it and switch on the best/worst-case band so it's visible right away
+  if (vol !== undefined && vol !== null && !isNaN(vol)){
+    document.getElementById('volatility').value = vol;
+    document.getElementById('volToggle').checked = true;
+    document.getElementById('volField').classList.add('open');
+  }
   calc();
   document.getElementById('rate').closest('.field').scrollIntoView({behavior:'smooth', block:'center'});
 }
@@ -2198,10 +2348,12 @@ async function fetchGlobalStock(){
 
 let lastFetchedCAGR = null;
 let lastFetchedTicker = null;
+let lastFetchedVol = null;
 
 function showFetchSuccess(ticker, cagr, vol, yearsUsed, months, fromCache){
   lastFetchedCAGR = cagr;
   lastFetchedTicker = ticker;
+  lastFetchedVol = vol;
   const resultBox = document.getElementById('fetchResult');
   resultBox.className = 'fetch-result show';
   resultBox.innerHTML = `
@@ -2216,7 +2368,7 @@ function showFetchSuccess(ticker, cagr, vol, yearsUsed, months, fromCache){
         <div class="fr-stat-val">${vol.toFixed(2)}%</div>
       </div>
     </div>
-    <button class="use-btn" style="width:auto;padding:8px 20px;" onclick="applyRate(${cagr.toFixed(2)})">ใช้ค่านี้ในการคำนวณ</button>
+    <button class="use-btn" style="width:auto;padding:8px 20px;" onclick="applyRate(${cagr.toFixed(2)}, ${vol.toFixed(2)})">ใช้ค่านี้ในการคำนวณ (พร้อมกรอบดี/แย่)</button>
     <p class="fr-note">คำนวณจากราคาปิดปรับปันผลแล้วรายเดือนของ Alpha Vantage · ผลตอบแทนในอดีตไม่ได้การันตีผลตอบแทนในอนาคต ไม่ใช่คำแนะนำให้ซื้อขาย</p>
   `;
 }
@@ -2789,6 +2941,7 @@ function updateBudgetSummary(){
     document.getElementById('investAmt').value = Math.max(0, Math.round(surplus));
   }
   refreshInvestHint();
+  updateFireProgress();
 }
 
 function onInvestAmtInput(){
@@ -3154,6 +3307,144 @@ function updateNetWorth(){
       ? 'พอร์ตลงทุนดึงจากช่อง "เงินลงทุนเริ่มต้น" ด้านล่าง ยอดหนี้รวมจากยอดคงเหลือที่กรอกไว้ในรายการผ่อน/หนี้ด้านบน — กรอกยิ่งครบ ตัวเลขยิ่งแม่น'
       : 'พอร์ตลงทุนดึงจากช่อง "เงินลงทุนเริ่มต้น" ด้านล่าง — ถ้ามีหนี้ ใส่ "ยอดหนี้คงเหลือ" ในรายการผ่อน/หนี้ด้านบนด้วย จะได้หักออกให้อัตโนมัติ';
   }
+
+  updateFireProgress();
+}
+
+/* ---- FIRE progress: 25× annual expense vs current portfolio (4% withdrawal rule) ---- */
+function updateFireProgress(){
+  const explain = document.getElementById('fireExplain');
+  const bar = document.getElementById('fireBar');
+  const status = document.getElementById('fireStatus');
+  if (!explain || !bar || !status) return;
+
+  const monthlyExpense = getBudgetTotal('fixedRows') + getBudgetTotal('varRows');
+  const portfolio = parseFloat(document.getElementById('initial').value) || 0;
+
+  if (monthlyExpense <= 0){
+    explain.textContent = 'กรอกรายจ่ายรายเดือนในงบด้านบนก่อน เพื่อคำนวณเลข FIRE (ใช้กฎ 25 เท่าของรายจ่ายทั้งปี ตามหลัก 4% withdrawal rate)';
+    bar.innerHTML = '';
+    status.textContent = '';
+    return;
+  }
+
+  const fireNumber = monthlyExpense * 12 * 25;
+  const pct = fireNumber > 0 ? Math.min(100, portfolio / fireNumber * 100) : 0;
+
+  explain.innerHTML = `เลข FIRE = รายจ่าย ${fmtMoney(monthlyExpense)}/เดือน × 12 × 25 = <b>${fmtMoney(fireNumber)}</b> · พอร์ตลงทุนปัจจุบัน ${fmtMoney(portfolio)}`;
+  bar.innerHTML = `<div style="width:${pct}%;background:var(--green);"></div>`;
+
+  if (portfolio >= fireNumber){
+    status.textContent = `🎉 ถึงเลข FIRE แล้ว (${pct.toFixed(0)}%) — พอร์ตตอนนี้ครอบคลุมรายจ่ายทั้งปีได้ ~25 เท่า`;
+    status.style.color = 'var(--green)';
+  } else {
+    status.textContent = `${pct.toFixed(1)}% ของเป้า FIRE — ขาดอีก ${fmtMoney(fireNumber - portfolio)}`;
+    status.style.color = 'var(--muted)';
+  }
+}
+
+/* ---- Milestone tracker: first age/year the DCA projection crosses each rung ---- */
+const MILESTONE_LADDER = [1000000, 5000000, 10000000]; // baht
+
+function updateMilestones(yearly, initial){
+  const rowsBox = document.getElementById('milestoneRows');
+  const emptyMsg = document.getElementById('milestoneEmpty');
+  if (!rowsBox || !emptyMsg) return;
+
+  const targets = MILESTONE_LADDER.filter(m => m > initial);
+  if (targets.length === 0){
+    rowsBox.innerHTML = '';
+    emptyMsg.style.display = 'block';
+    emptyMsg.textContent = 'เงินลงทุนเริ่มต้นสูงเกินทุกเส้นชัยในลิสต์นี้แล้ว 🎉 (1 ล้าน / 5 ล้าน / 10 ล้านบาท)';
+    return;
+  }
+  emptyMsg.style.display = 'none';
+
+  rowsBox.innerHTML = targets.map(m => {
+    const label = m >= 1000000 ? (m / 1000000) + ' ล้านบาท' : fmtMoney(m);
+    const hit = yearly.find(d => d.balance >= m);
+    const valueHtml = hit
+      ? `อายุ ${hit.age} <span style="color:var(--muted);font-weight:400;">(ปีที่ ${hit.year})</span>`
+      : `<span style="color:var(--muted);">ยังไม่ถึงภายในแผนนี้</span>`;
+    return `<div class="bl-row"><span class="bl-label">🚩 ${label}</span><span>${valueHtml}</span></div>`;
+  }).join('');
+}
+
+/* ---- one-page print/export summary — pulls text straight out of the already-rendered cards ---- */
+
+function buildPrintSummary(){
+  const today = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+  let html = `<h1>🌱 สรุปแผนการเงิน</h1><p class="ps-date">พิมพ์เมื่อ ${today}</p>`;
+
+  // monthly budget
+  const bIncome = document.getElementById('bIncome');
+  if (bIncome && bIncome.textContent !== '฿0'){
+    html += `
+      <h2>💰 งบรายรับ-รายจ่ายรายเดือน</h2>
+      <table class="ps-table">
+        <tr><td>รายรับรวม</td><td>${document.getElementById('bIncome').textContent}</td></tr>
+        <tr><td>รายจ่ายรวม</td><td>${document.getElementById('bExpense').textContent}</td></tr>
+        <tr><td>เหลือ (ลงทุนได้)</td><td>${document.getElementById('bSurplus').textContent}</td></tr>
+        <tr><td>อัตราออม</td><td>${document.getElementById('bRate').textContent}</td></tr>
+      </table>
+    `;
+  }
+
+  // net worth
+  const netWorthEl = document.getElementById('netWorthLedger');
+  if (netWorthEl && netWorthEl.innerHTML.trim()){
+    html += `<h2>📒 ทรัพย์สินสุทธิ (Net Worth)</h2><div class="budget-ledger">${netWorthEl.innerHTML}</div>`;
+  }
+
+  // goals
+  const goalRows = document.querySelectorAll('#goalRows .budget-row');
+  if (goalRows.length > 0){
+    html += `<h2>🎯 เป้าหมายการเงินระยะสั้น-กลาง</h2><table class="ps-table">`;
+    goalRows.forEach(r => {
+      const name = r.querySelector('.goal-label').value || 'เป้าหมาย';
+      const target = parseFloat(r.querySelector('.goal-target').value) || 0;
+      const current = parseFloat(r.querySelector('.goal-current').value) || 0;
+      const resultEl = document.getElementById('goalResult_' + r.id);
+      const resultText = resultEl ? resultEl.textContent : '';
+      html += `<tr><td>${name}<br><span style="color:#888;font-size:10.5px;">เป้า ${fmtMoney(target)} · มีแล้ว ${fmtMoney(current)}</span></td><td>${resultText}</td></tr>`;
+    });
+    html += `</table>`;
+  }
+
+  // DCA projection result
+  html += `
+    <h2>📈 ผลลัพธ์แผนลงทุนระยะยาว (DCA)</h2>
+    <table class="ps-table">
+      <tr><td>${document.getElementById('outFinalLabel').textContent}</td><td><b>${document.getElementById('outFinal').textContent}</b></td></tr>
+      <tr><td>เงินลงทุนรวม</td><td>${document.getElementById('outContrib').textContent}</td></tr>
+      <tr><td>กำไรรวม</td><td>${document.getElementById('outGain').textContent}</td></tr>
+      <tr><td>มูลค่าจริง (หักเงินเฟ้อ)</td><td>${document.getElementById('outReal').textContent}</td></tr>
+    </table>
+  `;
+  const rangeNote = document.getElementById('outRangeNote');
+  if (rangeNote && rangeNote.textContent.trim()){
+    html += `<p style="font-size:11px;color:#777;margin-top:-4px;">${rangeNote.textContent}</p>`;
+  }
+
+  // FIRE
+  const fireStatus = document.getElementById('fireStatus');
+  if (fireStatus && fireStatus.textContent.trim()){
+    html += `<h2>🔥 อิสรภาพทางการเงิน (FIRE)</h2><p>${document.getElementById('fireExplain').innerHTML}</p><p><b>${fireStatus.textContent}</b></p>`;
+  }
+
+  // milestones
+  const milestoneEl = document.getElementById('milestoneRows');
+  if (milestoneEl && milestoneEl.innerHTML.trim()){
+    html += `<h2>🚩 เส้นชัยระหว่างทาง</h2><div class="budget-ledger">${milestoneEl.innerHTML}</div>`;
+  }
+
+  html += `<p class="ps-foot">สร้างจากเครื่องมือ DCA Compound Calculator — เพื่อประกอบการตัดสินใจเบื้องต้นเท่านั้น ไม่ใช่คำแนะนำการลงทุน</p>`;
+  return html;
+}
+
+function printSummaryReport(){
+  document.getElementById('printSummary').innerHTML = buildPrintSummary();
+  window.print();
 }
 
 function renderBudgetLedger(income, fixed, varr, surplus, invest, leftover){
@@ -3568,7 +3859,12 @@ function applyBudgetState(state){
 function saveBudgetMonth(){
   const monthStr = document.getElementById('budgetMonth').value || todayMonthStr();
   const store = loadHistoryStore();
-  store[monthStr] = serializeBudgetState();
+  // keep any "actual invested" figure already logged for this month — re-saving the
+  // plan shouldn't wipe out a retrospective entry the user already made
+  const existingActual = store[monthStr] ? store[monthStr].actualInvested : undefined;
+  const newState = serializeBudgetState();
+  if (existingActual !== undefined) newState.actualInvested = existingActual;
+  store[monthStr] = newState;
   const ok = saveHistoryStore(store);
   const status = document.getElementById('monthSaveStatus');
   if (ok){
@@ -3623,6 +3919,8 @@ function renderHistoryTable(){
     const expense = (s.fixed || []).reduce((sum,r) => sum + (r.amount||0), 0) + (s.varr || []).reduce((sum,r) => sum + (r.amount||0), 0);
     const surplus = income - expense;
     const rate = income > 0 ? (surplus/income*100) : 0;
+    const plan = s.investAmt || 0;
+    const actual = s.actualInvested;
     return `
       <tr>
         <td style="text-align:left;font-family:inherit;font-weight:700;">${monthLabelTH(k)}</td>
@@ -3630,6 +3928,8 @@ function renderHistoryTable(){
         <td>${fmtMoney(expense)}</td>
         <td>${fmtMoney(surplus)}</td>
         <td>${rate.toFixed(1)}%</td>
+        <td>${fmtMoney(plan)}</td>
+        <td><input type="number" class="hist-actual-input" value="${actual !== undefined && actual !== null ? actual : ''}" placeholder="-" min="0" step="100" onchange="updateActualInvested('${k}', this.value)"></td>
         <td style="white-space:nowrap;">
           <button type="button" class="pct-btn" style="padding:3px 8px;font-size:10.5px;" onclick="loadMonthByKey('${k}')">โหลด</button>
           <button type="button" class="pct-btn" style="padding:3px 8px;font-size:10.5px;border-color:var(--red);color:var(--red);" onclick="deleteMonth('${k}')">ลบ</button>
@@ -3637,6 +3937,38 @@ function renderHistoryTable(){
       </tr>
     `;
   }).join('');
+
+  // plan-vs-actual summary across every month that has a logged "actual" figure
+  const summaryEl = document.getElementById('actualVsPlanSummary');
+  if (summaryEl){
+    const withActual = keys.filter(k => store[k].actualInvested !== undefined && store[k].actualInvested !== null && store[k].actualInvested !== '');
+    if (keys.length === 0){
+      summaryEl.textContent = '';
+    } else if (withActual.length === 0){
+      summaryEl.textContent = 'กรอกช่อง "ลงทุนจริง" ของแต่ละเดือนในตาราง เพื่อเทียบว่าลงทุนได้ตามแผนที่ตั้งไว้ตอนนั้นมั้ย';
+      summaryEl.style.color = 'var(--muted)';
+    } else {
+      let planSum = 0, actualSum = 0;
+      withActual.forEach(k => { planSum += (store[k].investAmt || 0); actualSum += (parseFloat(store[k].actualInvested) || 0); });
+      const diff = actualSum - planSum;
+      const diffTxt = Math.abs(diff) < 1 ? 'ตรงตามแผนพอดี' : (diff > 0 ? `มากกว่าแผน ${fmtMoney(diff)}` : `น้อยกว่าแผน ${fmtMoney(Math.abs(diff))}`);
+      summaryEl.innerHTML = `${withActual.length} เดือนที่บันทึกจริงไว้ — ตามแผนรวม ${fmtMoney(planSum)} ลงทุนจริงรวม ${fmtMoney(actualSum)} (${diffTxt})`;
+      summaryEl.style.color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+    }
+  }
+}
+
+function updateActualInvested(monthKey, value){
+  const store = loadHistoryStore();
+  if (!store[monthKey]) return;
+  const trimmed = (value || '').toString().trim();
+  if (trimmed === ''){
+    delete store[monthKey].actualInvested;
+  } else {
+    store[monthKey].actualInvested = Math.max(0, parseFloat(trimmed) || 0);
+  }
+  saveHistoryStore(store);
+  renderHistoryTable();
 }
 
 function loadMonthByKey(k){
