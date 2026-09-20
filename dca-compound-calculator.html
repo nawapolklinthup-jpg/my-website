@@ -1000,6 +1000,63 @@
   .swatch.balance{ background: var(--green); height:3px; }
   .swatch.contrib{ background: repeating-linear-gradient(90deg, var(--gold) 0 5px, transparent 5px 9px); }
 
+  /* ---- Stock quote header + range tabs ---- */
+  .stock-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .stock-badge{
+    flex:none;
+    width:38px; height:38px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:13.5px;
+    font-family:'IBM Plex Mono','Consolas',monospace;
+    letter-spacing:-0.5px;
+  }
+  .stock-id{ flex:1; min-width:0; }
+  .stock-ticker{ font-weight:700; font-size:15px; color:var(--ink); line-height:1.3; }
+  .stock-name{ font-size:11px; color:var(--muted); margin-top:1px; line-height:1.3; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .stock-price-block{ text-align:right; flex:none; }
+  .stock-price{ font-family:'IBM Plex Mono','Consolas',monospace; font-size:21px; font-weight:700; color:var(--ink); line-height:1.2; }
+  .stock-change{ font-family:'IBM Plex Mono','Consolas',monospace; font-size:11.5px; font-weight:700; margin-top:2px; color:var(--muted); }
+  .stock-change.up{ color: var(--green); }
+  .stock-change.down{ color: var(--red); }
+
+  .range-tabs{
+    display:flex;
+    gap:4px;
+    margin: 8px 0 2px;
+    flex-wrap:wrap;
+  }
+  .range-tab{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:1px;
+    padding: 5px 9px;
+    background:#fff;
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    font-family:inherit;
+    cursor:pointer;
+    flex:1;
+    min-width:38px;
+  }
+  .range-tab .rt-label{ font-size:11px; font-weight:700; color:var(--muted); }
+  .range-tab .rt-return{ font-size:9px; font-family:'IBM Plex Mono','Consolas',monospace; color:var(--muted); min-height:11px; }
+  .range-tab .rt-return.up{ color: var(--green); }
+  .range-tab .rt-return.down{ color: var(--red); }
+  .range-tab.active{ background: var(--green-soft); border-color: var(--green); }
+  .range-tab.active .rt-label{ color: var(--green-deep); }
+  .range-tab:hover:not(.active){ border-color: var(--green); }
+  @media (max-width: 500px){
+    .range-tab{ padding: 5px 4px; }
+    .range-tab .rt-label{ font-size:10px; }
+  }
+
   svg text{ font-family:'IBM Plex Mono','Consolas',monospace; }
 
   .table-card{
@@ -1392,15 +1449,39 @@
       <div class="fetch-result" id="fetchResult"></div>
 
       <div class="chart-card" id="candleCard" style="display:none;margin-top:14px;">
-        <div class="chart-legend" style="align-items:center;">
-          <span id="candleTitle">กราฟแท่งเทียนรายวัน</span>
-          <button type="button" class="use-btn" style="width:auto;padding:5px 12px;margin-left:auto;" id="candleRefreshBtn" onclick="fetchCandles(true)">🔄 รีเฟรชราคาล่าสุด</button>
+        <div class="stock-header">
+          <div class="stock-badge" id="stockBadge">?</div>
+          <div class="stock-id">
+            <div class="stock-ticker" id="stockTicker">—</div>
+            <div class="stock-name" id="stockName"></div>
+          </div>
+          <div class="stock-price-block">
+            <div class="stock-price" id="stockPrice">$0.00</div>
+            <div class="stock-change" id="stockChange"></div>
+          </div>
         </div>
+
         <svg id="candleChart" viewBox="0 0 600 260" width="100%" height="260" preserveAspectRatio="none"></svg>
-        <p class="preset-note" id="candleAsOf" style="margin-top:8px;"></p>
+
+        <div class="range-tabs" id="rangeTabs">
+          <button type="button" class="range-tab" data-range="1D" onclick="setChartRange('1D')"><span class="rt-label">1D</span><span class="rt-return" id="rtReturn_1D"></span></button>
+          <button type="button" class="range-tab" data-range="5D" onclick="setChartRange('5D')"><span class="rt-label">5D</span><span class="rt-return" id="rtReturn_5D"></span></button>
+          <button type="button" class="range-tab" data-range="1M" onclick="setChartRange('1M')"><span class="rt-label">1M</span><span class="rt-return" id="rtReturn_1M"></span></button>
+          <button type="button" class="range-tab" data-range="6M" onclick="setChartRange('6M')"><span class="rt-label">6M</span><span class="rt-return" id="rtReturn_6M"></span></button>
+          <button type="button" class="range-tab" data-range="YTD" onclick="setChartRange('YTD')"><span class="rt-label">YTD</span><span class="rt-return" id="rtReturn_YTD"></span></button>
+          <button type="button" class="range-tab active" data-range="1Y" onclick="setChartRange('1Y')"><span class="rt-label">1Y</span><span class="rt-return" id="rtReturn_1Y"></span></button>
+          <button type="button" class="range-tab" data-range="5Y" onclick="setChartRange('5Y')"><span class="rt-label">5Y</span><span class="rt-return" id="rtReturn_5Y"></span></button>
+          <button type="button" class="range-tab" data-range="10Y" onclick="setChartRange('10Y')"><span class="rt-label">10Y</span><span class="rt-return" id="rtReturn_10Y"></span></button>
+          <button type="button" class="range-tab" data-range="ALL" onclick="setChartRange('ALL')"><span class="rt-label">All</span><span class="rt-return" id="rtReturn_ALL"></span></button>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;">
+          <span class="preset-note" id="candleAsOf" style="margin:0;"></span>
+          <button type="button" class="use-btn" style="width:auto;padding:5px 12px;flex:none;" id="candleRefreshBtn" onclick="fetchCandles(true)">🔄 รีเฟรช</button>
+        </div>
       </div>
 
-      <p class="preset-note" style="margin-top:14px;">ใช้ endpoint TIME_SERIES_MONTHLY_ADJUSTED (ราคาปรับด้วยเงินปันผลแล้ว) คำนวณ CAGR และความผันผวนย้อนหลังจากข้อมูลจริง · Free tier ของ Alpha Vantage จำกัด 25 คำขอ/วัน ระบบจะแคชผลลัพธ์ของ ticker เดิมไว้ในเบราว์เซอร์เพื่อลดการเรียกซ้ำ · รองรับหุ้น/ETF ตลาดสหรัฐฯ เป็นหลัก</p>
+      <p class="preset-note" style="margin-top:14px;">คำนวณ CAGR และความผันผวนจาก TIME_SERIES_MONTHLY_ADJUSTED (ราคาปรับด้วยเงินปันผลแล้ว) · กราฟและปุ่มช่วงเวลาด้านบนดึงจาก TIME_SERIES_DAILY ครั้งเดียว (outputsize=full ราคาปิดรายวัน ไม่ปรับปันผล) แล้วตัดช่วงในเบราว์เซอร์เอง ไม่ได้ยิง API ใหม่ทุกครั้งที่กดเปลี่ยนช่วง · ช่วง 1D/5D จึงเป็นเส้นจากราคาปิดรายวันเท่านั้น ไม่ใช่กราฟ intraday รายนาที (free tier ไม่รองรับ) · Free tier ของ Alpha Vantage จำกัด 25 คำขอ/วัน ระบบแคชผลลัพธ์ของ ticker เดิมไว้ในเบราว์เซอร์เพื่อลดการเรียกซ้ำ · รองรับหุ้น/ETF ตลาดสหรัฐฯ เป็นหลัก</p>
     </div>
 
     <!-- THAI S&P500 FEEDER FUNDS -->
@@ -2081,10 +2162,25 @@ function showFetchError(msg){
   resultBox.innerHTML = `<div class="fr-title">ดึงข้อมูลไม่สำเร็จ</div><div class="fr-stat-val" style="font-size:14px;">${msg}</div>`;
 }
 
-/* ---- Candlestick chart (daily bars, real prices, Dime-style) ---- */
+/* ---- Stock quote chart (area chart, real daily closes, Google-Finance-style) ---- */
 
+function fmtUSD(n){
+  const sign = n < 0 ? "-" : "";
+  n = Math.abs(n);
+  return sign + "$" + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function tickerColor(ticker){
+  let hash = 0;
+  for (let i = 0; i < ticker.length; i++) hash = (hash * 31 + ticker.charCodeAt(i)) % 360;
+  return `hsl(${hash}, 42%, 38%)`;
+}
+
+const RANGE_LIST = ['1D','5D','1M','6M','YTD','1Y','5Y','10Y','ALL'];
 let lastCandleTicker = null;
 let lastCandleKey = null;
+let candleBarsFull = [];
+let chartRange = '1Y';
 
 async function fetchCandles(forceRefresh, tickerArg, keyArg){
   const ticker = (tickerArg || lastCandleTicker || document.getElementById('avTicker').value.trim().toUpperCase());
@@ -2096,19 +2192,20 @@ async function fetchCandles(forceRefresh, tickerArg, keyArg){
   const card = document.getElementById('candleCard');
   const asOfEl = document.getElementById('candleAsOf');
   const refreshBtn = document.getElementById('candleRefreshBtn');
-  const titleEl = document.getElementById('candleTitle');
   card.style.display = 'block';
-  titleEl.textContent = `กราฟแท่งเทียนรายวัน — ${ticker}`;
 
-  const cacheKey = 'avCandles_' + ticker;
+  const cacheKey = 'avCandlesFull_' + ticker;
   if (!forceRefresh){
     try{
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
       // daily bars only change once a day after market close — cache valid until next calendar day
       const cachedDay = cached ? new Date(cached.ts).toDateString() : null;
       if (cached && cachedDay === new Date().toDateString()){
-        drawCandleChart(cached.bars);
-        asOfEl.textContent = `ราคาล่าสุด (ปิด): ${cached.bars[cached.bars.length-1].date} · ดึงจากแคช · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน`;
+        candleBarsFull = cached.bars;
+        renderStockHeader(ticker, candleBarsFull);
+        applyChartRange();
+        asOfEl.textContent = `ข้อมูลราคาปิดรายวัน ${candleBarsFull.length.toLocaleString()} วัน · ดึงจากแคช · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน`;
+        fetchOverview(ticker, keyInput);
         return;
       }
     }catch(e){}
@@ -2119,7 +2216,7 @@ async function fetchCandles(forceRefresh, tickerArg, keyArg){
   asOfEl.textContent = 'กำลังดึงราคาล่าสุด...';
 
   try{
-    const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodeURIComponent(ticker)}&outputsize=compact&apikey=${encodeURIComponent(keyInput)}`;
+    const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodeURIComponent(ticker)}&outputsize=full&apikey=${encodeURIComponent(keyInput)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('เครือข่ายผิดพลาด (HTTP ' + res.status + ')');
     const data = await res.json();
@@ -2132,8 +2229,9 @@ async function fetchCandles(forceRefresh, tickerArg, keyArg){
     if (!series) throw new Error('ไม่ได้รับข้อมูลราคารายวัน');
 
     const dates = Object.keys(series).sort(); // ascending
-    const last60 = dates.slice(-60);
-    const bars = last60.map(d => ({
+    // cap at ~22 years of daily bars — plenty for the 10Y/All tabs, keeps localStorage reasonable
+    const capped = dates.slice(-5500);
+    const bars = capped.map(d => ({
       date: d,
       open: parseFloat(series[d]['1. open']),
       high: parseFloat(series[d]['2. high']),
@@ -2141,102 +2239,233 @@ async function fetchCandles(forceRefresh, tickerArg, keyArg){
       close: parseFloat(series[d]['4. close'])
     }));
 
-    try{ localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), bars })); }catch(e){}
+    try{ localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), bars })); }catch(e){
+      // full history can be large — if storage is full, retry with a smaller window rather than losing the chart entirely
+      try{ localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), bars: bars.slice(-1500) })); }catch(e2){}
+    }
 
-    drawCandleChart(bars);
-    const lastBar = bars[bars.length - 1];
-    const chg = ((lastBar.close - bars[bars.length-2].close) / bars[bars.length-2].close * 100);
-    asOfEl.textContent = `ราคาปิดล่าสุด: ${lastBar.date} · ${fmtMoney(lastBar.close)} (${chg>=0?'+':''}${chg.toFixed(2)}% จากวันก่อน) · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน`;
+    candleBarsFull = bars;
+    renderStockHeader(ticker, candleBarsFull);
+    applyChartRange();
+    asOfEl.textContent = `ข้อมูลราคาปิดรายวัน ${bars.length.toLocaleString()} วัน (ตั้งแต่ ${bars[0].date}) · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน`;
+    fetchOverview(ticker, keyInput);
 
   }catch(err){
     asOfEl.textContent = '⚠ ดึงกราฟไม่สำเร็จ: ' + (err.message || 'ลองใหม่ภายหลัง');
   }finally{
     refreshBtn.disabled = false;
-    refreshBtn.textContent = '🔄 รีเฟรชราคาล่าสุด';
+    refreshBtn.textContent = '🔄 รีเฟรช';
   }
 }
 
-function drawCandleChart(bars){
+function renderStockHeader(ticker, bars){
+  const badge = document.getElementById('stockBadge');
+  badge.textContent = ticker.slice(0, 2);
+  badge.style.background = tickerColor(ticker);
+  document.getElementById('stockTicker').textContent = ticker;
+
+  const last = bars[bars.length - 1];
+  const prev = bars.length > 1 ? bars[bars.length - 2] : null;
+  document.getElementById('stockPrice').textContent = fmtUSD(last.close);
+
+  const chEl = document.getElementById('stockChange');
+  if (prev){
+    const chg = last.close - prev.close;
+    const pct = (chg / prev.close) * 100;
+    const up = chg >= 0;
+    chEl.className = 'stock-change ' + (up ? 'up' : 'down');
+    chEl.textContent = `${up ? '+' : ''}${fmtUSD(chg)} (${up ? '+' : ''}${pct.toFixed(2)}%) · ${last.date}`;
+  } else {
+    chEl.className = 'stock-change';
+    chEl.textContent = last.date;
+  }
+}
+
+function fetchOverview(ticker, keyInput){
+  const cacheKey = 'avOverview_' + ticker;
+  try{
+    const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+    if (cached && (Date.now() - cached.ts) < 30*24*60*60*1000){
+      applyOverview(cached.name, cached.exchange);
+      return;
+    }
+  }catch(e){}
+
+  // best-effort decoration only — never blocks or errors out the chart above,
+  // and silently does nothing if the ticker is an ETF (Alpha Vantage's free
+  // OVERVIEW endpoint usually returns no data for those) rather than guess a name
+  fetch(`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(keyInput)}`)
+    .then(res => res.ok ? res.json() : null)
+    .then(data => {
+      if (!data || !data['Name']) return;
+      const name = data['Name'];
+      const exchange = data['Exchange'] || '';
+      try{ localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), name, exchange })); }catch(e){}
+      applyOverview(name, exchange);
+    })
+    .catch(() => {});
+}
+
+function applyOverview(name, exchange){
+  const nameEl = document.getElementById('stockName');
+  if (!nameEl) return;
+  nameEl.textContent = exchange ? `${name} · ${exchange}` : name;
+}
+
+function sliceByRange(bars, range){
+  const n = bars.length;
+  if (n === 0) return bars;
+  if (range === '1D') return bars.slice(Math.max(0, n - 2));
+  if (range === '5D') return bars.slice(Math.max(0, n - 6));
+  if (range === 'ALL') return bars;
+
+  const lastDate = new Date(bars[n - 1].date + 'T00:00:00');
+  let cutoff = new Date(lastDate);
+  if (range === '1M') cutoff.setMonth(cutoff.getMonth() - 1);
+  else if (range === '6M') cutoff.setMonth(cutoff.getMonth() - 6);
+  else if (range === 'YTD') cutoff = new Date(lastDate.getFullYear(), 0, 1);
+  else if (range === '1Y') cutoff.setFullYear(cutoff.getFullYear() - 1);
+  else if (range === '5Y') cutoff.setFullYear(cutoff.getFullYear() - 5);
+  else if (range === '10Y') cutoff.setFullYear(cutoff.getFullYear() - 10);
+
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+  let idx = bars.findIndex(b => b.date >= cutoffStr);
+  if (idx === -1) idx = n - 1;
+  idx = Math.max(0, idx - 1); // keep one bar before the cutoff as the % baseline
+  return bars.slice(idx);
+}
+
+function computeReturnForRange(bars, range){
+  const sliced = sliceByRange(bars, range);
+  if (sliced.length < 2) return null;
+  const first = sliced[0].close, last = sliced[sliced.length - 1].close;
+  if (!first) return null;
+  return (last / first - 1) * 100;
+}
+
+function setChartRange(range){
+  chartRange = range;
+  applyChartRange();
+}
+
+function applyChartRange(){
+  if (!candleBarsFull || candleBarsFull.length < 2) return;
+  let sliced = sliceByRange(candleBarsFull, chartRange);
+  if (sliced.length < 2) sliced = candleBarsFull.slice(-2);
+  drawAreaChart(sliced);
+  updateRangeTabs();
+}
+
+function updateRangeTabs(){
+  RANGE_LIST.forEach(r => {
+    const btn = document.querySelector('.range-tab[data-range="' + r + '"]');
+    if (btn) btn.classList.toggle('active', r === chartRange);
+    const el = document.getElementById('rtReturn_' + r);
+    if (!el) return;
+    const ret = computeReturnForRange(candleBarsFull, r);
+    if (ret === null){
+      el.textContent = '';
+      el.className = 'rt-return';
+    } else {
+      el.textContent = (ret >= 0 ? '+' : '') + ret.toFixed(1) + '%';
+      el.className = 'rt-return ' + (ret >= 0 ? 'up' : 'down');
+    }
+  });
+}
+
+function drawAreaChart(bars){
   const svg = document.getElementById('candleChart');
   svg.innerHTML = '';
   const W = 600, H = 260;
-  const padL = 56, padR = 12, padT = 14, padB = 26;
+  const padL = 48, padR = 10, padT = 14, padB = 20;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
   const n = bars.length;
   const ns = "http://www.w3.org/2000/svg";
+  if (n < 2) return;
 
-  const maxP = Math.max(...bars.map(b => b.high));
-  const minP = Math.min(...bars.map(b => b.low));
-  const pad = (maxP - minP) * 0.06 || maxP * 0.05;
+  const closes = bars.map(b => b.close);
+  const maxP = Math.max(...closes);
+  const minP = Math.min(...closes);
+  const pad = (maxP - minP) * 0.08 || maxP * 0.05;
   const top = maxP + pad, bottom = minP - pad;
 
   function y(v){ return padT + plotH * (1 - (v - bottom) / (top - bottom)); }
-  const slotW = plotW / n;
-  function xCenter(i){ return padL + slotW * (i + 0.5); }
+  function x(i){ return padL + plotW * i / (n - 1); }
 
-  // gridlines + y labels
-  const steps = 4;
-  for (let s = 0; s <= steps; s++){
-    const val = bottom + (top - bottom) * s / steps;
+  const up = closes[closes.length - 1] >= closes[0];
+  const lineColor = up ? '#2F5233' : '#8B3A3A';
+  const fillId = 'areaFill_' + Math.random().toString(36).slice(2, 9);
+
+  const defs = document.createElementNS(ns, 'defs');
+  const grad = document.createElementNS(ns, 'linearGradient');
+  grad.setAttribute('id', fillId);
+  grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0');
+  grad.setAttribute('x2', '0'); grad.setAttribute('y2', '1');
+  const stop1 = document.createElementNS(ns, 'stop');
+  stop1.setAttribute('offset', '0%'); stop1.setAttribute('stop-color', lineColor); stop1.setAttribute('stop-opacity', '0.25');
+  const stop2 = document.createElementNS(ns, 'stop');
+  stop2.setAttribute('offset', '100%'); stop2.setAttribute('stop-color', lineColor); stop2.setAttribute('stop-opacity', '0.02');
+  grad.appendChild(stop1); grad.appendChild(stop2);
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  // gridlines + y labels (top / mid / bottom only — minimal look)
+  [0, 0.5, 1].forEach(frac => {
+    const val = bottom + (top - bottom) * frac;
     const yy = y(val);
     const line = document.createElementNS(ns, 'line');
     line.setAttribute('x1', padL); line.setAttribute('x2', W - padR);
     line.setAttribute('y1', yy); line.setAttribute('y2', yy);
     line.setAttribute('stroke', '#E3DCC8');
     line.setAttribute('stroke-width', '1');
+    if (frac === 0.5) line.setAttribute('stroke-dasharray', '3,3');
     svg.appendChild(line);
 
     const label = document.createElementNS(ns, 'text');
-    label.setAttribute('x', padL - 8);
-    label.setAttribute('y', yy + 4);
+    label.setAttribute('x', padL - 6);
+    label.setAttribute('y', yy + 3);
     label.setAttribute('text-anchor', 'end');
-    label.setAttribute('font-size', '9.5');
+    label.setAttribute('font-size', '9');
     label.setAttribute('fill', '#5C6B57');
     label.textContent = val.toFixed(val < 10 ? 2 : (val < 200 ? 1 : 0));
     svg.appendChild(label);
-  }
+  });
 
-  // x labels (every ~10 candles)
-  const xInterval = Math.max(1, Math.ceil(n / 6));
-  for (let i = 0; i < n; i++){
-    if (i % xInterval === 0 || i === n - 1){
-      const label = document.createElementNS(ns, 'text');
-      label.setAttribute('x', xCenter(i));
-      label.setAttribute('y', H - 6);
-      label.setAttribute('text-anchor', 'middle');
-      label.setAttribute('font-size', '9');
-      label.setAttribute('fill', '#5C6B57');
-      label.textContent = bars[i].date.slice(5); // MM-DD
-      svg.appendChild(label);
-    }
-  }
-
-  const bodyW = Math.max(1.5, slotW * 0.6);
+  let linePath = '';
   bars.forEach((b, i) => {
-    const up = b.close >= b.open;
-    const color = up ? '#2F5233' : '#8B3A3A';
-    const cx = xCenter(i);
+    const cmd = i === 0 ? 'M' : 'L';
+    linePath += `${cmd}${x(i).toFixed(2)},${y(b.close).toFixed(2)} `;
+  });
+  linePath = linePath.trim();
 
-    // wick
-    const wick = document.createElementNS(ns, 'line');
-    wick.setAttribute('x1', cx); wick.setAttribute('x2', cx);
-    wick.setAttribute('y1', y(b.high)); wick.setAttribute('y2', y(b.low));
-    wick.setAttribute('stroke', color);
-    wick.setAttribute('stroke-width', '1');
-    svg.appendChild(wick);
+  const baseY = (padT + plotH).toFixed(2);
+  const areaPath = `${linePath} L${x(n - 1).toFixed(2)},${baseY} L${x(0).toFixed(2)},${baseY} Z`;
 
-    // body
-    const yOpen = y(b.open), yClose = y(b.close);
-    const bodyTop = Math.min(yOpen, yClose);
-    const bodyH = Math.max(1, Math.abs(yOpen - yClose));
-    const rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', cx - bodyW/2);
-    rect.setAttribute('y', bodyTop);
-    rect.setAttribute('width', bodyW);
-    rect.setAttribute('height', bodyH);
-    rect.setAttribute('fill', color);
-    svg.appendChild(rect);
+  const areaEl = document.createElementNS(ns, 'path');
+  areaEl.setAttribute('d', areaPath);
+  areaEl.setAttribute('fill', `url(#${fillId})`);
+  areaEl.setAttribute('stroke', 'none');
+  svg.appendChild(areaEl);
+
+  const lineEl = document.createElementNS(ns, 'path');
+  lineEl.setAttribute('d', linePath);
+  lineEl.setAttribute('fill', 'none');
+  lineEl.setAttribute('stroke', lineColor);
+  lineEl.setAttribute('stroke-width', '1.75');
+  lineEl.setAttribute('stroke-linejoin', 'round');
+  lineEl.setAttribute('stroke-linecap', 'round');
+  svg.appendChild(lineEl);
+
+  [0, n - 1].forEach(i => {
+    const label = document.createElementNS(ns, 'text');
+    label.setAttribute('x', x(i));
+    label.setAttribute('y', H - 5);
+    label.setAttribute('text-anchor', i === 0 ? 'start' : 'end');
+    label.setAttribute('font-size', '9');
+    label.setAttribute('fill', '#5C6B57');
+    label.textContent = bars[i].date;
+    svg.appendChild(label);
   });
 }
 
