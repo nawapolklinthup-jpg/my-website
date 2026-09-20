@@ -826,13 +826,20 @@
   .switch input:checked + .track{ background: var(--green); }
   .switch input:checked + .track::before{ transform: translateX(18px); }
 
-  #stepupField, #inflationNote{
+  #stepupField, #inflationNote, #volField{
     overflow:hidden;
     max-height:0;
     opacity:0;
     transition: max-height .2s ease, opacity .2s ease, margin .2s ease;
   }
   #stepupField.open{ max-height:220px; opacity:1; margin-bottom:16px; }
+  #volField.open{ max-height:140px; opacity:1; margin-bottom:16px; }
+  .range-note{
+    font-size: 10.5px;
+    color: var(--muted);
+    line-height:1.6;
+    margin-top:6px;
+  }
 
   .stepup-preview{
     background: var(--gold-soft);
@@ -979,6 +986,7 @@
   .stat.hero .stat-value{ font-size: 26px; color: #fff; }
   .stat.gain .stat-value{ color: var(--green); }
   .stat.real .stat-value{ color: var(--red); }
+  .stat-sub{ font-size:11px; color:#CBE0CB; margin-top:6px; font-family:'IBM Plex Mono','Consolas',monospace; }
 
   .chart-card{
     border: 1px solid var(--paper-line);
@@ -1407,6 +1415,27 @@
     <div class="goals-total" id="goalsTotal" style="display:none;"></div>
   </div>
 
+  <div class="bonus-card readiness-card" id="bonusCard">
+    <h2>🎁 จัดสรรโบนัส / เงินก้อนพิเศษ</h2>
+    <p class="sub">ได้โบนัสหรือเงินก้อนมา ไม่รู้จะใส่ตรงไหน? กรอกยอดที่ได้ตรงนี้ แล้วแบ่งเองว่าจะให้ไปทางไหนบ้าง — ลงทุนต่อ (เข้ากราฟ DCA ด้านล่างเป็นเงินก้อนพิเศษ), เข้าเป้าหมายไหนด้านบน (เงินสะสมของเป้านั้นเพิ่มให้อัตโนมัติ), หรือเก็บเป็นเงินสด (เข้า Emergency fund) — กดยืนยันทีเดียว ระบบอัปเดตให้ทุกจุดเอง ไม่ต้องมานั่งบวกเลข (ไม่มีสัดส่วนตายตัว กรอกเองทุกครั้งที่ได้เงินก้อนมา)</p>
+
+    <div class="inj-line" style="margin-bottom:10px;">
+      <div class="inj-field">
+        <label class="inj-field-label">ยอดที่ได้รับทั้งหมด (บาท)</label>
+        <input type="number" id="bonusTotal" value="" placeholder="เช่น 60000" min="0" step="1000" oninput="updateBonusRemainHint()">
+      </div>
+      <div class="inj-field">
+        <label class="inj-field-label">ป้ายกำกับ (ถ้ามี)</label>
+        <input type="text" id="bonusLabel" placeholder="เช่น โบนัสกลางปี 2569">
+      </div>
+    </div>
+
+    <div id="bonusAllocRows"></div>
+    <button type="button" class="budget-addbtn" onclick="addBonusAllocRow()">➕ เพิ่มรายการจัดสรร</button>
+    <p class="hint" id="bonusRemainHint" style="margin-top:8px;"></p>
+    <button type="button" class="use-btn" style="width:100%;margin-top:8px;" onclick="applyBonusAllocation()">✅ ยืนยันจัดสรร</button>
+  </div>
+
   <div class="asset-panel">
     <h2>📊 เลือกสินทรัพย์ที่จะลงทุน</h2>
     <p class="sub">เลือกอัตราผลตอบแทนคาดหวังจากข้อมูลอ้างอิง แล้วกด "ใช้ค่านี้" เพื่อใส่ในช่องคำนวณด้านล่างอัตโนมัติ — ผลตอบแทนในอดีตไม่ได้การันตีผลตอบแทนในอนาคต ไม่ใช่คำแนะนำการลงทุน</p>
@@ -1481,7 +1510,7 @@
         </div>
       </div>
 
-      <p class="preset-note" style="margin-top:14px;">คำนวณ CAGR และความผันผวนจาก TIME_SERIES_MONTHLY_ADJUSTED (ราคาปรับด้วยเงินปันผลแล้ว) · กราฟและปุ่มช่วงเวลาด้านบนดึงจาก TIME_SERIES_DAILY ครั้งเดียว (outputsize=full ราคาปิดรายวัน ไม่ปรับปันผล) แล้วตัดช่วงในเบราว์เซอร์เอง ไม่ได้ยิง API ใหม่ทุกครั้งที่กดเปลี่ยนช่วง · ช่วง 1D/5D จึงเป็นเส้นจากราคาปิดรายวันเท่านั้น ไม่ใช่กราฟ intraday รายนาที (free tier ไม่รองรับ) · Free tier ของ Alpha Vantage จำกัด 25 คำขอ/วัน ระบบแคชผลลัพธ์ของ ticker เดิมไว้ในเบราว์เซอร์เพื่อลดการเรียกซ้ำ · รองรับหุ้น/ETF ตลาดสหรัฐฯ เป็นหลัก</p>
+      <p class="preset-note" style="margin-top:14px;">คำนวณ CAGR และความผันผวนจาก TIME_SERIES_MONTHLY_ADJUSTED (ราคาปรับด้วยเงินปันผลแล้ว) · กราฟและปุ่มช่วงเวลาด้านบนดึงข้อมูล 2 ชุดพร้อมกัน (ครั้งเดียวต่อการรีเฟรช): TIME_SERIES_DAILY แบบ compact (~100 วันทำการล่าสุด ใช้กับช่วง 1D/5D/1M) และ TIME_SERIES_WEEKLY แบบเต็มประวัติ (ใช้กับช่วง 6M ขึ้นไป) — ทั้งสอง endpoint นี้ใช้ได้กับ free tier ไม่ต้องอัปเกรดบัญชี แล้วตัดช่วงในเบราว์เซอร์เอง ไม่ได้ยิง API ใหม่ทุกครั้งที่กดเปลี่ยนช่วง · ช่วง 1D/5D จึงเป็นเส้นจากราคาปิดรายวันเท่านั้น ไม่ใช่กราฟ intraday รายนาที (free tier ไม่รองรับ) · ช่วงยาว (5Y/10Y/All) เป็นเส้นจากราคาปิด<b>รายสัปดาห์</b> ไม่ใช่รายวัน ความละเอียดจึงหยาบกว่าช่วงสั้น · Free tier ของ Alpha Vantage จำกัด 25 คำขอ/วัน (การรีเฟรช 1 ครั้งใช้ไป 2 คำขอ) ระบบแคชผลลัพธ์ของ ticker เดิมไว้ในเบราว์เซอร์เพื่อลดการเรียกซ้ำ · รองรับหุ้น/ETF ตลาดสหรัฐฯ เป็นหลัก</p>
     </div>
 
     <!-- THAI S&P500 FEEDER FUNDS -->
@@ -1547,9 +1576,25 @@
       <div class="field">
         <label>📈 ผลตอบแทนคาดหวังต่อปี <span class="hint">(Expected annual return)</span></label>
         <div class="input-row">
-          <input type="number" id="rate" value="8" min="-50" max="100" step="0.1">
+          <input type="number" id="rate" value="8" min="-50" max="100" step="0.1" oninput="calc()">
           <span class="unit">% / ปี</span>
         </div>
+      </div>
+
+      <div class="toggle-row">
+        <div class="switch">
+          <input type="checkbox" id="volToggle" onchange="document.getElementById('volField').classList.toggle('open', this.checked); calc();">
+          <span class="track" onclick="document.getElementById('volToggle').click()"></span>
+        </div>
+        <label for="volToggle">แสดงช่วงกรณีดี/แย่ (± ความผันผวน)</label>
+      </div>
+      <div class="field" id="volField">
+        <label>📉📈 ความผันผวนรายปี (±) <span class="hint">(Volatility)</span></label>
+        <div class="input-row">
+          <input type="number" id="volatility" value="15" min="0" max="100" step="0.5" oninput="calc()">
+          <span class="unit">% / ปี</span>
+        </div>
+        <p class="range-note">กดปุ่ม "ใช้ค่านี้ในการคำนวณ" จากผลตอบแทนจริงที่ดึงมาในแท็บ "หุ้นต่างประเทศ" จะใส่ค่าความผันผวนจริงให้อัตโนมัติ — กรณีดี/แย่ คือ ผลตอบแทนคาดหวัง ± ค่านี้ สมมติว่าได้ผลตอบแทนแบบนั้น<b>ทุกปีติดต่อกัน</b> ซึ่งไม่สมจริง (ของจริงจะสลับดี/แย่ปนกันไป) ไว้ดูเป็นกรอบกว้างๆ ของความเสี่ยงเท่านั้น</p>
       </div>
 
       <div class="field" style="display:flex;gap:10px;">
@@ -1613,6 +1658,7 @@
         <div class="stat hero">
           <div class="stat-label" id="outFinalLabel">🏆 มูลค่าตอนเกษียณ (อายุ 60)</div>
           <div class="stat-value" id="outFinal">฿0</div>
+          <div class="stat-sub" id="outRangeNote" style="display:none;"></div>
         </div>
         <div class="stat">
           <div class="stat-label">💵 เงินลงทุนรวม</div>
@@ -1628,10 +1674,32 @@
         </div>
       </div>
 
+      <div class="chart-card" style="margin-bottom:14px;">
+        <button type="button" class="use-btn" style="width:auto;padding:7px 14px;font-size:12px;" onclick="printSummaryReport()">🖨️ พิมพ์ / บันทึกสรุปแผนเป็น PDF</button>
+      </div>
+
+      <div class="chart-card" id="fireCard">
+        <div class="chart-legend" style="margin-bottom:8px;">
+          <span style="font-weight:700;color:var(--ink);font-size:13px;">🔥 อิสรภาพทางการเงิน (FIRE)</span>
+        </div>
+        <p class="hint" id="fireExplain" style="margin:0 0 8px;"></p>
+        <div class="budget-bar" id="fireBar"></div>
+        <p class="hint" id="fireStatus" style="margin-top:6px;font-weight:600;"></p>
+      </div>
+
+      <div class="chart-card" id="milestoneCard">
+        <div class="chart-legend" style="margin-bottom:8px;">
+          <span style="font-weight:700;color:var(--ink);font-size:13px;">🚩 เส้นชัยระหว่างทาง</span>
+        </div>
+        <div class="budget-ledger" id="milestoneRows" style="margin-top:0;"></div>
+        <p class="hint" id="milestoneEmpty" style="display:none;"></p>
+      </div>
+
       <div class="chart-card">
         <div class="chart-legend">
           <span><i class="swatch balance"></i> ยอดเงินสะสม (Balance)</span>
           <span><i class="swatch contrib"></i> เงินลงทุนสะสม (Contributed)</span>
+          <span id="rangeLegendItem" style="display:none;"><i class="swatch" style="background:repeating-linear-gradient(90deg, #7C9E7F 0 4px, transparent 4px 7px);"></i> กรอบดี/แย่</span>
         </div>
         <svg id="chart" viewBox="0 0 600 220" width="100%" height="220" preserveAspectRatio="none"></svg>
       </div>
@@ -2179,8 +2247,30 @@ function tickerColor(ticker){
 const RANGE_LIST = ['1D','5D','1M','6M','YTD','1Y','5Y','10Y','ALL'];
 let lastCandleTicker = null;
 let lastCandleKey = null;
-let candleBarsFull = [];
+let candleDaily = [];   // compact daily bars — free tier, last ~100 trading days
+let candleWeekly = [];  // full weekly history — free tier, no outputsize limit
 let chartRange = '1Y';
+
+function parseAVSeries(obj, key){
+  const series = obj[key];
+  if (!series) return [];
+  const dates = Object.keys(series).sort(); // ascending
+  return dates.map(d => ({
+    date: d,
+    open: parseFloat(series[d]['1. open']),
+    high: parseFloat(series[d]['2. high']),
+    low: parseFloat(series[d]['3. low']),
+    close: parseFloat(series[d]['4. close'])
+  }));
+}
+
+function avApiErrorMsg(data, ticker){
+  if (!data) return 'เครือข่ายผิดพลาด';
+  if (data['Note']) return 'ถึงขีดจำกัดการเรียก API แล้ว (25 ครั้ง/วัน) ลองใหม่ภายหลัง';
+  if (data['Information']) return data['Information']; // e.g. premium-only param, bad key, etc — shown verbatim, never guessed
+  if (data['Error Message']) return 'ไม่พบ Ticker "' + ticker + '"';
+  return null;
+}
 
 async function fetchCandles(forceRefresh, tickerArg, keyArg){
   const ticker = (tickerArg || lastCandleTicker || document.getElementById('avTicker').value.trim().toUpperCase());
@@ -2194,17 +2284,18 @@ async function fetchCandles(forceRefresh, tickerArg, keyArg){
   const refreshBtn = document.getElementById('candleRefreshBtn');
   card.style.display = 'block';
 
-  const cacheKey = 'avCandlesFull_' + ticker;
+  const cacheKey = 'avCandles3_' + ticker;
   if (!forceRefresh){
     try{
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-      // daily bars only change once a day after market close — cache valid until next calendar day
+      // daily/weekly bars only change once a day after market close — cache valid until next calendar day
       const cachedDay = cached ? new Date(cached.ts).toDateString() : null;
-      if (cached && cachedDay === new Date().toDateString()){
-        candleBarsFull = cached.bars;
-        renderStockHeader(ticker, candleBarsFull);
+      if (cached && cachedDay === new Date().toDateString() && ((cached.daily||[]).length || (cached.weekly||[]).length)){
+        candleDaily = cached.daily || [];
+        candleWeekly = cached.weekly || [];
+        renderStockHeader(ticker, candleDaily.length ? candleDaily : candleWeekly);
         applyChartRange();
-        asOfEl.textContent = `ข้อมูลราคาปิดรายวัน ${candleBarsFull.length.toLocaleString()} วัน · ดึงจากแคช · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน`;
+        asOfEl.textContent = `รายวัน ${candleDaily.length} วัน + รายสัปดาห์ ${candleWeekly.length} สัปดาห์ · ดึงจากแคช · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน`;
         fetchOverview(ticker, keyInput);
         return;
       }
@@ -2216,38 +2307,42 @@ async function fetchCandles(forceRefresh, tickerArg, keyArg){
   asOfEl.textContent = 'กำลังดึงราคาล่าสุด...';
 
   try{
-    const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodeURIComponent(ticker)}&outputsize=full&apikey=${encodeURIComponent(keyInput)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('เครือข่ายผิดพลาด (HTTP ' + res.status + ')');
-    const data = await res.json();
+    // TIME_SERIES_DAILY (outputsize=compact, last ~100 trading days) covers the short ranges (1D/5D/1M)
+    // TIME_SERIES_WEEKLY always returns full history with no outputsize param, and stays on the free tier
+    // (outputsize=full on the DAILY endpoint is premium-only — confirmed by Alpha Vantage's own error message,
+    // so we deliberately don't request it) — covers the longer ranges (6M/YTD/1Y/5Y/10Y/All)
+    const dailyUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodeURIComponent(ticker)}&outputsize=compact&apikey=${encodeURIComponent(keyInput)}`;
+    const weeklyUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(keyInput)}`;
 
-    if (data['Note']) throw new Error('ถึงขีดจำกัดการเรียก API แล้ว (25 ครั้ง/วัน) ลองใหม่ภายหลัง');
-    if (data['Information']) throw new Error('API Key ไม่ถูกต้อง หรือถึงขีดจำกัดการใช้งาน: ' + data['Information']);
-    if (data['Error Message']) throw new Error('ไม่พบ Ticker "' + ticker + '"');
+    const [dailyRes, weeklyRes] = await Promise.all([fetch(dailyUrl), fetch(weeklyUrl)]);
+    const dailyData = dailyRes.ok ? await dailyRes.json() : null;
+    const weeklyData = weeklyRes.ok ? await weeklyRes.json() : null;
 
-    const series = data['Time Series (Daily)'];
-    if (!series) throw new Error('ไม่ได้รับข้อมูลราคารายวัน');
+    const dailyErr = avApiErrorMsg(dailyData, ticker);
+    const weeklyErr = avApiErrorMsg(weeklyData, ticker);
 
-    const dates = Object.keys(series).sort(); // ascending
-    // cap at ~22 years of daily bars — plenty for the 10Y/All tabs, keeps localStorage reasonable
-    const capped = dates.slice(-5500);
-    const bars = capped.map(d => ({
-      date: d,
-      open: parseFloat(series[d]['1. open']),
-      high: parseFloat(series[d]['2. high']),
-      low: parseFloat(series[d]['3. low']),
-      close: parseFloat(series[d]['4. close'])
-    }));
+    const daily = dailyErr ? [] : parseAVSeries(dailyData, 'Time Series (Daily)');
+    let weekly = weeklyErr ? [] : parseAVSeries(weeklyData, 'Weekly Time Series');
+    weekly = weekly.slice(-1150); // cap at ~22 years, plenty for the 10Y/All tabs
 
-    try{ localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), bars })); }catch(e){
-      // full history can be large — if storage is full, retry with a smaller window rather than losing the chart entirely
-      try{ localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), bars: bars.slice(-1500) })); }catch(e2){}
+    if (daily.length === 0 && weekly.length === 0){
+      throw new Error(dailyErr || weeklyErr || 'ไม่ได้รับข้อมูลราคา');
     }
 
-    candleBarsFull = bars;
-    renderStockHeader(ticker, candleBarsFull);
+    candleDaily = daily;
+    candleWeekly = weekly;
+
+    try{ localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), daily, weekly })); }catch(e){}
+
+    renderStockHeader(ticker, daily.length ? daily : weekly);
     applyChartRange();
-    asOfEl.textContent = `ข้อมูลราคาปิดรายวัน ${bars.length.toLocaleString()} วัน (ตั้งแต่ ${bars[0].date}) · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน`;
+
+    const notes = [];
+    if (daily.length) notes.push(`รายวัน ${daily.length} วัน`);
+    if (weekly.length) notes.push(`รายสัปดาห์ ${weekly.length} สัปดาห์ (ตั้งแต่ ${weekly[0].date})`);
+    if (dailyErr && weekly.length) notes.push('⚠ ดึงรายวันไม่ได้ (' + dailyErr + ') — ใช้รายสัปดาห์แทนสำหรับช่วงสั้น');
+    if (weeklyErr && daily.length) notes.push('⚠ ดึงรายสัปดาห์ไม่ได้ (' + weeklyErr + ') — ช่วงยาวจะไม่ครบ');
+    asOfEl.textContent = notes.join(' · ') + ' · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน';
     fetchOverview(ticker, keyInput);
 
   }catch(err){
@@ -2312,7 +2407,28 @@ function applyOverview(name, exchange){
   nameEl.textContent = exchange ? `${name} · ${exchange}` : name;
 }
 
-function sliceByRange(bars, range){
+// picks which free-tier series (daily-compact or weekly-full) best serves a given
+// range, falling back to whichever one actually has data
+function sourceForRange(range){
+  const hasDaily = candleDaily && candleDaily.length >= 2;
+  const hasWeekly = candleWeekly && candleWeekly.length >= 2;
+  if (range === '1D' || range === '5D'){
+    if (hasDaily) return candleDaily;
+    if (hasWeekly) return candleWeekly;
+    return [];
+  }
+  if (range === '1M'){
+    if (hasDaily && candleDaily.length >= 5) return candleDaily;
+    if (hasWeekly) return candleWeekly;
+    return hasDaily ? candleDaily : [];
+  }
+  // 6M / YTD / 1Y / 5Y / 10Y / ALL — long ranges need the full weekly history
+  if (hasWeekly) return candleWeekly;
+  return hasDaily ? candleDaily : [];
+}
+
+function sliceByRange(range){
+  const bars = sourceForRange(range);
   const n = bars.length;
   if (n === 0) return bars;
   if (range === '1D') return bars.slice(Math.max(0, n - 2));
@@ -2335,8 +2451,8 @@ function sliceByRange(bars, range){
   return bars.slice(idx);
 }
 
-function computeReturnForRange(bars, range){
-  const sliced = sliceByRange(bars, range);
+function computeReturnForRange(range){
+  const sliced = sliceByRange(range);
   if (sliced.length < 2) return null;
   const first = sliced[0].close, last = sliced[sliced.length - 1].close;
   if (!first) return null;
@@ -2349,9 +2465,15 @@ function setChartRange(range){
 }
 
 function applyChartRange(){
-  if (!candleBarsFull || candleBarsFull.length < 2) return;
-  let sliced = sliceByRange(candleBarsFull, chartRange);
-  if (sliced.length < 2) sliced = candleBarsFull.slice(-2);
+  const hasDaily = candleDaily && candleDaily.length >= 2;
+  const hasWeekly = candleWeekly && candleWeekly.length >= 2;
+  if (!hasDaily && !hasWeekly) return;
+  let sliced = sliceByRange(chartRange);
+  if (sliced.length < 2){
+    const fallback = sourceForRange(chartRange);
+    sliced = fallback.slice(-2);
+  }
+  if (sliced.length < 2) return;
   drawAreaChart(sliced);
   updateRangeTabs();
 }
@@ -2362,7 +2484,7 @@ function updateRangeTabs(){
     if (btn) btn.classList.toggle('active', r === chartRange);
     const el = document.getElementById('rtReturn_' + r);
     if (!el) return;
-    const ret = computeReturnForRange(candleBarsFull, r);
+    const ret = computeReturnForRange(r);
     if (ret === null){
       el.textContent = '';
       el.className = 'rt-return';
@@ -3231,6 +3353,137 @@ function loadGoals(){
     const list = raw ? JSON.parse(raw) : [];
     list.forEach(g => addGoalRow(g.name, g.target, g.current, g.targetMonth, g.rate));
   }catch(e){ /* ignore */ }
+}
+
+/* ---- Bonus / lump-sum allocator — manual split across invest / goals / cash ---- */
+/* Not persisted to localStorage on purpose: this is a one-off action each time */
+/* a bonus lands, not a recurring setting, so the form resets after each apply. */
+
+let bonusAllocSeq = 0;
+
+function bonusDestOptionsHtml(selected){
+  let html = `<option value="invest" ${selected==='invest'?'selected':''}>💹 ลงทุนต่อ (เพิ่มเงินก้อนในแผน DCA ด้านล่าง)</option>`;
+  html += `<option value="cash" ${selected==='cash'?'selected':''}>🏦 เก็บเป็นเงินสด (Emergency fund)</option>`;
+  document.querySelectorAll('#goalRows .budget-row').forEach(r => {
+    const val = 'goal:' + r.id;
+    const name = (r.querySelector('.goal-label').value || '').trim() || 'เป้าหมาย (ยังไม่ตั้งชื่อ)';
+    html += `<option value="${val}" ${selected===val?'selected':''}>🎯 เป้าหมาย: ${name}</option>`;
+  });
+  return html;
+}
+
+function addBonusAllocRow(dest, amount){
+  bonusAllocSeq++;
+  const id = 'balloc' + bonusAllocSeq;
+  const row = document.createElement('div');
+  row.className = 'inj-row';
+  row.id = id;
+  row.innerHTML = `
+    <div class="inj-line">
+      <div class="inj-field" style="flex:2;">
+        <label class="inj-field-label">แบ่งไปที่</label>
+        <select class="balloc-dest" oninput="updateBonusRemainHint()">${bonusDestOptionsHtml(dest)}</select>
+      </div>
+      <div class="inj-field">
+        <label class="inj-field-label">จำนวนเงิน (บาท)</label>
+        <input type="number" class="balloc-amt" value="${amount !== undefined ? amount : ''}" min="0" step="500" oninput="updateBonusRemainHint()">
+      </div>
+    </div>
+    <button type="button" class="inj-remove" onclick="document.getElementById('${id}').remove(); updateBonusRemainHint();">✕ ลบรายการนี้</button>
+  `;
+  document.getElementById('bonusAllocRows').appendChild(row);
+  updateBonusRemainHint();
+}
+
+function updateBonusRemainHint(){
+  const total = parseFloat(document.getElementById('bonusTotal').value) || 0;
+  const rows = document.querySelectorAll('#bonusAllocRows .inj-row');
+  let allocated = 0;
+  rows.forEach(r => { allocated += parseFloat(r.querySelector('.balloc-amt').value) || 0; });
+  const remain = total - allocated;
+  const hint = document.getElementById('bonusRemainHint');
+  if (total <= 0 && rows.length === 0){
+    hint.textContent = '';
+    hint.style.color = '';
+    return;
+  }
+  if (remain > 0.5){
+    hint.textContent = `ยังไม่ได้จัดสรร ${fmtMoney(remain)} จากยอดทั้งหมด ${fmtMoney(total)}`;
+    hint.style.color = 'var(--muted)';
+  } else if (remain < -0.5){
+    hint.textContent = `⚠ จัดสรรเกินยอดที่มี ${fmtMoney(-remain)} — ลองแก้ยอดในรายการใดรายการหนึ่ง`;
+    hint.style.color = 'var(--red)';
+  } else {
+    hint.textContent = `✓ จัดสรรครบพอดี ${fmtMoney(total)}`;
+    hint.style.color = 'var(--green)';
+  }
+}
+
+function applyBonusAllocation(){
+  const total = parseFloat(document.getElementById('bonusTotal').value) || 0;
+  const label = document.getElementById('bonusLabel').value.trim();
+  const rows = document.querySelectorAll('#bonusAllocRows .inj-row');
+  const allocs = [];
+  rows.forEach(r => {
+    const dest = r.querySelector('.balloc-dest').value;
+    const amount = parseFloat(r.querySelector('.balloc-amt').value) || 0;
+    if (amount > 0) allocs.push({ dest, amount });
+  });
+
+  if (total <= 0){
+    alert('ใส่ยอดเงินที่ได้รับก่อน');
+    return;
+  }
+  if (allocs.length === 0){
+    alert('ยังไม่ได้จัดสรรไปที่ไหนเลย ใส่จำนวนเงินในอย่างน้อย 1 รายการ');
+    return;
+  }
+
+  const { currentAge } = getHorizon();
+  let investTotal = 0, cashTotal = 0;
+  const goalNames = [];
+
+  allocs.forEach(a => {
+    if (a.dest === 'invest'){
+      investTotal += a.amount;
+    } else if (a.dest === 'cash'){
+      cashTotal += a.amount;
+    } else if (a.dest.indexOf('goal:') === 0){
+      const goalRow = document.getElementById(a.dest.slice(5));
+      if (goalRow){
+        const curEl = goalRow.querySelector('.goal-current');
+        curEl.value = (parseFloat(curEl.value) || 0) + a.amount;
+        calcGoalRow(goalRow.id);
+        goalNames.push((goalRow.querySelector('.goal-label').value || '').trim() || 'เป้าหมาย');
+      }
+    }
+  });
+
+  if (investTotal > 0){
+    addInjectionRow(currentAge, investTotal, 'once', label || 'โบนัส');
+  }
+  if (cashTotal > 0){
+    const el = document.getElementById('emergencyFund');
+    el.value = (parseFloat(el.value) || 0) + cashTotal;
+    el.dispatchEvent(new Event('input')); // triggers updateReadiness() -> syncPvdToBudget()/updateNetWorth()
+  }
+
+  calc(); // refresh the DCA graph now that an injection may have been added
+
+  const allocatedSum = allocs.reduce((s,a)=>s+a.amount, 0);
+  const leftover = total - allocatedSum;
+  const parts = [];
+  if (investTotal > 0) parts.push(`ลงทุน ${fmtMoney(investTotal)}`);
+  if (cashTotal > 0) parts.push(`เก็บสด ${fmtMoney(cashTotal)}`);
+  if (goalNames.length > 0) parts.push(`เข้าเป้าหมาย ${goalNames.join(', ')}`);
+
+  document.getElementById('bonusAllocRows').innerHTML = '';
+  document.getElementById('bonusTotal').value = '';
+  document.getElementById('bonusLabel').value = '';
+
+  const hint = document.getElementById('bonusRemainHint');
+  hint.style.color = 'var(--green)';
+  hint.textContent = `✅ จัดสรรเรียบร้อย: ${parts.join(' · ')}` + (Math.abs(leftover) > 0.5 ? ` (เหลือ ${fmtMoney(leftover)} ที่ยังไม่ได้จัดสรร)` : '');
 }
 
 /* ============ MONTHLY HISTORY (saved in this browser only) ============ */
