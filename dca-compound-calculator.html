@@ -2230,6 +2230,10 @@
 
   .sec-box{ margin-top: 14px; }
   .sec-box > summary{ font-size: 12.5px; }
+
+  .place-main{ flex:1; font-size: 13px; color: var(--ink); overflow:hidden; }
+  .place-main small{ display:block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
+  .fuel-maps-row .sym-wrap{ width: 100%; }
 </style>
 </head>
 <body data-theme="dark">
@@ -2428,18 +2432,19 @@
           </div></div></div>
       <div class="fuel-card tool-collapsible collapsed" id="secFuel">
     <h2>🚗 คำนวณค่าน้ำมันไป-กลับ</h2>
-    <p class="sub">ประมาณค่าน้ำมันจากระยะทาง เพื่อเติมเป็นรายจ่ายผันแปรในงบฯ ด้านบน — เช็คระยะทางจริงจาก Google Maps เองก่อน แล้วกรอกเลข กม. ที่นี่ (หน้านี้ไม่ได้ดึงระยะทางอัตโนมัติ เพราะ Google Maps ต้องใช้ API Key ของตัวเองและอาจมีค่าใช้จ่าย)</p>
+    <p class="sub">พิมพ์ชื่อสถานที่ต้นทาง-ปลายทางแล้วเลือกจากรายการ ระบบหาระยะทางขับรถให้เอง (แผนที่ OpenStreetMap ฟรี ไม่ต้องใช้ key) แล้วคิดค่าน้ำมันต่อเดือนให้</p>
+    <p class="hint" id="routeStatus" style="margin:0 0 10px;"></p>
 
     <div class="fuel-maps-row">
       <div class="field">
         <label>📍 จาก <span class="hint">(ที่อยู่/สถานที่)</span></label>
-        <input type="text" id="fuelOrigin" placeholder="เช่น บ้าน คลองเตย">
+        <input type="text" id="fuelOrigin" placeholder="พิมพ์ชื่อสถานที่ เช่น Ideo, เซ็นทรัลลาดพร้าว">
       </div>
       <div class="field">
         <label>🏁 ไป <span class="hint">(ที่อยู่/สถานที่)</span></label>
-        <input type="text" id="fuelDest" placeholder="เช่น ที่ทำงาน สีลม">
+        <input type="text" id="fuelDest" placeholder="พิมพ์ชื่อสถานที่ เช่น DSV บางนา, สีลม">
       </div>
-      <button type="button" class="use-btn" style="width:auto;padding:10px 16px;background:var(--gold);" onclick="openInMaps()">🗺️ เปิดดูระยะทางใน Google Maps</button>
+      <button type="button" class="use-btn" style="width:auto;padding:10px 16px;background:var(--gold);" onclick="openInMaps()">🗺️ ดูเส้นทางใน Google Maps</button>
     </div>
 
     <div class="fuel-grid">
@@ -4627,9 +4632,98 @@ function refreshInvestHint(){
 
 /* ============ FUEL COST CALCULATOR ============ */
 
+
+/* ================= PLACE SEARCH + DRIVING DISTANCE (free, no key) =================
+   Place suggestions: Photon (OpenStreetMap data, built for search-as-you-type).
+   Driving distance: the public OSRM router. Both are free community services —
+   fine for personal use; if either is down, the km box can still be typed by hand. */
+var routePts = { fuelOrigin: null, fuelDest: null };
+function placeLabel(f){
+  const p = f.properties || {};
+  const main = p.name || [p.housenumber, p.street].filter(Boolean).join(' ') || p.city || '';
+  const sub = [p.street && p.name ? p.street : '', p.district || p.locality || '', p.city || p.county || '', p.state || ''].filter(Boolean);
+  return { main, sub: [...new Set(sub)].filter(x => x !== main).slice(0, 3).join(', ') };
+}
+function attachPlacePicker(input){
+  if (!input || input.dataset.place) return;
+  input.dataset.place = '1';
+  input.setAttribute('autocomplete', 'off');
+  const wrap = document.createElement('div');
+  wrap.className = 'sym-wrap';
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+  const list = document.createElement('div');
+  list.className = 'sym-list';
+  wrap.appendChild(list);
+  let timer = null, lastQ = '';
+  const close = () => { list.classList.remove('open'); list.innerHTML = ''; };
+  input.addEventListener('input', () => {
+    routePts[input.id] = null;              // typing again invalidates the chosen point
+    const q = input.value.trim();
+    clearTimeout(timer);
+    if (q.length < 2){ close(); return; }
+    timer = setTimeout(async () => {
+      lastQ = q;
+      list.innerHTML = '<div class="sym-note">กำลังค้นหา...</div>';
+      list.classList.add('open');
+      try{
+        const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=8&lat=13.75&lon=100.52&bbox=97.3,5.6,105.7,20.5`;
+        const j = await (await fetch(url)).json();
+        if (input.value.trim() !== lastQ) return;
+        const feats = (j.features || []).filter(f => f.geometry && f.geometry.coordinates);
+        if (!feats.length){ list.innerHTML = '<div class="sym-note">ไม่เจอสถานที่นี้ — ลองพิมพ์ชื่อเขต/ถนน หรือใส่ระยะทาง กม. เองด้านล่าง</div>'; return; }
+        list.innerHTML = feats.map((f, i) => { const l = placeLabel(f);
+          return `<button type="button" class="sym-item" data-i="${i}"><span class="sym-code">📍</span><span class="place-main">${escHtml(l.main)}<small>${escHtml(l.sub)}</small></span></button>`; }).join('');
+        list.querySelectorAll('.sym-item').forEach(b => b.addEventListener('mousedown', ev => {
+          ev.preventDefault();
+          const f = feats[+b.dataset.i];
+          const l = placeLabel(f);
+          input.value = l.main + (l.sub ? ', ' + l.sub.split(', ')[0] : '');
+          routePts[input.id] = { lon: f.geometry.coordinates[0], lat: f.geometry.coordinates[1], name: l.main };
+          close();
+          calcRouteDistance();
+        }));
+      }catch(e){
+        list.innerHTML = '<div class="sym-note">ค้นหาสถานที่ไม่ได้ตอนนี้ (ไม่มีเน็ต หรือบริการแผนที่ฟรีไม่ตอบ) — ใส่ระยะทาง กม. เองด้านล่างได้</div>';
+      }
+    }, 350);
+  });
+  input.addEventListener('blur', () => setTimeout(close, 150));
+  input.addEventListener('keydown', ev => {
+    if (ev.key === 'Escape') close();
+    if (ev.key === 'Enter'){ const first = list.querySelector('.sym-item'); if (first){ ev.preventDefault(); first.dispatchEvent(new Event('mousedown')); } }
+  });
+}
+async function calcRouteDistance(){
+  const a = routePts.fuelOrigin, b = routePts.fuelDest;
+  const st = document.getElementById('routeStatus');
+  if (!a || !b){
+    if (st){ st.textContent = a || b ? 'เลือกอีกฝั่งจากรายการ แล้วระบบจะหาระยะทางให้' : ''; st.style.color = 'var(--muted)'; }
+    return;
+  }
+  st.textContent = '🧭 กำลังหาระยะทางขับรถ...'; st.style.color = 'var(--muted)';
+  try{
+    const url = `https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`;
+    const j = await (await fetch(url)).json();
+    if (!j.routes || !j.routes.length) throw new Error('no route');
+    const km = j.routes[0].distance / 1000, min = j.routes[0].duration / 60;
+    const round = Math.round(km * 2 * 10) / 10;
+    document.getElementById('fuelDistance').value = round;
+    calcFuel();
+    st.innerHTML = `✅ ${escHtml(a.name)} → ${escHtml(b.name)}: ขาไป <b>${km.toFixed(1)} กม.</b> (~${Math.round(min)} นาที ไม่รวมรถติด) · ใส่ไป-กลับ <b>${round} กม.</b> ในช่องด้านล่างให้แล้ว`;
+    st.style.color = 'var(--green)';
+  }catch(e){
+    st.textContent = '⚠️ หาระยะทางอัตโนมัติไม่ได้ตอนนี้ — กด "ดูเส้นทางใน Google Maps" แล้วใส่ กม. เองได้';
+    st.style.color = 'var(--gold)';
+  }
+}
+attachPlacePicker(document.getElementById('fuelOrigin'));
+attachPlacePicker(document.getElementById('fuelDest'));
+
 function openInMaps(){
-  const origin = document.getElementById('fuelOrigin').value.trim();
-  const dest = document.getElementById('fuelDest').value.trim();
+  const a = routePts.fuelOrigin, b = routePts.fuelDest;
+  const origin = a ? `${a.lat},${a.lon}` : document.getElementById('fuelOrigin').value.trim();
+  const dest = b ? `${b.lat},${b.lon}` : document.getElementById('fuelDest').value.trim();
   let url = 'https://www.google.com/maps';
   if (origin && dest){
     url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}`;
