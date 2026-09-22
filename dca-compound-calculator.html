@@ -1714,7 +1714,7 @@
   }
 </style>
 </head>
-<body>
+<body data-theme="dark">
 <nav class="side-nav" id="sideNav">
   <div class="side-nav-brand">🌱 DCA</div>
   <a href="#secBudget" class="side-nav-link">📒<span>งบรายเดือน</span></a>
@@ -1752,7 +1752,6 @@
 
   <div class="book-header">
     <div class="header-actions">
-      <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">🌙 ธีมมืด</button>
       <button type="button" class="clear-data-btn" onclick="clearAllToolData()" title="ล้างข้อมูลที่กรอกไว้ทั้งหมดในเบราว์เซอร์นี้ — เบราว์เซอร์/เครื่องอื่นไม่โดนกระทบ">🗑️ ล้างข้อมูลของฉัน</button>
     </div>
     <div class="book-eyebrow">SAVINGS &amp; INVESTMENT PASSBOOK</div>
@@ -2453,12 +2452,10 @@ function toggleTheme(){
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
+// Dark dashboard theme is now fixed (light theme toggle removed).
 function initTheme(){
-  let saved = 'light';
-  try{ saved = localStorage.getItem(THEME_KEY) || 'light'; }catch(e){ /* ignore */ }
-  document.body.setAttribute('data-theme', saved);
-  const btn = document.getElementById('themeToggleBtn');
-  if (btn) btn.textContent = saved === 'dark' ? '☀️ ธีมสว่าง' : '🌙 ธีมมืด';
+  document.body.setAttribute('data-theme', 'dark');
+  try{ localStorage.removeItem(THEME_KEY); }catch(e){ /* ignore */ }
 }
 initTheme();
 
