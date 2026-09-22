@@ -2081,6 +2081,20 @@
     .book-header{ padding-top: 64px !important; padding-bottom: 18px !important; }
     .book-title{ font-size: 24px !important; }
   }
+
+  .net-card .budget-ledger{ margin-top: 8px; }
+  .net-card{ border-color: rgba(47,191,113,0.35) !important; }
+
+  .tv-quick{ background: var(--nested-bg); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
+  .tv-quick-head{ font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+  .tv-quick-row{ display:flex; gap: 10px; flex-wrap: wrap; }
+  .tv-quick-row input{ flex:1; min-width: 200px; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--paper-line);
+    background: var(--input-bg); color: var(--ink); font-family:'IBM Plex Mono',monospace; font-size: 13px; outline:none; }
+  .tv-quick-row input:focus{ border-color: var(--green); }
+  .chart-src{ display:flex; gap: 8px; margin: 10px 0 12px; flex-wrap: wrap; }
+  .src-btn{ border: 1px solid rgba(255,255,255,0.18); background: var(--card-bg); color: var(--muted); border-radius: 999px;
+    padding: 7px 16px; font-size: 12.5px; cursor:pointer; font-family: inherit; }
+  .src-btn.active{ border-color: var(--green); color: var(--green); background: rgba(47,191,113,0.12); font-weight: 700; }
 </style>
 </head>
 <body data-theme="dark">
@@ -2402,6 +2416,7 @@
         <button type="button" class="use-btn" style="width:auto;padding:10px 18px;background:var(--green);" onclick="applyBudgetToMonthly()">↓ ใช้จำนวนนี้เป็นเงินลงทุนรายเดือน</button>
           <p class="hint" id="budgetApplyHint" style="margin-top:8px;"></p>
       </div>
+      <div class="step-card net-card" id="step3Net"></div>
       <div class="flow-card readiness-card" id="flowCard">
     <h2>🧭 เส้นทางเงินของคุณ</h2>
     <p class="sub">ภาพรวมว่าเงินเดือนไหลไปที่ไหนบ้าง — อัปเดตอัตโนมัติจากงบฯ, เงินลงทุน, เงินสำรอง, เป้าหมาย และทองคำด้านบนทั้งหมด</p>
@@ -2778,6 +2793,15 @@
         <button class="fetch-btn" id="fetchBtn" onclick="fetchGlobalStock()">ดึงข้อมูลจริง</button>
       </div>
 
+      <div class="tv-quick">
+        <div class="tv-quick-head">📈 ดูกราฟหุ้น/ETF จาก TradingView <span class="hint">(ไม่ต้องใช้ API key · ใส่ชื่อย่อแล้วกดดู)</span></div>
+        <div class="tv-quick-row">
+          <input type="text" id="tvSymbol" placeholder="เช่น META, VOO, NASDAQ:AAPL, SET:SCB" style="text-transform:uppercase;">
+          <button type="button" class="fetch-btn" onclick="showQuickTV()">ดูกราฟ</button>
+        </div>
+        <div id="tvQuickBox"></div>
+      </div>
+
       <div class="fetch-result" id="fetchResult"></div>
 
       <div class="chart-card" id="candleCard" style="display:none;margin-top:14px;">
@@ -2793,6 +2817,11 @@
           </div>
         </div>
 
+        <div class="chart-src">
+          <button type="button" class="src-btn active" id="srcTV" onclick="setChartSource('tv')">📈 TradingView</button>
+          <button type="button" class="src-btn" id="srcAV" onclick="setChartSource('av')">📊 ข้อมูล Alpha Vantage</button>
+        </div>
+        <div id="tvGlobalBox"></div>
         <svg id="candleChart" viewBox="0 0 600 260" width="100%" height="260" preserveAspectRatio="none"></svg>
 
         <div class="range-tabs" id="rangeTabs">
@@ -3608,6 +3637,7 @@ function showFetchSuccess(ticker, cagr, vol, yearsUsed, months, fromCache){
   lastFetchedCAGR = cagr;
   lastFetchedTicker = ticker;
   lastFetchedVol = vol;
+  setTimeout(() => { if (document.getElementById('tvGlobalBox')) setChartSource(chartSource); }, 50);
   const resultBox = document.getElementById('fetchResult');
   resultBox.className = 'fetch-result show';
   resultBox.innerHTML = `
@@ -5933,6 +5963,19 @@ function renderStep3(){
   const pct = target > 0 ? Math.min(100, fund / target * 100) : 0;
   const base = Math.max(surplus, invest + goalsM, 1);
   const seg = (v, c, l) => v > 0 ? `<div style="width:${v / base * 100}%;background:${c}" title="${l} ${fmtMoney(v)}"></div>` : '';
+  const netBox = document.getElementById('step3Net');
+  if (netBox){
+    const row = (label, val, cls) => `<div class="bl-row ${cls || ''}"><span class="bl-label">${label}</span><span class="${val < 0 ? 'bl-neg' : ''}">${val < 0 ? '-' : '+'}${fmtMoney(Math.abs(val))}</span></div>`;
+    netBox.innerHTML = `
+      <h3 class="step-h3">🧮 สรุปสุทธิเดือนนี้</h3>
+      <div class="budget-ledger">
+        ${row('เหลือหลังหักรายจ่าย', surplus)}
+        ${row('หัก  เงินลงทุน', -invest)}
+        ${row('หัก  เงินเก็บเข้าเป้าหมาย', -goalsM)}
+        ${row('= คงเหลือสุทธิ (เข้าเงินสด/สำรอง)', rest, 'bl-final')}
+      </div>
+      <p class="hint">${rest < -0.5 ? '⚠ ติดลบ — แบ่งไปลงทุน/เป้าหมายเกินเงินที่เหลือ ลดลงหน่อย' : rest < 500 ? 'เหลือเข้าเงินสดน้อยมาก — เผื่อไว้ใช้ฉุกเฉินบ้างก็ดี' : 'ยอดนี้จะไปเพิ่มในเงินสด/สำรอง ถ้าไม่ได้เอาไปใช้อย่างอื่น'}</p>`;
+  }
   box.innerHTML = `
     <div class="split-bar">${seg(Math.max(0, rest), 'var(--teal)', 'สำรอง')}${seg(goalsM, 'var(--gold)', 'เป้าหมาย')}${seg(invest, 'var(--green)', 'ลงทุน')}</div>
     <div class="split-legend">
@@ -6667,24 +6710,60 @@ function removeDividend(did){
   renderHoldings();
 }
 
+// one place that builds a TradingView chart — used by the portfolio cards and the
+// "เลือกสินทรัพย์" tab. Thai tickers get the SET: prefix, US ones are passed through.
+function tvSymbolOf(raw, type){
+  const t = String(raw || '').toUpperCase().replace(/\s+/g, '');
+  if (!t) return '';
+  if (t.indexOf(':') !== -1) return t;
+  return type === 'th' ? 'SET:' + t.replace(/\.BK$/, '') : t;
+}
+function mountTV(box, sym, height){
+  if (!box || !sym) return;
+  box.innerHTML = `<div class="tv-wrap" style="height:${height || 380}px"><div class="tradingview-widget-container" style="height:100%;width:100%">
+      <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div></div></div>
+    <p class="hint">กราฟจาก TradingView (${escHtml(sym)}) · ถ้ากราฟไม่ขึ้น <a href="https://www.tradingview.com/symbols/${encodeURIComponent(sym.replace(':', '-'))}/" target="_blank" rel="noopener">เปิดใน TradingView ↗</a> — ใส่ตลาดนำหน้าได้ เช่น NASDAQ:AAPL, SET:SCB</p>`;
+  const sc = document.createElement('script');
+  sc.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+  sc.async = true;
+  sc.textContent = JSON.stringify({
+    autosize: true, symbol: sym, interval: 'D', range: '12M', timezone: 'Asia/Bangkok',
+    theme: 'dark', style: '3', locale: 'th_TH', hide_side_toolbar: true, hide_legend: false,
+    allow_symbol_change: false, save_image: false, calendar: false,
+    backgroundColor: 'rgba(28, 35, 48, 1)', gridColor: 'rgba(255, 255, 255, 0.05)',
+    support_host: 'https://www.tradingview.com'
+  });
+  box.querySelector('.tradingview-widget-container').appendChild(sc);
+}
+function showQuickTV(){
+  const raw = document.getElementById('tvSymbol').value.trim();
+  const box = document.getElementById('tvQuickBox');
+  if (!raw){ box.innerHTML = '<p class="hint">ใส่ชื่อย่อหุ้นก่อน เช่น META หรือ SET:SCB</p>'; return; }
+  mountTV(box, tvSymbolOf(raw, 'us'), 420);
+}
+// TradingView / Alpha Vantage switch inside the fetched-stock card
+var chartSource = 'tv';
+function setChartSource(src){
+  chartSource = src;
+  const tvBox = document.getElementById('tvGlobalBox');
+  const svg = document.getElementById('candleChart');
+  const tabs = document.getElementById('rangeTabs');
+  document.getElementById('srcTV').classList.toggle('active', src === 'tv');
+  document.getElementById('srcAV').classList.toggle('active', src === 'av');
+  const showTV = src === 'tv';
+  tvBox.style.display = showTV ? '' : 'none';
+  svg.style.display = showTV ? 'none' : '';
+  if (tabs) tabs.style.display = showTV ? 'none' : '';
+  if (showTV && lastFetchedTicker && tvBox.dataset.sym !== lastFetchedTicker){
+    tvBox.dataset.sym = lastFetchedTicker;
+    mountTV(tvBox, tvSymbolOf(lastFetchedTicker, 'us'), 380);
+  }
+  if (!showTV && typeof applyChartRange === 'function') applyChartRange();
+}
+
 function renderHoldChart(h, box){
   if (h.type === 'th' || h.type === 'us'){
-    const raw = h.symbol.toUpperCase().replace(/\s+/g, '');
-    const sym = raw.indexOf(':') !== -1 ? raw : (h.type === 'th' ? 'SET:' + raw.replace(/\.BK$/, '') : raw);
-    box.innerHTML = `<div class="tv-wrap"><div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div></div></div>
-      <p class="hint">กราฟจาก TradingView (${escHtml(sym)}) · ถ้ากราฟไม่ขึ้น <a href="https://www.tradingview.com/symbols/${encodeURIComponent(sym.replace(':', '-'))}/" target="_blank" rel="noopener">เปิดใน TradingView ↗</a> — หุ้น US ใส่ตลาดนำหน้าได้ เช่น NASDAQ:AAPL</p>`;
-    const sc = document.createElement('script');
-    sc.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-    sc.async = true;
-    sc.textContent = JSON.stringify({
-      autosize: true, symbol: sym, interval: 'D', range: '12M', timezone: 'Asia/Bangkok',
-      theme: 'dark', style: '3', locale: 'th_TH', hide_side_toolbar: true, hide_legend: false,
-      allow_symbol_change: false, save_image: false, calendar: false,
-      backgroundColor: 'rgba(28, 35, 48, 1)', gridColor: 'rgba(255, 255, 255, 0.05)',
-      support_host: 'https://www.tradingview.com'
-    });
-    box.querySelector('.tradingview-widget-container').appendChild(sc);
+    mountTV(box, tvSymbolOf(h.symbol, h.type), 380);
   } else {
     // funds / others: chart from the prices logged each month in this tool
     const hist = h.hist || {};
