@@ -11,13 +11,57 @@
     --paper-dark:#EFE8D6;
     --ink:#1F2A1F;
     --muted:#5C6B57;
+    --muted-soft:#96A090;
     --green:#2F5233;
     --green-deep:#1C3420;
     --green-soft:#DCE7DA;
     --gold:#AD8A47;
     --gold-soft:#EFE6CC;
+    --gold-deep:#7A5E1F;
     --red:#8B3A3A;
+    --red-deep:#8B3A3A;
+    --red-soft:#F3DCDC;
+    --teal:#3E6E77;
+    --teal-soft:#DCE9EA;
+    --card-bg:#FFFDF7;
+    --input-bg:#fff;
+    --stripe:#FBF8EF;
+    --band:#7C9E7F;
+    --disabled-bg:#B7BFB4;
+    --disabled-bg2:#C9BFA3;
+    --alert-green-bg:#DCE7DA;
+    --alert-green-text:#1C3420;
+    --alert-red-bg:#F3DCDC;
+    --alert-red-text:#8B3A3A;
+    --row-highlight-bg:#EFE6CC;
+    --nested-bg:#F7F3E8;
     --card-shadow: 0 2px 0 rgba(31,42,31,0.06), 0 10px 24px rgba(31,42,31,0.08);
+  }
+
+  body[data-theme="dark"]{
+    --paper:#10141A;
+    --paper-line:#262B33;
+    --paper-dark:#1A1F26;
+    --ink:#E7EAEC;
+    --muted:#98A5A0;
+    --muted-soft:#5F6B64;
+    --green:#2FBF71;
+    --gold:#D9A94E;
+    --red:#E2857F;
+    --teal:#55B6C2;
+    --card-bg:#1C2330;
+    --input-bg:#1B2028;
+    --stripe:#1B2028;
+    --band:#5FA37D;
+    --disabled-bg:#3A4048;
+    --disabled-bg2:#3A4048;
+    --alert-green-bg:rgba(47,191,113,0.14);
+    --alert-green-text:#6EE7A8;
+    --alert-red-bg:rgba(226,133,127,0.14);
+    --alert-red-text:#F3A8A3;
+    --row-highlight-bg:rgba(217,169,78,0.16);
+    --nested-bg:#262E3D;
+    --card-shadow: 0 2px 0 rgba(0,0,0,0.35), 0 10px 26px rgba(0,0,0,0.55);
   }
 
   *{box-sizing:border-box;}
@@ -32,7 +76,10 @@
     font-family: 'Segoe UI', 'Tahoma', 'Leelawadee UI', 'Sarabun', system-ui, sans-serif;
     min-height: 100vh;
     padding: 28px 16px 60px;
+    color-scheme: light;
+    transition: background-color .2s ease, color .2s ease;
   }
+  body[data-theme="dark"]{ color-scheme: dark; }
 
   .wrap{
     max-width: 1100px;
@@ -77,11 +124,15 @@
     margin:0;
     font-weight: 400;
   }
-  .clear-data-btn{
+  .header-actions{
     position: absolute;
     top: 14px;
     right: 16px;
     z-index: 2;
+    display: flex;
+    gap: 8px;
+  }
+  .clear-data-btn, .theme-toggle-btn{
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.35);
     color: #CBE0CB;
@@ -93,14 +144,14 @@
     cursor: pointer;
     transition: background .15s ease, color .15s ease;
   }
-  .clear-data-btn:hover{ background: rgba(255,255,255,0.24); color:#fff; }
+  .clear-data-btn:hover, .theme-toggle-btn:hover{ background: rgba(255,255,255,0.24); color:#fff; }
   @media (max-width: 560px){
-    .clear-data-btn{ position: static; display:inline-block; margin-bottom:10px; }
+    .header-actions{ position: static; display:flex; margin-bottom:10px; }
   }
 
   /* ---- Asset picker ---- */
   .asset-panel{
-    background: #FFFDF7;
+    background: var(--card-bg);
     border: 1px solid var(--paper-line);
     border-radius: 12px;
     box-shadow: var(--card-shadow);
@@ -187,9 +238,9 @@
     border-radius: 20px;
     letter-spacing: 0.3px;
   }
-  .risk-low{ background:#DCE7DA; color: var(--green-deep); }
-  .risk-mid{ background: var(--gold-soft); color: #7A5E1F; }
-  .risk-high{ background:#F3DCDC; color: var(--red); }
+  .risk-low{ background:var(--green-soft); color: var(--green-deep); }
+  .risk-mid{ background: var(--gold-soft); color: var(--gold-deep); }
+  .risk-high{ background:var(--red-soft); color: var(--red-deep); }
   .use-btn{
     width:100%;
     padding: 8px;
@@ -201,10 +252,10 @@
     font-weight:700;
     cursor:pointer;
   }
-  .use-btn:disabled{ background:#B7BFB4; cursor:not-allowed; }
+  .use-btn:disabled{ background:var(--disabled-bg); cursor:not-allowed; }
   .preset-note{
     font-size: 11px;
-    color: #96A090;
+    color: var(--muted-soft);
     margin-top: 14px;
     line-height:1.6;
   }
@@ -226,7 +277,7 @@
     font-family: 'IBM Plex Mono','Consolas',monospace;
     outline:none;
   }
-  .api-row input:focus{ border-color: var(--green); background:#fff; }
+  .api-row input:focus{ border-color: var(--green); background:var(--input-bg); }
   .api-row select{
     padding: 10px 12px;
     border: 1.5px solid var(--paper-line);
@@ -247,7 +298,7 @@
     cursor:pointer;
     align-self: flex-end;
   }
-  .fetch-btn:disabled{ background:#C9BFA3; cursor:not-allowed; }
+  .fetch-btn:disabled{ background:var(--disabled-bg2); cursor:not-allowed; }
   .apikey-hint{
     font-size: 11.5px;
     color: var(--muted);
@@ -263,7 +314,7 @@
     display:none;
   }
   .fetch-result.show{ display:block; }
-  .fetch-result.error{ border-color: var(--red); background:#FBF1F1; }
+  .fetch-result.error{ border-color: var(--red); background:var(--alert-red-bg); }
   .fetch-result .fr-title{
     font-weight:700;
     font-size:14px;
@@ -292,7 +343,7 @@
   .fetch-result.error .fr-stat-val{ color: var(--red); }
   .fetch-result .fr-note{
     font-size: 11px;
-    color:#96A090;
+    color:var(--muted-soft);
     margin-top:8px;
     line-height:1.5;
   }
@@ -310,7 +361,7 @@
 
   /* ---- Budget / income-expense ---- */
   .budget-card{
-    background: #FFFDF7;
+    background: var(--card-bg);
     border: 1px solid var(--paper-line);
     border-radius: 12px;
     box-shadow: var(--card-shadow);
@@ -388,7 +439,7 @@
     padding: 7px 8px;
     border: 1.5px solid var(--paper-line);
     border-radius: 6px;
-    background:#fff;
+    background:var(--input-bg);
     font-size: 12.5px;
     font-family: inherit;
     color: var(--ink);
@@ -402,7 +453,7 @@
     padding: 7px 40px 7px 8px;
   }
   .budget-row .bg-remove{
-    background: #fff;
+    background: var(--input-bg);
     border: 1.5px solid var(--red);
     color: var(--red);
     font-weight:700;
@@ -458,9 +509,117 @@
   .budget-bar-legend span{ display:flex; align-items:center; gap:5px; }
   .budget-bar-legend i{ width:10px; height:10px; border-radius:3px; display:inline-block; }
 
+  /* ---- Budget donut chart (summary tab) ---- */
+  .budget-donut-wrap{
+    display:flex;
+    align-items:center;
+    gap: 28px;
+    flex-wrap:wrap;
+    margin-bottom: 18px;
+  }
+  .budget-donut{
+    width: 148px;
+    height: 148px;
+    min-width: 148px;
+    border-radius: 50%;
+    background: var(--paper-line);
+    position: relative;
+    transition: background .3s ease;
+  }
+  .budget-donut-hole{
+    position: absolute;
+    inset: 16px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4px;
+  }
+  .bd-value{
+    font-family:'IBM Plex Mono','Consolas',monospace;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height:1.2;
+  }
+  .bd-label{
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+    max-width: 94px;
+    line-height:1.3;
+  }
+  .budget-donut-wrap .alloc-legend{ flex:1; min-width: 220px; margin-top:0; }
+
+  /* ---- Category breakdown (big donut + ranked list + tiles) ---- */
+  .budget-donut.big{ width: 210px; height: 210px; min-width: 210px; }
+  .budget-donut.big .budget-donut-hole{ inset: 26px; }
+  .budget-donut.big .bd-value{ font-size: 21px; }
+  .budget-donut.big .bd-label{ max-width: 130px; font-size: 11px; }
+  .budget-donut-ring{
+    padding: 10px; border-radius: 50%;
+    background: repeating-linear-gradient(135deg, var(--paper-line) 0 2px, transparent 2px 7px);
+  }
+  .cat-list{ flex:1; min-width: 240px; display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; align-content:start; }
+  .cat-list-title{ grid-column: 1 / -1; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .04em; margin-bottom: 2px; }
+  .cat-item{
+    display:flex; align-items:center; gap: 10px;
+    padding: 9px 12px; border-radius: 12px;
+    background: var(--nested-bg); border: 1px solid var(--paper-line);
+  }
+  .cat-ico{
+    width: 30px; height: 30px; min-width: 30px; border-radius: 9px;
+    display:flex; align-items:center; justify-content:center; font-size: 15px;
+  }
+  .cat-name{ flex:1; font-size: 13px; color: var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cat-name small{ display:block; font-size: 10.5px; color: var(--muted); }
+  .cat-amt{ font-family:'IBM Plex Mono','Consolas',monospace; font-size: 13px; font-weight:700; color: var(--ink); text-align:right; }
+  .cat-amt small{ display:block; font-size: 10.5px; font-weight:500; }
+
+  .cat-tiles{
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .cat-tile{
+    background: var(--card-bg); border: 1px solid var(--paper-line); border-radius: 16px;
+    padding: 14px 10px 12px; text-align:center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+  body[data-theme="dark"] .cat-tile{ background: var(--nested-bg); border-color: rgba(255,255,255,0.12); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .cat-tile.hero{ background: linear-gradient(160deg, #24473A, #13271F) !important; border-color: transparent !important; color:#fff; }
+  .cat-tile.hero .ct-name{ color: rgba(255,255,255,0.75); }
+  .cat-tile.hero .ct-amt{ color:#fff; }
+  .ct-ring{
+    width: 58px; height: 58px; margin: 0 auto 8px; border-radius: 50%;
+    position: relative; display:flex; align-items:center; justify-content:center;
+  }
+  .ct-ring::after{
+    content:""; position:absolute; inset: 6px; border-radius:50%; background: var(--card-bg);
+  }
+  body[data-theme="dark"] .ct-ring::after{ background: var(--nested-bg); }
+  .cat-tile.hero .ct-ring::after{ background: #1A3329; }
+  .ct-ring span{ position:relative; z-index:1; font-size: 20px; }
+  .ct-name{ font-size: 11.5px; color: var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ct-amt{ font-family:'IBM Plex Mono','Consolas',monospace; font-size: 14px; font-weight:700; color: var(--ink); margin-top: 2px; }
+  .ct-pct{ font-size: 10.5px; color: var(--muted); }
+  .cat-tile.hero .ct-pct{ color: rgba(255,255,255,0.6); }
+  @media (max-width: 560px){
+    .budget-donut.big{ width: 180px; height: 180px; min-width: 180px; }
+    .budget-donut-wrap{ justify-content:center; }
+    .cat-tiles{ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .cat-tile{ padding: 10px 6px; min-width: 0; }
+    .ct-ring{ width: 48px; height: 48px; }
+    .ct-ring span{ font-size: 17px; }
+    .ct-amt{ font-size: 12.5px; }
+    .cat-list{ grid-template-columns: minmax(0,1fr); }
+  }
+
   .pct-btn{
     padding: 5px 12px;
-    background: #fff;
+    background: var(--input-bg);
     border: 1.5px solid var(--green);
     color: var(--green);
     border-radius: 20px;
@@ -483,7 +642,7 @@
 
   /* ---- Readiness check ---- */
   .readiness-card{
-    background: #FFFDF7;
+    background: var(--card-bg);
     border: 1px solid var(--paper-line);
     border-radius: 12px;
     box-shadow: var(--card-shadow);
@@ -531,7 +690,7 @@
     color: var(--muted);
   }
   .rc-icon.rc-good{ background: var(--green-soft); color: var(--green-deep); }
-  .rc-icon.rc-bad{ background: #F3DCDC; color: var(--red); }
+  .rc-icon.rc-bad{ background: var(--red-soft); color: var(--red-deep); }
   .rc-body{ flex:1; min-width:0; }
   .rc-title{ font-weight:700; font-size:13.5px; color: var(--ink); margin-bottom:4px; }
   .rc-desc{ font-size: 11.5px; color: var(--muted); line-height:1.6; margin-bottom:4px; }
@@ -582,13 +741,13 @@
   .goal-result{
     font-size: 12.5px;
     font-weight: 700;
-    color: var(--green-deep);
-    background: var(--green-soft);
+    color: var(--alert-green-text);
+    background: var(--alert-green-bg);
     border-radius: 6px;
     padding: 7px 10px;
     margin: 8px 0;
   }
-  .goal-result.gr-warn{ color: var(--red); background: #F3DCDC; }
+  .goal-result.gr-warn{ color: var(--alert-red-text); background: var(--alert-red-bg); }
   .goals-total{
     border-top: 2px dashed var(--paper-line);
     padding-top: 12px;
@@ -601,7 +760,7 @@
 
   /* ---- Fuel cost calculator ---- */
   .fuel-card{
-    background: #FFFDF7;
+    background: var(--card-bg);
     border: 1px solid var(--paper-line);
     border-radius: 12px;
     box-shadow: var(--card-shadow);
@@ -696,6 +855,101 @@
   }
   .link-hint a{ color: var(--green); font-weight:700; text-decoration: underline; }
 
+  /* ---- net worth: jump-to-field links + flash highlight on the target field ---- */
+  .nw-jump{
+    font-size: 10.5px;
+    color: var(--green);
+    text-decoration: none;
+    margin-left: 5px;
+    cursor: pointer;
+    border-bottom: 1px dashed var(--green);
+  }
+  .nw-jump:hover{ background: var(--green-soft); }
+  @keyframes flashHighlight{
+    0%{ background: var(--gold-soft); box-shadow: 0 0 0 3px var(--gold); }
+    100%{ background: transparent; box-shadow: 0 0 0 0 transparent; }
+  }
+  .field-flash{ animation: flashHighlight 1.3s ease; border-radius: 8px; }
+
+  /* ---- asset allocation widget (inside net worth card) — rounded segmented
+     bar + a row-list legend (dot, label+%, value right-aligned), styled after
+     a typical portfolio-dashboard "Asset Allocation" panel. ---- */
+  .alloc-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+  .alloc-head .alloc-title{ font-size:11px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+  .alloc-head .alloc-total{ font-size:11px; color:var(--muted); }
+  .alloc-bar{
+    display:flex;
+    height: 10px;
+    border-radius: 999px;
+    overflow:hidden;
+    background: var(--paper-line);
+    gap: 2px;
+  }
+  .alloc-bar > div{ border-radius: 999px; }
+  .alloc-legend{
+    display:flex;
+    flex-direction: column;
+    margin-top: 12px;
+  }
+  .alloc-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding: 7px 0;
+    font-size: 12.5px;
+    border-bottom: 1px solid var(--paper-line);
+  }
+  .alloc-row:last-child{ border-bottom:none; }
+  .alloc-row .alloc-dot{ width:10px; height:10px; border-radius:50%; display:inline-block; flex:none; }
+  .alloc-row .alloc-label{ color: var(--ink); font-weight:600; flex:1; min-width:0; }
+  .alloc-row .alloc-pct{ color: var(--muted); font-weight:600; font-size:11.5px; flex:none; }
+  .alloc-row .alloc-val{ font-family:'IBM Plex Mono','Consolas',monospace; font-weight:700; color:var(--ink); flex:none; min-width:90px; text-align:right; }
+
+  /* ---- cash/gold accumulation log (inside net worth card) ---- */
+  .cashlog-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size: 11px;
+    font-weight:700;
+    color: var(--muted);
+    margin-bottom:4px;
+  }
+  .cashlog-clear{
+    font-size: 10.5px;
+    color: var(--red);
+    background:none;
+    border:none;
+    cursor:pointer;
+    text-decoration:underline;
+    padding:0;
+    font-weight:600;
+  }
+
+  /* ---- money-flow diagram card ---- */
+  .flow-stage{ display:flex; flex-direction:column; align-items:center; }
+  .flow-box{
+    background: var(--paper);
+    border: 1.5px solid var(--paper-line);
+    border-radius: 10px;
+    padding: 10px 16px;
+    text-align:center;
+    font-size:12.5px;
+    min-width:190px;
+  }
+  .flow-box .fb-label{ font-weight:700; color:var(--ink); }
+  .flow-box .fb-val{ font-family:'IBM Plex Mono','Consolas',monospace; font-weight:700; color:var(--green); margin-top:3px; font-size:13.5px; }
+  .flow-box .fb-note{ font-size:10px; color:var(--muted); margin-top:4px; line-height:1.5; }
+  .flow-arrow{ font-size:12px; color:var(--muted); margin:4px 0; font-weight:600; text-align:center; }
+  .flow-branches{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:2px; width:100%; }
+  .flow-branches .flow-box{ min-width:150px; flex:1; }
+
   .month-bar{
     display:flex;
     align-items:center;
@@ -712,7 +966,7 @@
     padding: 7px 8px;
     border: 1.5px solid var(--paper-line);
     border-radius: 6px;
-    background:#fff;
+    background:var(--input-bg);
     font-size: 12.5px;
     font-family: inherit;
     color: var(--ink);
@@ -737,11 +991,22 @@
     gap: 20px;
   }
   @media (max-width: 860px){
-    .grid{ grid-template-columns: 1fr; }
+    .grid{ grid-template-columns: minmax(0, 1fr); }
+    .grid > *{ min-width: 0; }
+  }
+  .insights-row{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .insights-row > .chart-card{ margin-bottom: 0; }
+  @media (max-width: 860px){
+    .insights-row{ grid-template-columns: 1fr; }
   }
 
   .panel{
-    background: #FFFDF7;
+    background: var(--card-bg);
     border: 1px solid var(--paper-line);
     border-radius: 12px;
     box-shadow: var(--card-shadow);
@@ -769,7 +1034,7 @@
   }
   .field .hint{
     font-weight: 400;
-    color: #96A090;
+    color: var(--muted-soft);
     font-size: 11px;
   }
 
@@ -793,7 +1058,7 @@
   }
   .input-row input[type="number"]:focus{
     border-color: var(--green);
-    background: #fff;
+    background: var(--input-bg);
   }
   .input-row .unit{
     position:absolute;
@@ -862,7 +1127,7 @@
   }
 
   .stepup-preview{
-    background: var(--gold-soft);
+    background: var(--row-highlight-bg);
     border: 1px solid var(--paper-line);
     border-radius: 8px;
     padding: 10px 12px;
@@ -898,7 +1163,7 @@
     padding: 7px 8px;
     border: 1.5px solid var(--paper-line);
     border-radius: 6px;
-    background: #fff;
+    background: var(--input-bg);
     font-family:'IBM Plex Mono','Consolas',monospace;
     font-size: 13px;
     outline:none;
@@ -924,7 +1189,7 @@
     padding: 7px 8px;
     border: 1.5px solid var(--paper-line);
     border-radius: 6px;
-    background:#fff;
+    background:var(--input-bg);
     font-size: 12.5px;
     font-family: 'IBM Plex Mono','Consolas',monospace;
     color: var(--ink);
@@ -932,7 +1197,7 @@
   }
   .inj-row select{ font-family: inherit; font-size: 11.5px; }
   .inj-row .inj-remove{
-    background: #fff;
+    background: var(--input-bg);
     border: 1.5px solid var(--red);
     color: var(--red);
     font-weight:700;
@@ -1065,7 +1330,7 @@
     align-items:center;
     gap:1px;
     padding: 5px 9px;
-    background:#fff;
+    background:var(--input-bg);
     border:1.5px solid var(--paper-line);
     border-radius:10px;
     font-family:inherit;
@@ -1134,14 +1399,14 @@
     font-weight:700;
     color: var(--green);
   }
-  tbody tr:nth-child(even){ background: #FBF8EF; }
-  tbody tr:hover{ background: var(--gold-soft); }
+  tbody tr:nth-child(even){ background: var(--stripe); }
+  tbody tr:hover{ background: var(--row-highlight-bg); }
   td.interest{ color: var(--green); }
 
   .foot-note{
     text-align:center;
     font-size: 11.5px;
-    color: #96A090;
+    color: var(--muted-soft);
     margin-top: 18px;
     line-height:1.6;
   }
@@ -1170,7 +1435,7 @@
     padding: 3px 5px;
     border: 1.5px solid var(--paper-line);
     border-radius: 5px;
-    background: #fff;
+    background: var(--input-bg);
     font-family: 'IBM Plex Mono','Consolas',monospace;
     font-size: 10.5px;
     text-align: right;
@@ -1191,21 +1456,330 @@
   #printSummary .ps-foot{ margin-top:24px; font-size:10px; color:#999; border-top:1px solid #eee; padding-top:8px; }
   @media print{
     .wrap{ display:none !important; }
+    .side-nav{ display:none !important; }
     #printSummary{ display:block !important; padding: 10px 4px; }
+  }
+
+  /* ============================================================
+     Dark-mode "dashboard" redesign — flat card background, rounded
+     elevated cards, solid dividers, pill buttons, accented stat tiles.
+     Light theme (passbook) is untouched.
+     ============================================================ */
+  body[data-theme="dark"]{
+    background-image:
+      radial-gradient(760px circle at 8% -8%, rgba(47,191,113,0.12), transparent 55%),
+      radial-gradient(620px circle at 100% 0%, rgba(85,182,194,0.10), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  body[data-theme="dark"] .book-header{ border-radius: 22px; }
+  body[data-theme="dark"] .book-header::before{ opacity: 0.35; }
+
+  body[data-theme="dark"] .asset-panel,
+  body[data-theme="dark"] .budget-card,
+  body[data-theme="dark"] .readiness-card,
+  body[data-theme="dark"] .fuel-card,
+  body[data-theme="dark"] .panel,
+  body[data-theme="dark"] .chart-card,
+  body[data-theme="dark"] .table-card,
+  body[data-theme="dark"] .preset-card{
+    border-radius: 20px;
+    border-color: rgba(255,255,255,0.16);
+    box-shadow: var(--card-shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  body[data-theme="dark"] .chart-card,
+  body[data-theme="dark"] .table-card,
+  body[data-theme="dark"] .preset-card,
+  body[data-theme="dark"] .budget-row{
+    background: var(--card-bg);
+  }
+  body[data-theme="dark"] .budget-row{ border-color: rgba(255,255,255,0.16); border-radius: 12px; }
+
+  /* Nested boxes (checklist items, ledger blocks, form rows) sat one shade
+     DARKER than the card around them — they read as holes punched in the
+     card instead of raised chips. Bump them a step lighter than the card. */
+  body[data-theme="dark"] .readiness-check,
+  body[data-theme="dark"] .budget-ledger,
+  body[data-theme="dark"] .flow-box,
+  body[data-theme="dark"] .month-bar,
+  body[data-theme="dark"] .fetch-result,
+  body[data-theme="dark"] .api-row input[type="text"],
+  body[data-theme="dark"] .api-row input[type="password"],
+  body[data-theme="dark"] .api-row select{
+    background: var(--nested-bg);
+    border-color: rgba(255,255,255,0.14);
+  }
+  body[data-theme="dark"] .input-row input[type="number"]{
+    background: var(--input-bg);
+  }
+  body[data-theme="dark"] #fuelType{
+    background: var(--nested-bg) !important;
+  }
+
+  body[data-theme="dark"] .budget-card:hover,
+  body[data-theme="dark"] .readiness-card:hover,
+  body[data-theme="dark"] .fuel-card:hover,
+  body[data-theme="dark"] .asset-panel:hover,
+  body[data-theme="dark"] .panel:hover{
+    box-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 16px 34px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+    border-color: rgba(47,191,113,0.35);
+  }
+
+  /* Section dividers: solid instead of the passbook "dashed rule" look.
+     Only the side that actually carries a border is touched, so rows/panels
+     that have no border at all don't suddenly grow one on every side. */
+  body[data-theme="dark"] .asset-tabs{ border-bottom-style: solid; }
+  body[data-theme="dark"] .budget-summary{ border-top-style: solid; }
+  body[data-theme="dark"] .readiness-summary{ border-top-style: solid; }
+  body[data-theme="dark"] .goals-total{ border-top-style: solid; }
+  body[data-theme="dark"] .fuel-maps-row{ border-bottom-style: solid; }
+  body[data-theme="dark"] .budget-ledger .bl-row.bl-total{ border-top-style: solid; }
+  body[data-theme="dark"] .panel h2{ border-bottom-style: solid; }
+  body[data-theme="dark"] .toggle-row{ border-top-style: solid; }
+  body[data-theme="dark"] .field[style*="dashed"]{ border-top-style: solid !important; }
+  body[data-theme="dark"] .link-hint{
+    border-style: solid;
+    background: rgba(217,169,78,0.08);
+  }
+  body[data-theme="dark"] .nw-jump{ border-bottom-style: solid; }
+
+  /* Buttons: pill-shaped, subtle lift on hover */
+  body[data-theme="dark"] .use-btn,
+  body[data-theme="dark"] .calc-btn,
+  body[data-theme="dark"] .fetch-btn,
+  body[data-theme="dark"] .pct-btn,
+  body[data-theme="dark"] .budget-addbtn,
+  body[data-theme="dark"] .bg-remove{
+    border-radius: 999px;
+  }
+  body[data-theme="dark"] .use-btn:not(:disabled):hover,
+  body[data-theme="dark"] .calc-btn:hover,
+  body[data-theme="dark"] .fetch-btn:hover,
+  body[data-theme="dark"] .pct-btn:hover{
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+  body[data-theme="dark"] .calc-btn{
+    box-shadow: 0 8px 20px rgba(47,191,113,0.28);
+  }
+
+  /* Stat tiles: rounded, elevated, colour-accented left bar (like the
+     reference dashboards' "Available Credit" / "Cash Available" tiles) */
+  body[data-theme="dark"] .stat{
+    background: var(--nested-bg);
+    border-radius: 16px;
+    border-color: rgba(255,255,255,0.16);
+    position: relative;
+    padding-left: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  }
+  body[data-theme="dark"] .stat::before{
+    content:"";
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width: 4px;
+    background: var(--green);
+  }
+  body[data-theme="dark"] .stat:nth-child(2)::before{ background: var(--gold); }
+  body[data-theme="dark"] .stat:nth-child(3)::before{ background: var(--teal); }
+  body[data-theme="dark"] .stat:nth-child(4)::before{ background: var(--red); }
+  body[data-theme="dark"] .stat.gain::before{ background: var(--green); }
+  body[data-theme="dark"] .stat.real::before{ background: var(--red); }
+  body[data-theme="dark"] .stat.hero::before{ display:none; }
+  body[data-theme="dark"] .stat.hero{
+    box-shadow: 0 10px 26px rgba(47,191,113,0.22);
+  }
+
+  /* Inputs: slightly more rounded to match the softer card language */
+  body[data-theme="dark"] input, body[data-theme="dark"] select{
+    border-radius: 9px;
+  }
+
+  /* ============================================================
+     Sidebar nav + dashboard-style card grid — dark theme only,
+     desktop only. Light theme (passbook, single column) and
+     mobile are completely untouched.
+     ============================================================ */
+  .side-nav{ display: none; }
+
+  @media (min-width: 1300px){
+    body[data-theme="dark"] .side-nav{
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      bottom: 20px;
+      width: 220px;
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 18px 12px;
+      gap: 3px;
+      overflow-y: auto;
+      box-shadow: var(--card-shadow);
+      z-index: 10;
+    }
+    body[data-theme="dark"] .side-nav-brand{
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--ink);
+      padding: 6px 10px 16px;
+      letter-spacing: 0.3px;
+    }
+    body[data-theme="dark"] .side-nav-link{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: background .15s ease, color .15s ease;
+    }
+    body[data-theme="dark"] .side-nav-link:hover{
+      background: rgba(47,191,113,0.12);
+      color: var(--green);
+    }
+    body[data-theme="dark"] .side-nav-group-label{
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted-soft);
+      font-weight: 700;
+      padding: 18px 10px 6px;
+    }
+    body[data-theme="dark"] .side-nav-account{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background .15s ease;
+    }
+    body[data-theme="dark"] .side-nav-account:hover{ background: rgba(255,255,255,0.05); }
+    body[data-theme="dark"] .sna-dot{
+      width: 8px; height: 8px; border-radius: 50%; flex: none;
+    }
+    body[data-theme="dark"] .sna-label{
+      font-size: 11.5px;
+      color: var(--muted);
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    body[data-theme="dark"] .sna-val{
+      font-family:'IBM Plex Mono','Consolas',monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink);
+      flex: none;
+    }
+    body[data-theme="dark"]{ padding-left: 280px; }
+  }
+
+  @media (min-width: 1300px){
+    body[data-theme="dark"] .dashboard-grid{
+      column-count: 2;
+      column-gap: 20px;
+    }
+    body[data-theme="dark"] .dashboard-grid > *{
+      break-inside: avoid;
+    }
+  }
+
+  /* ---- Overview row: quick-glance stat cards right under the header ---- */
+  .overview-row{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 900px){
+    .overview-row{ grid-template-columns: repeat(2, 1fr); }
+  }
+  .overview-stat{ background: var(--card-bg); }
+  body[data-theme="dark"] .overview-stat{ background: var(--card-bg); }
+  @media (max-width: 560px){
+    .overview-row{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .overview-row .overview-stat{ padding: 12px 12px 12px 16px; }
+    .overview-row .stat-label{ font-size: 10px; letter-spacing: 0.02em; }
+    .overview-row .stat-value{ font-size: 17px; }
   }
 </style>
 </head>
 <body>
+<nav class="side-nav" id="sideNav">
+  <div class="side-nav-brand">🌱 DCA</div>
+  <a href="#secBudget" class="side-nav-link">📒<span>งบรายเดือน</span></a>
+  <a href="#secFuel" class="side-nav-link">🚗<span>ค่าน้ำมัน</span></a>
+  <a href="#secReadiness" class="side-nav-link">✅<span>ความพร้อม</span></a>
+  <a href="#taxCard" class="side-nav-link">🧾<span>ภาษี RMF/SSF</span></a>
+  <a href="#secNetWorth" class="side-nav-link">🏦<span>Net Worth</span></a>
+  <a href="#secAssets" class="side-nav-link">📊<span>เลือกสินทรัพย์</span></a>
+  <a href="#secResults" class="side-nav-link">🧮<span>ผลลัพธ์</span></a>
+  <a href="#fireCard" class="side-nav-link">🔥<span>FIRE</span></a>
+
+  <div class="side-nav-group-label">ภาพรวมทรัพย์สิน</div>
+  <a href="#secNetWorth" class="side-nav-account">
+    <span class="sna-dot" style="background:var(--green)"></span>
+    <span class="sna-label">เงินสด/สำรอง</span>
+    <span class="sna-val" id="snaCash">฿0</span>
+  </a>
+  <a href="#secNetWorth" class="side-nav-account">
+    <span class="sna-dot" style="background:var(--gold)"></span>
+    <span class="sna-label">ทองคำ</span>
+    <span class="sna-val" id="snaGold">฿0</span>
+  </a>
+  <a href="#secResults" class="side-nav-account">
+    <span class="sna-dot" style="background:var(--teal)"></span>
+    <span class="sna-label">พอร์ต DCA</span>
+    <span class="sna-val" id="snaPortfolio">฿0</span>
+  </a>
+  <a href="#secReadiness" class="side-nav-account">
+    <span class="sna-dot" style="background:var(--red)"></span>
+    <span class="sna-label">หนี้คงเหลือ</span>
+    <span class="sna-val" id="snaDebt">฿0</span>
+  </a>
+</nav>
 <div class="wrap">
 
   <div class="book-header">
-    <button type="button" class="clear-data-btn" onclick="clearAllToolData()" title="ล้างข้อมูลที่กรอกไว้ทั้งหมดในเบราว์เซอร์นี้ — เบราว์เซอร์/เครื่องอื่นไม่โดนกระทบ">🗑️ ล้างข้อมูลของฉัน</button>
+    <div class="header-actions">
+      <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">🌙 ธีมมืด</button>
+      <button type="button" class="clear-data-btn" onclick="clearAllToolData()" title="ล้างข้อมูลที่กรอกไว้ทั้งหมดในเบราว์เซอร์นี้ — เบราว์เซอร์/เครื่องอื่นไม่โดนกระทบ">🗑️ ล้างข้อมูลของฉัน</button>
+    </div>
     <div class="book-eyebrow">SAVINGS &amp; INVESTMENT PASSBOOK</div>
     <h1 class="book-title">🌱 Compound / DCA Calculator</h1>
     <p class="book-sub">คำนวณการเติบโตของเงินลงทุนแบบทบต้น พร้อมออมเงินรายเดือน (Dollar-Cost Averaging)</p>
   </div>
 
-  <div class="budget-card">
+  <div class="overview-row" id="overviewRow">
+    <div class="stat overview-stat">
+      <div class="stat-label">ทรัพย์สินสุทธิ (Net Worth)</div>
+      <div class="stat-value" id="ovNetWorth">฿0</div>
+    </div>
+    <div class="stat overview-stat gain">
+      <div class="stat-label">ลงทุนอยู่ต่อเดือน</div>
+      <div class="stat-value" id="ovInvest">฿0</div>
+    </div>
+    <div class="stat overview-stat">
+      <div class="stat-label">อัตราออม (Savings rate)</div>
+      <div class="stat-value" id="ovRate">0%</div>
+    </div>
+    <div class="stat overview-stat">
+      <div class="stat-label">ความคืบหน้า FIRE</div>
+      <div class="stat-value" id="ovFire">0%</div>
+    </div>
+  </div>
+
+  <div class="budget-card" id="secBudget">
     <div class="budget-head" onclick="toggleBudget()">
       <div>
         <h2>📒 งบรายรับ-รายจ่ายรายเดือน</h2>
@@ -1215,103 +1789,120 @@
     </div>
 
     <div class="budget-body" id="budgetBody">
-      <div class="month-bar" onclick="event.stopPropagation()">
-        <label>🗓️ เดือนที่บันทึก:</label>
-        <input type="month" id="budgetMonth" onchange="onMonthChange()" onclick="event.stopPropagation()">
-        <button type="button" class="pct-btn" onclick="saveBudgetMonth()">💾 บันทึกเดือนนี้</button>
-        <button type="button" class="pct-btn" onclick="loadPrevMonth()">📂 โหลดจากเดือนก่อนหน้า</button>
-        <p class="hint" id="monthSaveStatus"></p>
-      </div>
-      <button type="button" class="history-toggle" id="historyToggleBtn" onclick="event.stopPropagation(); toggleHistory();" style="display:none;">▾ ดูประวัติที่บันทึกไว้ทั้งหมด</button>
-      <div class="table-card" id="historyBox" style="display:none;margin-bottom:16px;">
-        <div class="table-scroll" style="max-height:220px;">
-          <table>
-            <thead>
-              <tr>
-                <th style="text-align:left;">เดือน</th>
-                <th>รายรับ</th>
-                <th>รายจ่าย</th>
-                <th>เหลือ</th>
-                <th>อัตราออม</th>
-                <th>แผนลงทุน</th>
-                <th>ลงทุนจริง</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="historyTableBody"></tbody>
-          </table>
-        </div>
-        <p class="hint" id="actualVsPlanSummary" style="margin-top:8px;"></p>
+      <div class="asset-tabs" style="margin-bottom:16px;">
+        <button type="button" class="asset-tab active" id="budgetTabInput" onclick="switchBudgetTab('input')">📝 กรอกรายรับ-รายจ่าย</button>
+        <button type="button" class="asset-tab" id="budgetTabSummary" onclick="switchBudgetTab('summary')">📊 สรุปผล</button>
       </div>
 
-      <div class="budget-cols">
-        <div class="budget-col">
-          <h4>💰 รายรับ</h4>
-          <div id="incomeRows"></div>
-          <button type="button" class="budget-addbtn" onclick="addBudgetRow('income')">➕ เพิ่มรายรับ</button>
+      <div class="asset-view active" id="budgetViewInput">
+        <div class="month-bar" onclick="event.stopPropagation()">
+          <label>🗓️ เดือนที่บันทึก:</label>
+          <input type="month" id="budgetMonth" onchange="onMonthChange()" onclick="event.stopPropagation()">
+          <button type="button" class="pct-btn" onclick="saveBudgetMonth()">💾 บันทึกเดือนนี้</button>
+          <button type="button" class="pct-btn" onclick="loadPrevMonth()">📂 โหลดจากเดือนก่อนหน้า</button>
+          <p class="hint" id="monthSaveStatus"></p>
         </div>
-        <div class="budget-col">
-          <h4>🧾 รายจ่ายคงที่</h4>
-          <div id="fixedRows"></div>
-          <button type="button" class="budget-addbtn" onclick="addBudgetRow('fixed')">➕ เพิ่มรายจ่ายคงที่</button>
+        <button type="button" class="history-toggle" id="historyToggleBtn" onclick="event.stopPropagation(); toggleHistory();" style="display:none;">▾ ดูประวัติที่บันทึกไว้ทั้งหมด</button>
+        <div class="table-card" id="historyBox" style="display:none;margin-bottom:16px;">
+          <div class="table-scroll" style="max-height:220px;">
+            <table>
+              <thead>
+                <tr>
+                  <th style="text-align:left;">เดือน</th>
+                  <th>รายรับ</th>
+                  <th>รายจ่าย</th>
+                  <th>เหลือ</th>
+                  <th>อัตราออม</th>
+                  <th>แผนลงทุน</th>
+                  <th>ลงทุนจริง</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody"></tbody>
+            </table>
+          </div>
+          <p class="hint" id="actualVsPlanSummary" style="margin-top:8px;"></p>
         </div>
-        <div class="budget-col">
-          <h4>🛍️ รายจ่ายผันแปร</h4>
-          <div id="varRows"></div>
-          <button type="button" class="budget-addbtn" onclick="addBudgetRow('var')">➕ เพิ่มรายจ่ายผันแปร</button>
+
+        <div class="budget-cols">
+          <div class="budget-col">
+            <h4>💰 รายรับ</h4>
+            <div id="incomeRows"></div>
+            <button type="button" class="budget-addbtn" onclick="addBudgetRow('income')">➕ เพิ่มรายรับ</button>
+          </div>
+          <div class="budget-col">
+            <h4>🧾 รายจ่ายคงที่</h4>
+            <div id="fixedRows"></div>
+            <button type="button" class="budget-addbtn" onclick="addBudgetRow('fixed')">➕ เพิ่มรายจ่ายคงที่</button>
+          </div>
+          <div class="budget-col">
+            <h4>🛍️ รายจ่ายผันแปร</h4>
+            <div id="varRows"></div>
+            <button type="button" class="budget-addbtn" onclick="addBudgetRow('var')">➕ เพิ่มรายจ่ายผันแปร</button>
+          </div>
         </div>
+        <button type="button" class="use-btn" style="width:auto;padding:10px 18px;margin-top:16px;" onclick="switchBudgetTab('summary')">ดูสรุปผล →</button>
       </div>
 
-      <div class="budget-summary">
-        <div class="budget-sum-grid">
-          <div class="stat">
-            <div class="stat-label">รายรับรวม</div>
-            <div class="stat-value" id="bIncome">฿0</div>
+      <div class="asset-view" id="budgetViewSummary">
+        <div class="budget-summary" style="border-top:none;padding-top:0;">
+          <div class="budget-sum-grid">
+            <div class="stat">
+              <div class="stat-label">รายรับรวม</div>
+              <div class="stat-value" id="bIncome">฿0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">รายจ่ายรวม</div>
+              <div class="stat-value" id="bExpense">฿0</div>
+            </div>
+            <div class="stat gain">
+              <div class="stat-label">เหลือ (ลงทุนได้)</div>
+              <div class="stat-value" id="bSurplus">฿0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">อัตราออม (Savings rate)</div>
+              <div class="stat-value" id="bRate">0%</div>
+            </div>
           </div>
-          <div class="stat">
-            <div class="stat-label">รายจ่ายรวม</div>
-            <div class="stat-value" id="bExpense">฿0</div>
-          </div>
-          <div class="stat gain">
-            <div class="stat-label">เหลือ (ลงทุนได้)</div>
-            <div class="stat-value" id="bSurplus">฿0</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">อัตราออม (Savings rate)</div>
-            <div class="stat-value" id="bRate">0%</div>
-          </div>
-        </div>
-        <div class="budget-bar" id="budgetBar"></div>
-        <div class="budget-bar-legend">
-          <span><i style="background:var(--red);opacity:.75;"></i> รายจ่ายคงที่</span>
-          <span><i style="background:var(--gold);"></i> รายจ่ายผันแปร</span>
-          <span><i style="background:var(--green);"></i> เหลือ/ลงทุนได้</span>
-        </div>
 
-        <div class="budget-ledger" id="budgetLedger"></div>
+          <div class="budget-donut-wrap">
+            <div class="budget-donut-ring">
+              <div class="budget-donut big" id="budgetDonut">
+                <div class="budget-donut-hole">
+                  <div class="bd-value" id="budgetDonutValue">฿0</div>
+                  <div class="bd-label" id="budgetDonutLabel">รายจ่ายรวม</div>
+                </div>
+              </div>
+            </div>
+            <div class="cat-list" id="budgetDonutLegend"></div>
+          </div>
+          <div class="cat-tiles" id="budgetCatTiles"></div>
 
-        <div class="field" style="margin:14px 0 10px;">
-          <label>💸 จะลงทุนเท่าไหร่ต่อเดือนจริงๆ <span class="hint">(ไม่ต้องลงทุนหมดยอดที่เหลือ ฿<span id="bSurplusInline">0</span> ก็ได้ เก็บสำรองไว้บ้าง)</span></label>
-          <div class="input-row" style="max-width:220px;">
-            <input type="number" id="investAmt" value="0" min="0" step="100" oninput="onInvestAmtInput()">
-            <span class="unit">บาท/ด.</span>
+          <div class="budget-ledger" id="budgetLedger"></div>
+
+          <div class="field" style="margin:14px 0 10px;">
+            <label>💸 จะลงทุนเท่าไหร่ต่อเดือนจริงๆ <span class="hint">(ไม่ต้องลงทุนหมดยอดที่เหลือ ฿<span id="bSurplusInline">0</span> ก็ได้ เก็บสำรองไว้บ้าง)</span></label>
+            <div class="input-row" style="max-width:220px;">
+              <input type="number" id="investAmt" value="0" min="0" step="100" oninput="onInvestAmtInput()">
+              <span class="unit">บาท/ด.</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+              <button type="button" class="pct-btn" onclick="setInvestPct(1)">100% ของยอดเหลือ</button>
+              <button type="button" class="pct-btn" onclick="setInvestPct(0.75)">75%</button>
+              <button type="button" class="pct-btn" onclick="setInvestPct(0.5)">50%</button>
+              <button type="button" class="pct-btn" onclick="setInvestPct(0.25)">25%</button>
+            </div>
+            <p class="hint" id="investLeftoverHint" style="margin-top:8px;"></p>
           </div>
-          <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-            <button type="button" class="pct-btn" onclick="setInvestPct(1)">100% ของยอดเหลือ</button>
-            <button type="button" class="pct-btn" onclick="setInvestPct(0.75)">75%</button>
-            <button type="button" class="pct-btn" onclick="setInvestPct(0.5)">50%</button>
-            <button type="button" class="pct-btn" onclick="setInvestPct(0.25)">25%</button>
-          </div>
-          <p class="hint" id="investLeftoverHint" style="margin-top:8px;"></p>
+
+          <button type="button" class="use-btn" style="width:auto;padding:10px 18px;background:var(--green);" onclick="applyBudgetToMonthly()">↓ ใช้จำนวนนี้เป็นเงินลงทุนรายเดือน</button>
+          <p class="hint" id="budgetApplyHint" style="margin-top:8px;"></p>
         </div>
-
-        <button type="button" class="use-btn" style="width:auto;padding:10px 18px;background:var(--green);" onclick="applyBudgetToMonthly()">↓ ใช้จำนวนนี้เป็นเงินลงทุนรายเดือน</button>
-        <p class="hint" id="budgetApplyHint" style="margin-top:8px;"></p>
       </div>
     </div>
   </div>
 
-  <div class="fuel-card">
+  <div class="fuel-card" id="secFuel">
     <h2>🚗 คำนวณค่าน้ำมันไป-กลับ</h2>
     <p class="sub">ประมาณค่าน้ำมันจากระยะทาง เพื่อเติมเป็นรายจ่ายผันแปรในงบฯ ด้านบน — เช็คระยะทางจริงจาก Google Maps เองก่อน แล้วกรอกเลข กม. ที่นี่ (หน้านี้ไม่ได้ดึงระยะทางอัตโนมัติ เพราะ Google Maps ต้องใช้ API Key ของตัวเองและอาจมีค่าใช้จ่าย)</p>
 
@@ -1387,7 +1978,8 @@
     <p class="hint" id="fuelAddHint" style="margin-top:8px;"></p>
   </div>
 
-  <div class="readiness-card">
+  <div class="dashboard-grid">
+  <div class="readiness-card" id="secReadiness">
     <h2>✅ เช็คความพร้อมก่อนเริ่มลงทุนจริง</h2>
     <p class="sub">มาตรฐานทั่วไปแนะนำให้เช็ค 2 เรื่องนี้ก่อนเริ่ม DCA เสมอ — ไม่ใช่กฎห้ามลงทุนถ้ายังไม่ผ่าน แค่เป็นข้อมูลประกอบการตัดสินใจ (คำนวณจากรายจ่ายที่กรอกไว้ในงบฯ ด้านบน)</p>
 
@@ -1404,11 +1996,11 @@
           <div style="display:flex;gap:8px;margin-top:8px;">
             <div style="flex:1;">
               <label class="inj-field-label" style="display:block;font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:600;">🪙 ทองคำที่มี (บาท)</label>
-              <input type="number" id="goldBaht" value="0" min="0" step="0.5" oninput="updateReadiness()" style="width:100%;box-sizing:border-box;padding:7px 8px;border:1.5px solid var(--paper-line);border-radius:6px;background:#fff;font-family:'IBM Plex Mono','Consolas',monospace;font-size:13px;color:var(--ink);">
+              <input type="number" id="goldBaht" value="0" min="0" step="0.5" oninput="updateReadiness()" style="width:100%;box-sizing:border-box;padding:7px 8px;border:1.5px solid var(--paper-line);border-radius:6px;background:var(--input-bg);font-family:'IBM Plex Mono','Consolas',monospace;font-size:13px;color:var(--ink);">
             </div>
             <div style="flex:1;">
               <label class="inj-field-label" style="display:block;font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:600;">ราคาทอง รับซื้อ/บาท</label>
-              <input type="number" id="goldPrice" value="68900" min="0" step="50" oninput="updateReadiness()" style="width:100%;box-sizing:border-box;padding:7px 8px;border:1.5px solid var(--paper-line);border-radius:6px;background:#fff;font-family:'IBM Plex Mono','Consolas',monospace;font-size:13px;color:var(--ink);">
+              <input type="number" id="goldPrice" value="68900" min="0" step="50" oninput="updateReadiness()" style="width:100%;box-sizing:border-box;padding:7px 8px;border:1.5px solid var(--paper-line);border-radius:6px;background:var(--input-bg);font-family:'IBM Plex Mono','Consolas',monospace;font-size:13px;color:var(--ink);">
             </div>
           </div>
           <p class="hint" style="margin-top:4px;font-size:10px;line-height:1.5;">ราคาทองอ้างอิงรับซื้อ (ไม่ใช่ราคาขายออก) ณ 20 ก.ย. 2026 จาก <a href="https://www.goldtraders.or.th/" target="_blank" rel="noopener" style="color:var(--green);font-weight:600;">สมาคมค้าทองคำ</a> ~฿68,900/บาททองคำ — ราคาจริงเปลี่ยนทุกวัน แก้ตัวเลขนี้เป็นราคาวันนี้เองได้เลย</p>
@@ -1444,11 +2036,11 @@
           <div style="display:flex;gap:8px;margin-top:8px;">
             <div style="flex:1;">
               <label class="inj-field-label" style="display:block;font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:600;">นายจ้างสมทบสูงสุด</label>
-              <input type="number" id="pvdEmployerRate" value="5" min="0" max="100" step="0.5" oninput="updateReadiness()" style="width:100%;box-sizing:border-box;padding:7px 8px;border:1.5px solid var(--paper-line);border-radius:6px;background:#fff;font-family:'IBM Plex Mono','Consolas',monospace;font-size:13px;color:var(--ink);">
+              <input type="number" id="pvdEmployerRate" value="5" min="0" max="100" step="0.5" oninput="updateReadiness()" style="width:100%;box-sizing:border-box;padding:7px 8px;border:1.5px solid var(--paper-line);border-radius:6px;background:var(--input-bg);font-family:'IBM Plex Mono','Consolas',monospace;font-size:13px;color:var(--ink);">
             </div>
             <div style="flex:1;">
               <label class="inj-field-label" style="display:block;font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:600;">เราสะสมอยู่ตอนนี้</label>
-              <input type="number" id="pvdOwnRate" value="3" min="0" max="100" step="0.5" oninput="updateReadiness()" style="width:100%;box-sizing:border-box;padding:7px 8px;border:1.5px solid var(--paper-line);border-radius:6px;background:#fff;font-family:'IBM Plex Mono','Consolas',monospace;font-size:13px;color:var(--ink);">
+              <input type="number" id="pvdOwnRate" value="3" min="0" max="100" step="0.5" oninput="updateReadiness()" style="width:100%;box-sizing:border-box;padding:7px 8px;border:1.5px solid var(--paper-line);border-radius:6px;background:var(--input-bg);font-family:'IBM Plex Mono','Consolas',monospace;font-size:13px;color:var(--ink);">
             </div>
           </div>
           <p class="hint" style="margin-top:4px;font-size:10px;line-height:1.5;">ทั้งสองช่องเป็น % ของเงินเดือน — เช็คตัวเลขจริงได้จากฝ่ายบุคคล/กองทุนสำรองเลี้ยงชีพของบริษัท แต่ละที่ให้ไม่เท่ากัน</p>
@@ -1460,11 +2052,36 @@
     <div class="readiness-summary" id="readinessSummary"></div>
   </div>
 
-  <div class="networth-card readiness-card">
+  <div class="tax-card readiness-card" id="taxCard">
+    <h2>🧾 ประเมินลดหย่อนภาษีจาก RMF/SSF</h2>
+    <p class="sub">ประมาณการคร่าวๆ ว่าซื้อ RMF/SSF เพิ่มแล้วประหยัดภาษีได้เท่าไหร่ — ใช้อัตราภาษีเงินได้บุคคลธรรมดาแบบขั้นบันได ไม่นับลดหย่อนอื่นที่ซับซ้อน (ลูก, ประกัน, บริจาค ฯลฯ) ไม่ใช่การคำนวณภาษีที่แม่นยำหรือคำแนะนำด้านภาษี ก่อนตัดสินใจจริงควรเช็คกับผู้เชี่ยวชาญ/โปรแกรมคำนวณภาษีทางการ</p>
+    <div class="inj-line" style="margin-bottom:6px;">
+      <div class="inj-field">
+        <label class="inj-field-label">เงินได้สุทธิต่อปี (หลังหักค่าใช้จ่าย+ลดหย่อนอื่นๆ แล้ว)</label>
+        <input type="number" id="taxNetIncome" value="0" min="0" step="1000" oninput="onTaxNetIncomeInput()">
+      </div>
+      <div class="inj-field">
+        <label class="inj-field-label">จะซื้อ RMF+SSF รวมกัน (บาท/ปี)</label>
+        <input type="number" id="taxRmfSsf" value="0" min="0" step="1000" oninput="updateTaxEstimate()">
+      </div>
+    </div>
+    <p class="hint" id="taxNetIncomeHint" style="margin:0 0 10px;font-size:10px;line-height:1.6;"></p>
+    <div class="budget-ledger" id="taxLedger"></div>
+    <p class="hint" id="taxLimitHint" style="margin-top:6px;"></p>
+  </div>
+
+  <div class="networth-card readiness-card" id="secNetWorth">
     <h2>📒 ทรัพย์สินสุทธิ (Net Worth)</h2>
-    <p class="sub">รวมทุกอย่างที่มี หักด้วยหนี้คงเหลือ — อัปเดตอัตโนมัติจากตัวเลขที่กรอกไว้ในเช็คความพร้อมด้านบนและเงินลงทุนเริ่มต้นด้านล่าง</p>
+    <p class="sub">รวมทุกอย่างที่มี หักด้วยหนี้คงเหลือ — อัปเดตอัตโนมัติจากตัวเลขที่กรอกไว้ในเช็คความพร้อมด้านบนและเงินลงทุนเริ่มต้นด้านล่าง · กดไอคอน ↗ ท้ายแต่ละบรรทัดเพื่อไปช่องกรอกจริงของตัวเลขนั้น</p>
     <div class="budget-ledger" id="netWorthLedger"></div>
     <p class="hint" id="netWorthHint" style="margin-top:4px;"></p>
+    <div class="alloc-head" id="allocHead" style="display:none;">
+      <span class="alloc-title">สัดส่วนสินทรัพย์</span>
+      <span class="alloc-total" id="allocTotal"></span>
+    </div>
+    <div class="alloc-bar" id="allocBar"></div>
+    <div class="alloc-legend" id="allocLegend"></div>
+    <div id="cashLogBox" style="display:none;margin-top:14px;"></div>
   </div>
 
   <div class="goals-card readiness-card">
@@ -1496,7 +2113,15 @@
     <button type="button" class="use-btn" style="width:100%;margin-top:8px;" onclick="applyBonusAllocation()">✅ ยืนยันจัดสรร</button>
   </div>
 
-  <div class="asset-panel">
+  <div class="flow-card readiness-card" id="flowCard">
+    <h2>🧭 เส้นทางเงินของคุณ</h2>
+    <p class="sub">ภาพรวมว่าเงินเดือนไหลไปที่ไหนบ้าง — อัปเดตอัตโนมัติจากงบฯ, เงินลงทุน, เงินสำรอง, เป้าหมาย และทองคำด้านบนทั้งหมด</p>
+    <div id="flowDiagram"></div>
+  </div>
+
+  </div>
+
+  <div class="asset-panel" id="secAssets">
     <h2>📊 เลือกสินทรัพย์ที่จะลงทุน</h2>
     <p class="sub">เลือกอัตราผลตอบแทนคาดหวังจากข้อมูลอ้างอิง แล้วกด "ใช้ค่านี้" เพื่อใส่ในช่องคำนวณด้านล่างอัตโนมัติ — ผลตอบแทนในอดีตไม่ได้การันตีผลตอบแทนในอนาคต ไม่ใช่คำแนะนำการลงทุน</p>
 
@@ -1611,7 +2236,7 @@
     </div>
   </div>
 
-  <div class="grid">
+  <div class="grid" id="secResults">
     <!-- INPUT PANEL -->
     <div class="panel">
       <h2>✏️ ข้อมูลนำเข้า</h2>
@@ -1734,32 +2359,11 @@
         </div>
       </div>
 
-      <div class="chart-card" style="margin-bottom:14px;">
-        <button type="button" class="use-btn" style="width:auto;padding:7px 14px;font-size:12px;" onclick="printSummaryReport()">🖨️ พิมพ์ / บันทึกสรุปแผนเป็น PDF</button>
-      </div>
-
-      <div class="chart-card" id="fireCard">
-        <div class="chart-legend" style="margin-bottom:8px;">
-          <span style="font-weight:700;color:var(--ink);font-size:13px;">🔥 อิสรภาพทางการเงิน (FIRE)</span>
-        </div>
-        <p class="hint" id="fireExplain" style="margin:0 0 8px;"></p>
-        <div class="budget-bar" id="fireBar"></div>
-        <p class="hint" id="fireStatus" style="margin-top:6px;font-weight:600;"></p>
-      </div>
-
-      <div class="chart-card" id="milestoneCard">
-        <div class="chart-legend" style="margin-bottom:8px;">
-          <span style="font-weight:700;color:var(--ink);font-size:13px;">🚩 เส้นชัยระหว่างทาง</span>
-        </div>
-        <div class="budget-ledger" id="milestoneRows" style="margin-top:0;"></div>
-        <p class="hint" id="milestoneEmpty" style="display:none;"></p>
-      </div>
-
       <div class="chart-card">
         <div class="chart-legend">
           <span><i class="swatch balance"></i> ยอดเงินสะสม (Balance)</span>
           <span><i class="swatch contrib"></i> เงินลงทุนสะสม (Contributed)</span>
-          <span id="rangeLegendItem" style="display:none;"><i class="swatch" style="background:repeating-linear-gradient(90deg, #7C9E7F 0 4px, transparent 4px 7px);"></i> กรอบดี/แย่</span>
+          <span id="rangeLegendItem" style="display:none;"><i class="swatch" style="background:repeating-linear-gradient(90deg, var(--band) 0 4px, transparent 4px 7px);"></i> กรอบดี/แย่</span>
         </div>
         <svg id="chart" viewBox="0 0 600 220" width="100%" height="220" preserveAspectRatio="none"></svg>
       </div>
@@ -1783,6 +2387,31 @@
     </div>
   </div>
 
+  <!-- extra insights on the projection above — full-width so they don't unbalance the two-column grid -->
+  <div class="insights-row">
+    <div class="chart-card" id="fireCard">
+      <div class="chart-legend" style="margin-bottom:8px;">
+        <span style="font-weight:700;color:var(--ink);font-size:13px;">🔥 อิสรภาพทางการเงิน (FIRE)</span>
+      </div>
+      <p class="hint" id="fireExplain" style="margin:0 0 8px;"></p>
+      <div class="budget-bar" id="fireBar"></div>
+      <p class="hint" id="fireStatus" style="margin-top:6px;font-weight:600;"></p>
+    </div>
+
+    <div class="chart-card" id="milestoneCard">
+      <div class="chart-legend" style="margin-bottom:8px;">
+        <span style="font-weight:700;color:var(--ink);font-size:13px;">🚩 เส้นชัยระหว่างทาง</span>
+      </div>
+      <div class="budget-ledger" id="milestoneRows" style="margin-top:0;"></div>
+      <p class="hint" id="milestoneEmpty" style="display:none;"></p>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:20px;text-align:center;">
+    <button type="button" class="use-btn" style="width:auto;padding:9px 22px;font-size:12.5px;" onclick="printSummaryReport()">🖨️ พิมพ์ / บันทึกสรุปแผนทั้งหมดเป็น PDF</button>
+    <p class="hint" style="margin-top:8px;">รวมงบ, net worth, เป้าหมาย, ผลลัพธ์, FIRE และเส้นชัยด้านบนเป็นหน้าเดียว</p>
+  </div>
+
   <p class="foot-note">📝 เครื่องมือนี้ใช้เพื่อประกอบการตัดสินใจเบื้องต้นเท่านั้น ผลตอบแทนจริงขึ้นอยู่กับความผันผวนของตลาด ไม่ใช่คำแนะนำการลงทุน<br>
   This tool is for illustrative purposes only and is not investment advice.</p>
 
@@ -1798,6 +2427,41 @@ function fmtMoney(n){
   return sign + "฿" + n.toLocaleString('en-US', {maximumFractionDigits:0});
 }
 
+/* ---- Theme (light "สมุดบัญชี" / dark) — the JS-drawn SVG charts below read
+   their colors from CSS variables via this helper, so they stay legible and
+   redraw correctly whichever theme is active. ---- */
+const THEME_KEY = 'dcaThemeV1';
+
+function themeVar(name){
+  return getComputedStyle(document.body).getPropertyValue(name).trim();
+}
+
+function applyTheme(mode){
+  document.body.setAttribute('data-theme', mode);
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = mode === 'dark' ? '☀️ ธีมสว่าง' : '🌙 ธีมมืด';
+  try{ localStorage.setItem(THEME_KEY, mode); }catch(e){ /* ignore */ }
+  // colors baked into the SVG charts on the last draw don't update on their
+  // own when CSS variables change, so re-run both chart draws against the
+  // new theme's colors.
+  if (typeof calc === 'function') calc();
+  if (typeof applyChartRange === 'function') applyChartRange();
+}
+
+function toggleTheme(){
+  const current = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+function initTheme(){
+  let saved = 'light';
+  try{ saved = localStorage.getItem(THEME_KEY) || 'light'; }catch(e){ /* ignore */ }
+  document.body.setAttribute('data-theme', saved);
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = saved === 'dark' ? '☀️ ธีมสว่าง' : '🌙 ธีมมืด';
+}
+initTheme();
+
 // wipes every localStorage key this tool owns (budget history, goals, API key,
 // price caches) — for demoing this page on a shared/public device without
 // leaving personal numbers behind. Data in OTHER people's own browsers is
@@ -1807,7 +2471,7 @@ function clearAllToolData(){
   const ok = confirm('ล้างข้อมูลที่กรอกไว้ทั้งหมดของเครื่องมือนี้ในเบราว์เซอร์นี้ (งบรายเดือน, เป้าหมาย, ประวัติที่บันทึกไว้, API key ที่จำไว้)?\n\nเบราว์เซอร์/เครื่องอื่นไม่โดนกระทบ เพราะข้อมูลเก็บแยกเป็นของแต่ละเบราว์เซอร์อยู่แล้ว — กดแล้วกู้คืนไม่ได้');
   if (!ok) return;
   try{
-    const exactKeys = ['avApiKey', 'dcaGoalsV1', 'dcaBudgetHistoryV1'];
+    const exactKeys = ['avApiKey', 'dcaGoalsV1', 'dcaBudgetHistoryV1', 'dcaCashLogV1'];
     const prefixes = ['avCache_', 'avCandles3_', 'avOverview_'];
     Object.keys(localStorage).forEach(k => {
       if (exactKeys.indexOf(k) !== -1 || prefixes.some(p => k.indexOf(p) === 0)){
@@ -2059,7 +2723,7 @@ function drawChart(yearly, initial, optimistic, pessimistic){
     const line = document.createElementNS(ns, 'line');
     line.setAttribute('x1', padL); line.setAttribute('x2', W - padR);
     line.setAttribute('y1', yy); line.setAttribute('y2', yy);
-    line.setAttribute('stroke', '#E3DCC8');
+    line.setAttribute('stroke', themeVar('--paper-line'));
     line.setAttribute('stroke-width', '1');
     svg.appendChild(line);
 
@@ -2068,7 +2732,7 @@ function drawChart(yearly, initial, optimistic, pessimistic){
     label.setAttribute('y', yy + 4);
     label.setAttribute('text-anchor', 'end');
     label.setAttribute('font-size', '9.5');
-    label.setAttribute('fill', '#5C6B57');
+    label.setAttribute('fill', themeVar('--muted'));
     let txt;
     if (val >= 1000000) txt = (val/1000000).toFixed(1) + 'M';
     else if (val >= 1000) txt = Math.round(val/1000) + 'k';
@@ -2086,7 +2750,7 @@ function drawChart(yearly, initial, optimistic, pessimistic){
       label.setAttribute('y', H - 6);
       label.setAttribute('text-anchor', 'middle');
       label.setAttribute('font-size', '9.5');
-      label.setAttribute('fill', '#5C6B57');
+      label.setAttribute('fill', themeVar('--muted'));
       label.textContent = 'อายุ' + yearly[i].age;
       svg.appendChild(label);
     }
@@ -2103,7 +2767,7 @@ function drawChart(yearly, initial, optimistic, pessimistic){
                     + ' L' + loPts.slice().reverse().map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L') + ' Z';
     const band = document.createElementNS(ns, 'path');
     band.setAttribute('d', bandPath);
-    band.setAttribute('fill', '#7C9E7F');
+    band.setAttribute('fill', themeVar('--band'));
     band.setAttribute('opacity', '0.18');
     svg.appendChild(band);
 
@@ -2111,7 +2775,7 @@ function drawChart(yearly, initial, optimistic, pessimistic){
       const line = document.createElementNS(ns, 'path');
       line.setAttribute('d', 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'));
       line.setAttribute('fill', 'none');
-      line.setAttribute('stroke', '#7C9E7F');
+      line.setAttribute('stroke', themeVar('--band'));
       line.setAttribute('stroke-width', '1.5');
       line.setAttribute('stroke-dasharray', '4 3');
       svg.appendChild(line);
@@ -2125,27 +2789,39 @@ function drawChart(yearly, initial, optimistic, pessimistic){
   const contribLine = document.createElementNS(ns, 'path');
   contribLine.setAttribute('d', contribPath);
   contribLine.setAttribute('fill', 'none');
-  contribLine.setAttribute('stroke', '#AD8A47');
+  contribLine.setAttribute('stroke', themeVar('--gold'));
   contribLine.setAttribute('stroke-width', '2');
   contribLine.setAttribute('stroke-dasharray', '5 4');
   svg.appendChild(contribLine);
 
-  // balance area (green fill)
+  // balance area (gradient fill, fading from the balance line down to the axis)
   let balPts = [[x(0), y(initial)]];
   yearly.forEach((d, i) => balPts.push([x(i+1), y(d.balance)]));
   const areaPath = 'M' + balPts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L')
                   + ` L ${x(n)} ${padT+plotH} L ${x(0)} ${padT+plotH} Z`;
+  const balFillId = 'dcaAreaFill_' + Math.random().toString(36).slice(2, 9);
+  const balDefs = document.createElementNS(ns, 'defs');
+  const balGrad = document.createElementNS(ns, 'linearGradient');
+  balGrad.setAttribute('id', balFillId);
+  balGrad.setAttribute('x1', '0'); balGrad.setAttribute('y1', '0');
+  balGrad.setAttribute('x2', '0'); balGrad.setAttribute('y2', '1');
+  const balStop1 = document.createElementNS(ns, 'stop');
+  balStop1.setAttribute('offset', '0%'); balStop1.setAttribute('stop-color', themeVar('--green')); balStop1.setAttribute('stop-opacity', '0.32');
+  const balStop2 = document.createElementNS(ns, 'stop');
+  balStop2.setAttribute('offset', '100%'); balStop2.setAttribute('stop-color', themeVar('--green')); balStop2.setAttribute('stop-opacity', '0.02');
+  balGrad.appendChild(balStop1); balGrad.appendChild(balStop2);
+  balDefs.appendChild(balGrad);
+  svg.appendChild(balDefs);
   const area = document.createElementNS(ns, 'path');
   area.setAttribute('d', areaPath);
-  area.setAttribute('fill', '#2F5233');
-  area.setAttribute('opacity', '0.12');
+  area.setAttribute('fill', 'url(#' + balFillId + ')');
   svg.appendChild(area);
 
   const balPath = 'M' + balPts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
   const balLine = document.createElementNS(ns, 'path');
   balLine.setAttribute('d', balPath);
   balLine.setAttribute('fill', 'none');
-  balLine.setAttribute('stroke', '#2F5233');
+  balLine.setAttribute('stroke', themeVar('--green'));
   balLine.setAttribute('stroke-width', '2.5');
   svg.appendChild(balLine);
 
@@ -2154,7 +2830,7 @@ function drawChart(yearly, initial, optimistic, pessimistic){
   const dot = document.createElementNS(ns, 'circle');
   dot.setAttribute('cx', lastPt[0]); dot.setAttribute('cy', lastPt[1]);
   dot.setAttribute('r', 4);
-  dot.setAttribute('fill', '#2F5233');
+  dot.setAttribute('fill', themeVar('--green'));
   svg.appendChild(dot);
 }
 
@@ -2171,7 +2847,7 @@ function fillLedger(yearly){
       <td class="interest">+${fmtMoney(d.interestYr)}</td>
       <td>${fmtMoney(d.balance)}</td>
     `;
-    if (hasInj) tr.style.background = 'var(--gold-soft)';
+    if (hasInj) tr.style.background = 'var(--row-highlight-bg)';
     body.appendChild(tr);
   });
 }
@@ -2668,7 +3344,7 @@ function drawAreaChart(bars){
   function x(i){ return padL + plotW * i / (n - 1); }
 
   const up = closes[closes.length - 1] >= closes[0];
-  const lineColor = up ? '#2F5233' : '#8B3A3A';
+  const lineColor = up ? themeVar('--green') : themeVar('--red');
   const fillId = 'areaFill_' + Math.random().toString(36).slice(2, 9);
 
   const defs = document.createElementNS(ns, 'defs');
@@ -2691,7 +3367,7 @@ function drawAreaChart(bars){
     const line = document.createElementNS(ns, 'line');
     line.setAttribute('x1', padL); line.setAttribute('x2', W - padR);
     line.setAttribute('y1', yy); line.setAttribute('y2', yy);
-    line.setAttribute('stroke', '#E3DCC8');
+    line.setAttribute('stroke', themeVar('--paper-line'));
     line.setAttribute('stroke-width', '1');
     if (frac === 0.5) line.setAttribute('stroke-dasharray', '3,3');
     svg.appendChild(line);
@@ -2701,7 +3377,7 @@ function drawAreaChart(bars){
     label.setAttribute('y', yy + 3);
     label.setAttribute('text-anchor', 'end');
     label.setAttribute('font-size', '9');
-    label.setAttribute('fill', '#5C6B57');
+    label.setAttribute('fill', themeVar('--muted'));
     label.textContent = val.toFixed(val < 10 ? 2 : (val < 200 ? 1 : 0));
     svg.appendChild(label);
   });
@@ -2737,7 +3413,7 @@ function drawAreaChart(bars){
     label.setAttribute('y', H - 5);
     label.setAttribute('text-anchor', i === 0 ? 'start' : 'end');
     label.setAttribute('font-size', '9');
-    label.setAttribute('fill', '#5C6B57');
+    label.setAttribute('fill', themeVar('--muted'));
     label.textContent = bars[i].date;
     svg.appendChild(label);
   });
@@ -2905,7 +3581,127 @@ function toggleBudget(){
   document.getElementById('budgetToggleIcon').classList.toggle('closed');
 }
 
+function switchBudgetTab(tab){
+  document.getElementById('budgetTabInput').classList.toggle('active', tab === 'input');
+  document.getElementById('budgetTabSummary').classList.toggle('active', tab === 'summary');
+  document.getElementById('budgetViewInput').classList.toggle('active', tab === 'input');
+  document.getElementById('budgetViewSummary').classList.toggle('active', tab === 'summary');
+}
+
 let investTouched = false;
+
+const CAT_COLORS = ['#F26B3A','#4C8BF5','#F2B441','#9B6DFF','#2EC4B6','#FF6FB5','#E5484D','#7C8DA6','#C98B5A','#5AC8FA'];
+const CAT_ICONS = [
+  [/กิน|อาหาร|ข้าว|กาแฟ|ขนม|food|eat/i, '🍜'],
+  [/ประกัน|insur/i, '🛡️'],
+  [/เดินทาง|รถ|น้ำมัน|bts|mrt|แท็กซี่|grab|ทางด่วน|travel/i, '🚗'],
+  [/เช่า|ผ่อนบ้าน|ที่พัก|บ้าน|คอนโด|หอ|rent/i, '🏠'],
+  [/น้ำ|ไฟ|เน็ต|มือถือ|โทรศัพท์|internet|bill/i, '💡'],
+  [/ช้อป|บันเทิง|เที่ยว|หนัง|เกม|shop/i, '🛍️'],
+  [/หนี้|บัตร|ผ่อน|loan|credit/i, '💳'],
+  [/สุขภาพ|ยา|หมอ|ฟิต|ยิม|gym/i, '💪'],
+  [/แฟน|ครอบครัว|พ่อ|แม่|family/i, '❤️'],
+  [/ออม|ลงทุน|save|invest/i, '🐷'],
+  [/สัตว์|แมว|หมา|pet/i, '🐾']
+];
+function catIcon(label){
+  for (const [re, ic] of CAT_ICONS){ if (re.test(label)) return ic; }
+  return '💸';
+}
+function escHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function collectBudgetItems(){
+  const items = [];
+  [['fixedRows','คงที่'],['varRows','ผันแปร']].forEach(([cid, kind]) => {
+    document.querySelectorAll('#' + cid + ' .budget-row').forEach(r => {
+      const val = parseFloat(r.querySelector('.bud-amt').value) || 0;
+      if (val <= 0) return;
+      const label = (r.querySelector('.bud-label').value || '').trim() || 'ไม่ระบุชื่อ';
+      items.push({ label, val, kind });
+    });
+  });
+  items.sort((a,b) => b.val - a.val);
+  items.forEach((it, i) => { it.color = CAT_COLORS[i % CAT_COLORS.length]; it.icon = catIcon(it.label); });
+  return items;
+}
+function ringBg(color, pct, track){
+  const p = Math.max(0, Math.min(100, pct));
+  return `conic-gradient(${color} 0% ${p}%, ${track} ${p}% 100%)`;
+}
+function renderBudgetCategories(income, expense, surplus){
+  const donut = document.getElementById('budgetDonut');
+  const donutValue = document.getElementById('budgetDonutValue');
+  const donutLabel = document.getElementById('budgetDonutLabel');
+  const list = document.getElementById('budgetDonutLegend');
+  const tiles = document.getElementById('budgetCatTiles');
+  const items = collectBudgetItems();
+
+  if (income <= 0 && expense <= 0){
+    donut.style.background = 'var(--paper-line)';
+    donutValue.textContent = '—';
+    donutLabel.textContent = 'รายจ่ายรวม';
+    list.innerHTML = '<p class="hint">กรอกรายรับ-รายจ่ายในแท็บ "กรอกรายรับ-รายจ่าย" ก่อน เพื่อดูสัดส่วน</p>';
+    tiles.innerHTML = '';
+    return;
+  }
+
+  // Donut: each expense item + leftover (green), as share of whichever is bigger (income or expense)
+  const base = Math.max(income, expense) || 1;
+  const segs = items.map(it => ({ color: it.color, pct: it.val / base * 100 }));
+  if (surplus > 0) segs.push({ color: 'var(--green)', pct: surplus / base * 100 });
+  const gap = segs.length > 1 ? 0.6 : 0;
+  let acc = 0; const stops = [];
+  segs.forEach(s => {
+    const start = acc, end = acc + s.pct;
+    stops.push(`${s.color} ${start}% ${Math.max(start, end - gap)}%`);
+    if (gap) stops.push(`var(--card-bg) ${Math.max(start, end - gap)}% ${end}%`);
+    acc = end;
+  });
+  if (acc < 100) stops.push(`var(--paper-line) ${acc}% 100%`);
+  donut.style.background = `conic-gradient(${stops.join(', ')})`;
+  donutValue.textContent = fmtMoney(expense);
+  donutLabel.textContent = income > 0
+    ? `รายจ่ายรวม · ${(expense / income * 100).toFixed(0)}% ของรายรับ`
+    : 'รายจ่ายรวม';
+
+  // Ranked list (like a "history" panel)
+  const rows = items.map(it => `
+    <div class="cat-item">
+      <span class="cat-ico" style="background:${it.color}22;color:${it.color}">${it.icon}</span>
+      <span class="cat-name">${escHtml(it.label)}<small>รายจ่าย${it.kind}</small></span>
+      <span class="cat-amt">${fmtMoney(it.val)}<small style="color:${it.color}">${expense > 0 ? (it.val / expense * 100).toFixed(0) : 0}%</small></span>
+    </div>`);
+  if (income > 0){
+    rows.push(`
+    <div class="cat-item">
+      <span class="cat-ico" style="background:rgba(47,191,113,0.15)">🌱</span>
+      <span class="cat-name">เหลือ / ลงทุนได้<small>จากรายรับ ${fmtMoney(income)}</small></span>
+      <span class="cat-amt" style="color:${surplus < 0 ? 'var(--red)' : 'var(--green)'}">${fmtMoney(surplus)}<small>${(surplus / income * 100).toFixed(0)}%</small></span>
+    </div>`);
+  }
+  list.innerHTML = '<div class="cat-list-title">รายจ่ายแยกตามหมวด</div>' + rows.join('');
+
+  // Tiles with mini ring gauges (share of total expense)
+  const expPctOfIncome = income > 0 ? expense / income * 100 : 100;
+  const hero = `
+    <div class="cat-tile hero">
+      <div class="ct-ring" style="background:${ringBg('#F2B441', expPctOfIncome, 'rgba(255,255,255,0.15)')}"><span>📊</span></div>
+      <div class="ct-name">ใช้ไปทั้งหมด</div>
+      <div class="ct-amt">${fmtMoney(expense)}</div>
+      <div class="ct-pct">${income > 0 ? expPctOfIncome.toFixed(0) + '% ของรายรับ' : '—'}</div>
+    </div>`;
+  tiles.innerHTML = hero + items.map(it => {
+    const pct = expense > 0 ? it.val / expense * 100 : 0;
+    return `
+    <div class="cat-tile">
+      <div class="ct-ring" style="background:${ringBg(it.color, pct, 'rgba(128,128,128,0.22)')}"><span>${it.icon}</span></div>
+      <div class="ct-name" title="${escHtml(it.label)}">${escHtml(it.label)}</div>
+      <div class="ct-amt">${fmtMoney(it.val)}</div>
+      <div class="ct-pct">${pct.toFixed(0)}%</div>
+    </div>`;
+  }).join('');
+}
 
 function updateBudgetSummary(){
   const income = getBudgetTotal('incomeRows');
@@ -2921,19 +3717,7 @@ function updateBudgetSummary(){
   document.getElementById('bSurplus').style.color = surplus < 0 ? 'var(--red)' : '';
   document.getElementById('bRate').textContent = rate.toFixed(1) + '%';
 
-  const bar = document.getElementById('budgetBar');
-  if (income <= 0){
-    bar.innerHTML = '';
-  } else {
-    const fixedPct = Math.max(0, Math.min(100, fixed/income*100));
-    const varPct   = Math.max(0, Math.min(100, varr/income*100));
-    const surplusPct = Math.max(0, 100 - fixedPct - varPct);
-    bar.innerHTML = `
-      <div style="width:${fixedPct}%;background:var(--red);opacity:.75;"></div>
-      <div style="width:${varPct}%;background:var(--gold);"></div>
-      <div style="width:${surplusPct}%;background:var(--green);"></div>
-    `;
-  }
+  renderBudgetCategories(income, expense, surplus);
 
   // keep the "จะลงทุนเท่าไหร่" field synced to the leftover amount,
   // unless the user has already typed/picked their own number
@@ -2980,6 +3764,8 @@ function refreshInvestHint(){
 
   renderBudgetLedger(income, fixed, varr, surplus, invest, leftover);
   updateReadiness();
+  updateMoneyFlow();
+  updateOverviewRow();
 
   // if the monthly field was already linked from this budget, keep its
   // shown numbers in sync live as the budget/invest amount changes
@@ -3144,6 +3930,114 @@ function syncPvdToBudget(){
   return amt;
 }
 
+/* ---- RMF/SSF tax estimator: rough progressive personal-income-tax savings ---- */
+// 2026 Thai personal income tax brackets (progressive, THB/year, ends at 35%)
+const TH_TAX_BRACKETS = [
+  { upto: 150000,   rate: 0  },
+  { upto: 300000,   rate: 5  },
+  { upto: 500000,   rate: 10 },
+  { upto: 750000,   rate: 15 },
+  { upto: 1000000,  rate: 20 },
+  { upto: 2000000,  rate: 25 },
+  { upto: 5000000,  rate: 30 },
+  { upto: Infinity, rate: 35 }
+];
+
+function calcThaiTax(netIncome){
+  netIncome = Math.max(0, netIncome);
+  let tax = 0, prev = 0, marginalRate = 0;
+  for (const b of TH_TAX_BRACKETS){
+    if (netIncome <= prev) break;
+    const taxableInBracket = Math.min(netIncome, b.upto) - prev;
+    tax += taxableInBracket * b.rate / 100;
+    marginalRate = b.rate;
+    prev = b.upto;
+  }
+  return { tax, marginalRate };
+}
+
+let taxIncomeTouched = false;
+
+function onTaxNetIncomeInput(){
+  taxIncomeTouched = true;
+  updateTaxEstimate();
+}
+
+// auto-fills "เงินได้สุทธิต่อปี" from the monthly budget income (annualized,
+// minus a rough 50%-of-income-capped-at-100k expense deduction + 60k personal
+// allowance — the two deductions almost everyone with salary income gets) —
+// only while the user hasn't typed their own number in that field.
+function refreshTaxNetIncomeDefault(){
+  if (taxIncomeTouched) return;
+  const el = document.getElementById('taxNetIncome');
+  if (!el) return;
+  const annualIncome = getBudgetTotal('incomeRows') * 12;
+  const expenseDeduction = Math.min(100000, annualIncome * 0.5);
+  const est = Math.max(0, annualIncome - expenseDeduction - 60000);
+  el.value = Math.round(est);
+}
+
+function updateTaxEstimate(){
+  const ledger = document.getElementById('taxLedger');
+  if (!ledger) return;
+  refreshTaxNetIncomeDefault();
+
+  const netIncomeEl = document.getElementById('taxNetIncome');
+  const rmfSsfEl = document.getElementById('taxRmfSsf');
+  const netIncome = Math.max(0, parseFloat(netIncomeEl.value) || 0);
+  const rmfSsfWanted = Math.max(0, parseFloat(rmfSsfEl.value) || 0);
+
+  const hint = document.getElementById('taxNetIncomeHint');
+  if (hint){
+    hint.textContent = taxIncomeTouched
+      ? 'แก้ตัวเลขเองแล้ว — ถ้าอยากให้คำนวณใหม่จากรายรับในงบฯ อัตโนมัติ ลบข้อความในช่องนี้แล้วพิมพ์ใหม่'
+      : 'ประมาณจากรายรับในงบฯ ด้านบน × 12 หักค่าใช้จ่าย 50% (สูงสุด 100,000) และค่าลดหย่อนส่วนตัว 60,000 ให้อัตโนมัติ — แก้เป็นตัวเลขจริงจากใบแนบภาษี/หนังสือรับรองหักภาษี ณ ที่จ่ายได้เลย ถ้ามี';
+  }
+
+  if (netIncome <= 0){
+    ledger.innerHTML = '';
+    document.getElementById('taxLimitHint').textContent = '';
+    return;
+  }
+
+  // combined deduction room for RMF/SSF/PVD/กบข./ประกันบำนาญ is capped at
+  // 500,000 บาท/ปี รวมกัน (และ RMF/SSF แต่ละกองก็จำกัดที่ 30% ของเงินได้ด้วย) —
+  // this only accounts for PVD as the other "already-used" slice of that cap,
+  // since it's the only other retirement-deduction field this tool tracks.
+  const annualIncome = getBudgetTotal('incomeRows') * 12;
+  const hasPvd = document.getElementById('hasPvd').checked;
+  const pvdOwnRate = parseFloat(document.getElementById('pvdOwnRate').value) || 0;
+  const pvdAnnual = hasPvd ? annualIncome * pvdOwnRate / 100 : 0;
+  const combinedCapRemaining = Math.max(0, 500000 - pvdAnnual);
+  const incomeCap30pct = annualIncome * 0.3;
+  const deductible = Math.max(0, Math.min(rmfSsfWanted, combinedCapRemaining, incomeCap30pct));
+
+  const before = calcThaiTax(netIncome);
+  const after = calcThaiTax(netIncome - deductible);
+  const saved = before.tax - after.tax;
+
+  const row = (label, val, cls) => `<div class="bl-row ${cls||''}"><span class="bl-label">${label}</span><span class="${val<0?'bl-neg':''}">${val<0?'-':'+'}${fmtMoney(Math.abs(val))}</span></div>`;
+  ledger.innerHTML = [
+    row('เงินได้สุทธิ (ก่อนซื้อ RMF/SSF)', netIncome),
+    row('หัก RMF/SSF ที่ลดหย่อนได้จริง', -deductible),
+    row('= เงินได้สุทธิหลังลดหย่อน', netIncome - deductible, 'bl-total'),
+    row('ภาษีที่ต้องจ่าย (ก่อนซื้อ)', before.tax),
+    row('ภาษีที่ต้องจ่าย (หลังซื้อ)', after.tax),
+    row('= ประหยัดภาษีได้ประมาณ', saved, 'bl-final')
+  ].join('');
+
+  const limitHint = document.getElementById('taxLimitHint');
+  if (rmfSsfWanted > deductible + 0.5){
+    limitHint.textContent = `⚠ ที่กรอกไว้ (${fmtMoney(rmfSsfWanted)}) เกินสิทธิ์ลดหย่อนที่ใช้ได้จริง (${fmtMoney(deductible)}/ปี — คำนวณจาก 30% ของเงินได้ และเพดานรวม 500,000 บาท/ปี ของ RMF+SSF+PVD+กบข.+ประกันบำนาญ หักส่วนที่ PVD ใช้ไปแล้วออกแล้ว) ส่วนเกินจะไม่ได้ลดหย่อนเพิ่ม`;
+    limitHint.style.color = 'var(--red)';
+  } else if (deductible > 0){
+    limitHint.textContent = `อัตราภาษีขั้นสูงสุดของคุณตอนนี้ ${before.marginalRate}%/ปี — สิทธิ์ลดหย่อน RMF/SSF ที่เหลือใช้ได้อีกสูงสุด ${fmtMoney(combinedCapRemaining)}/ปี (หลังหัก PVD ที่ใช้ไปแล้ว)`;
+    limitHint.style.color = 'var(--muted)';
+  } else {
+    limitHint.textContent = '';
+  }
+}
+
 function getDebts(){
   const rows = document.querySelectorAll('#debtRows .budget-row');
   const list = [];
@@ -3263,19 +4157,35 @@ function updateReadiness(){
   const summary = document.getElementById('readinessSummary');
   if (expense > 0 && emergencyOk && !hasHighInterestDebt && pvdOk){
     summary.textContent = '🎉 พร้อมลงทุนจริงจังแล้ว ผ่านครบทุกเกณฑ์!';
-    summary.style.color = 'var(--green)';
-    summary.style.background = 'var(--green-soft)';
+    summary.style.color = 'var(--alert-green-text)';
+    summary.style.background = 'var(--alert-green-bg)';
   } else if (expense <= 0){
     summary.textContent = 'กรอกงบรายรับ-รายจ่ายด้านบนก่อน เพื่อเช็คความพร้อมได้ครบ';
     summary.style.color = 'var(--muted)';
     summary.style.background = 'transparent';
   } else {
     summary.textContent = 'ยังไม่ผ่านครบทุกข้อ — ลงทุนได้ แต่พิจารณาจัดการเรื่องที่ค้างก่อน จะปลอดภัยกว่า';
-    summary.style.color = 'var(--red)';
-    summary.style.background = '#FBF1F1';
+    summary.style.color = 'var(--alert-red-text)';
+    summary.style.background = 'var(--alert-red-bg)';
   }
 
+  updateTaxEstimate();
   updateNetWorth();
+}
+
+// scrolls to a source input field and briefly flashes it — used by the
+// "↗" jump links on each Net Worth line so it's obvious where each number
+// actually comes from, instead of it just appearing in the ledger unexplained.
+function jumpToField(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior:'smooth', block:'center' });
+  const flashTarget = el.closest('.input-row') || el.closest('.readiness-check') || el;
+  flashTarget.classList.remove('field-flash');
+  void flashTarget.offsetWidth; // restart the animation if clicked twice in a row
+  flashTarget.classList.add('field-flash');
+  setTimeout(() => flashTarget.classList.remove('field-flash'), 1300);
+  if (el.focus) setTimeout(() => el.focus({ preventScroll:true }), 350);
 }
 
 function updateNetWorth(){
@@ -3291,13 +4201,14 @@ function updateNetWorth(){
   const assets = cashFund + goldValue + portfolio;
   const netWorth = assets - totalDebtBalance;
 
-  const row = (label, val, cls) => `<div class="bl-row ${cls||''}"><span class="bl-label">${label}</span><span class="${val<0?'bl-neg':''}">${val<0?'-':'+'}${fmtMoney(Math.abs(val))}</span></div>`;
+  const jumpLink = (targetId) => targetId ? ` <a href="#" class="nw-jump" onclick="jumpToField('${targetId}');return false;" title="ไปช่องกรอกตัวเลขนี้">↗ ที่มา</a>` : '';
+  const row = (label, val, cls, targetId) => `<div class="bl-row ${cls||''}"><span class="bl-label">${label}${jumpLink(targetId)}</span><span class="${val<0?'bl-neg':''}">${val<0?'-':'+'}${fmtMoney(Math.abs(val))}</span></div>`;
   box.innerHTML = [
-    row('เงินสด (สำรองฉุกเฉิน)', cashFund),
-    row(`ทองคำ (${goldBaht} บาท)`, goldValue),
-    row('พอร์ตลงทุนปัจจุบัน', portfolio),
+    row('เงินสด (สำรองฉุกเฉิน)', cashFund, '', 'emergencyFund'),
+    row(`ทองคำ (${goldBaht} บาท)`, goldValue, '', 'goldBaht'),
+    row('พอร์ตลงทุนปัจจุบัน', portfolio, '', 'initial'),
     row('= รวมสินทรัพย์', assets, 'bl-total'),
-    row('หัก ยอดหนี้คงเหลือรวม', -totalDebtBalance),
+    row('หัก ยอดหนี้คงเหลือรวม', -totalDebtBalance, '', debts.length ? 'debtRows' : undefined),
     row('= ทรัพย์สินสุทธิ (Net Worth)', netWorth, 'bl-final')
   ].join('');
 
@@ -3308,7 +4219,143 @@ function updateNetWorth(){
       : 'พอร์ตลงทุนดึงจากช่อง "เงินลงทุนเริ่มต้น" ด้านล่าง — ถ้ามีหนี้ ใส่ "ยอดหนี้คงเหลือ" ในรายการผ่อน/หนี้ด้านบนด้วย จะได้หักออกให้อัตโนมัติ';
   }
 
+  updateAssetAllocation(cashFund, goldValue, portfolio);
   updateFireProgress();
+  updateMoneyFlow();
+  updateOverviewRow();
+
+  const snaCash = document.getElementById('snaCash');
+  const snaGold = document.getElementById('snaGold');
+  const snaPortfolio = document.getElementById('snaPortfolio');
+  const snaDebt = document.getElementById('snaDebt');
+  if (snaCash) snaCash.textContent = fmtMoney(cashFund);
+  if (snaGold) snaGold.textContent = fmtMoney(goldValue);
+  if (snaPortfolio) snaPortfolio.textContent = fmtMoney(portfolio);
+  if (snaDebt) snaDebt.textContent = fmtMoney(totalDebtBalance);
+}
+
+/* ---- Overview row: net worth / current monthly investment / savings
+   rate / FIRE progress at a glance, right under the header ---- */
+function updateOverviewRow(){
+  const ovNetWorth = document.getElementById('ovNetWorth');
+  const ovInvest = document.getElementById('ovInvest');
+  const ovRate = document.getElementById('ovRate');
+  const ovFire = document.getElementById('ovFire');
+  if (!ovNetWorth) return;
+
+  const cashFund = parseFloat(document.getElementById('emergencyFund').value) || 0;
+  const goldBaht = parseFloat(document.getElementById('goldBaht').value) || 0;
+  const goldPrice = parseFloat(document.getElementById('goldPrice').value) || 0;
+  const goldValue = goldBaht * goldPrice;
+  const portfolio = parseFloat(document.getElementById('initial').value) || 0;
+  const debts = getDebts();
+  const totalDebtBalance = debts.reduce((s,d) => s + (d.balance||0), 0);
+  const netWorth = cashFund + goldValue + portfolio - totalDebtBalance;
+  ovNetWorth.textContent = fmtMoney(netWorth);
+
+  const investAmt = parseFloat(document.getElementById('investAmt').value) || 0;
+  ovInvest.textContent = fmtMoney(investAmt) + '/ด.';
+
+  const income = getBudgetTotal('incomeRows');
+  const expense = getBudgetTotal('fixedRows') + getBudgetTotal('varRows');
+  const rate = income > 0 ? Math.max(0, (income - expense) / income * 100) : 0;
+  ovRate.textContent = rate.toFixed(1) + '%';
+
+  const fireNumber = expense * 12 * 25;
+  const firePct = fireNumber > 0 ? Math.min(100, portfolio / fireNumber * 100) : 0;
+  ovFire.textContent = firePct.toFixed(1) + '%';
+}
+
+// ---- asset allocation widget: rounded segmented bar + row-list legend
+// (dot, label+%, value right-aligned) — % breakdown of cash / gold / DCA portfolio ----
+function updateAssetAllocation(cashFund, goldValue, portfolio){
+  const bar = document.getElementById('allocBar');
+  const legend = document.getElementById('allocLegend');
+  const head = document.getElementById('allocHead');
+  if (!bar || !legend) return;
+  const total = cashFund + goldValue + portfolio;
+  if (total <= 0){
+    bar.innerHTML = '';
+    legend.innerHTML = '';
+    if (head) head.style.display = 'none';
+    return;
+  }
+  const items = [
+    { label: 'เงินสด/สำรอง', val: cashFund, color: 'var(--green)' },
+    { label: 'ทองคำ', val: goldValue, color: 'var(--gold)' },
+    { label: 'พอร์ตลงทุน DCA', val: portfolio, color: 'var(--teal)' }
+  ].filter(i => i.val > 0);
+
+  if (head){
+    head.style.display = 'flex';
+    document.getElementById('allocTotal').textContent = 'รวม ' + fmtMoney(total);
+  }
+
+  bar.innerHTML = items.map(i => {
+    const pct = i.val / total * 100;
+    return `<div style="width:${pct}%;background:${i.color};" title="${i.label} ${pct.toFixed(1)}%"></div>`;
+  }).join('');
+
+  legend.innerHTML = items.map(i => {
+    const pct = i.val / total * 100;
+    return `<div class="alloc-row"><span class="alloc-dot" style="background:${i.color};"></span><span class="alloc-label">${i.label}</span><span class="alloc-pct">${pct.toFixed(0)}%</span><span class="alloc-val">${fmtMoney(i.val)}</span></div>`;
+  }).join('');
+}
+
+// ---- cash/gold accumulation log: records lump sums added to Emergency Fund ----
+// via the Bonus Allocator, so "เงินสดตอนนี้มาจากไหน" has a real trail instead of
+// just silently jumping to a new number. Direct edits to the emergency-fund
+// field itself aren't logged (no way to tell "new base value" from "top-up").
+const CASHLOG_KEY = 'dcaCashLogV1';
+
+function loadCashLog(){
+  try{
+    const raw = localStorage.getItem(CASHLOG_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+
+function saveCashLog(list){
+  try{ localStorage.setItem(CASHLOG_KEY, JSON.stringify(list)); }catch(e){ /* ignore */ }
+}
+
+function logCashEvent(amount, label){
+  if (amount <= 0) return;
+  const list = loadCashLog();
+  list.push({ ts: Date.now(), amount, label: label || 'เงินก้อน' });
+  while (list.length > 50) list.shift();
+  saveCashLog(list);
+  renderCashLog();
+}
+
+function clearCashLog(){
+  if (!confirm('ล้างประวัติเงินสดที่สะสมมาทั้งหมด? (ไม่กระทบยอดเงินสดจริงในช่องเงินสำรองฉุกเฉิน)')) return;
+  saveCashLog([]);
+  renderCashLog();
+}
+
+function renderCashLog(){
+  const box = document.getElementById('cashLogBox');
+  if (!box) return;
+  const list = loadCashLog();
+  if (list.length === 0){
+    box.style.display = 'none';
+    box.innerHTML = '';
+    return;
+  }
+  box.style.display = 'block';
+  const rows = list.slice().reverse().map(e => {
+    const d = new Date(e.ts);
+    const dateStr = d.toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric' });
+    return `<div class="bl-row"><span class="bl-label">${dateStr} — ${e.label}</span><span>+${fmtMoney(e.amount)}</span></div>`;
+  }).join('');
+  box.innerHTML = `
+    <div class="cashlog-head">
+      <span>📜 ประวัติเงินสดที่เพิ่มผ่านการจัดสรรโบนัส</span>
+      <button type="button" class="cashlog-clear" onclick="clearCashLog()">ล้างประวัตินี้</button>
+    </div>
+    <div class="budget-ledger" style="margin:0;">${rows}</div>
+  `;
 }
 
 /* ---- FIRE progress: 25× annual expense vs current portfolio (4% withdrawal rule) ---- */
@@ -3598,6 +4645,79 @@ function updateGoalsTotal(){
   rows.forEach(r => { total += parseFloat(r.dataset.monthly) || 0; });
   box.style.display = 'block';
   box.textContent = `รวมทุกเป้าหมาย ต้องออมเดือนละ ${fmtMoney(total)}`;
+  updateMoneyFlow();
+}
+
+// sum of "มีอยู่แล้ว" across all short/medium-term goal rows — used by the
+// money-flow diagram to show how much has already piled up toward goals.
+function getGoalsCurrentSum(){
+  let sum = 0;
+  document.querySelectorAll('#goalRows .budget-row').forEach(r => {
+    const el = r.querySelector('.goal-current');
+    if (el) sum += parseFloat(el.value) || 0;
+  });
+  return sum;
+}
+
+/* ---- money-flow diagram: เงินเดือน -> หักรายจ่าย -> แบ่งไป DCA/เงินสด/เป้าหมาย/ทอง ---- */
+function updateMoneyFlow(){
+  const box = document.getElementById('flowDiagram');
+  if (!box) return;
+
+  const income = getBudgetTotal('incomeRows');
+  const fixed = getBudgetTotal('fixedRows');
+  const varr = getBudgetTotal('varRows');
+  const expense = fixed + varr;
+  const surplus = income - expense;
+
+  if (income <= 0){
+    box.innerHTML = `<p class="hint" style="margin:0;">กรอกรายรับในงบรายรับ-รายจ่ายด้านบนก่อน เพื่อดูเส้นทางเงินทั้งหมด</p>`;
+    return;
+  }
+
+  const investAmt = parseFloat(document.getElementById('investAmt').value) || 0;
+  const leftoverCash = Math.max(0, surplus - investAmt);
+  const portfolio = parseFloat(document.getElementById('initial').value) || 0;
+  const cashFund = parseFloat(document.getElementById('emergencyFund').value) || 0;
+  const goldBaht = parseFloat(document.getElementById('goldBaht').value) || 0;
+  const goldPrice = parseFloat(document.getElementById('goldPrice').value) || 0;
+  const goldValue = goldBaht * goldPrice;
+  const goalsCurrent = getGoalsCurrentSum();
+  const hasPvd = document.getElementById('hasPvd').checked;
+
+  const expenseNote = hasPvd ? 'รายจ่ายคงที่+ผันแปร (รวมหัก PVD แล้ว)' : 'รายจ่ายคงที่+ผันแปร';
+
+  box.innerHTML = `
+    <div class="flow-stage">
+      <div class="flow-box"><div class="fb-label">💰 เงินเดือนรวม</div><div class="fb-val">${fmtMoney(income)}/ด.</div></div>
+      <div class="flow-arrow">↓ หัก${expenseNote} ${fmtMoney(expense)}/ด.</div>
+      <div class="flow-box"><div class="fb-label">เหลือ (ออมได้)</div><div class="fb-val">${fmtMoney(surplus)}/ด.</div></div>
+      <div class="flow-arrow">↓ แบ่งไปตามที่ตั้งใจไว้</div>
+      <div class="flow-branches">
+        <div class="flow-box">
+          <div class="fb-label">🌱 ลงทุน DCA</div>
+          <div class="fb-val">${fmtMoney(investAmt)}/ด.</div>
+          <div class="fb-note">พอร์ตสะสมตอนนี้ ${fmtMoney(portfolio)} <a href="#" class="nw-jump" onclick="jumpToField('initial');return false;">↗</a></div>
+        </div>
+        <div class="flow-box">
+          <div class="fb-label">🏦 เงินสด/สำรอง</div>
+          <div class="fb-val">${fmtMoney(leftoverCash)}/ด.</div>
+          <div class="fb-note">สะสมแล้ว ${fmtMoney(cashFund)} <a href="#" class="nw-jump" onclick="jumpToField('emergencyFund');return false;">↗</a></div>
+        </div>
+        <div class="flow-box">
+          <div class="fb-label">🎯 เป้าหมายอื่นๆ</div>
+          <div class="fb-val">${fmtMoney(goalsCurrent)}</div>
+          <div class="fb-note">สะสมไว้แล้วรวมทุกเป้าหมาย</div>
+        </div>
+        ${goldValue > 0 ? `
+        <div class="flow-box">
+          <div class="fb-label">🪙 ทองคำ</div>
+          <div class="fb-val">${fmtMoney(goldValue)}</div>
+          <div class="fb-note">${goldBaht} บาททองคำ — กรอกเองแยกต่างหาก ไม่ได้ไหลมาจากงบรายเดือนนี้ <a href="#" class="nw-jump" onclick="jumpToField('goldBaht');return false;">↗</a></div>
+        </div>` : ''}
+      </div>
+    </div>
+  `;
 }
 
 function addGoalToBudget(id){
@@ -3757,6 +4877,7 @@ function applyBonusAllocation(){
     const el = document.getElementById('emergencyFund');
     el.value = (parseFloat(el.value) || 0) + cashTotal;
     el.dispatchEvent(new Event('input')); // triggers updateReadiness() -> syncPvdToBudget()/updateNetWorth()
+    logCashEvent(cashTotal, label || 'โบนัส');
   }
 
   calc(); // refresh the DCA graph now that an injection may have been added
@@ -4028,6 +5149,8 @@ function toggleHistory(){
 })();
 
 loadGoals();
+renderCashLog();
+updateTaxEstimate();
 updateNetWorth();
 calcFuel();
 calc();
