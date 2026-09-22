@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Compound / DCA Calculator — สมุดบัญชีการลงทุน</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#11161F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="สมุดออม DCA">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
 <style>
   :root{
     --paper:#F7F3E8;
@@ -2095,6 +2102,31 @@
   .src-btn{ border: 1px solid rgba(255,255,255,0.18); background: var(--card-bg); color: var(--muted); border-radius: 999px;
     padding: 7px 16px; font-size: 12.5px; cursor:pointer; font-family: inherit; }
   .src-btn.active{ border-color: var(--green); color: var(--green); background: rgba(47,191,113,0.12); font-weight: 700; }
+
+  /* ---- first-run welcome ---- */
+  .welcome-overlay{
+    position: fixed; inset: 0; z-index: 200; display:flex; align-items:center; justify-content:center;
+    background: rgba(8,12,17,0.82); backdrop-filter: blur(6px); padding: 20px;
+  }
+  .welcome-box{
+    background: var(--card-bg); border: 1px solid rgba(255,255,255,0.16); border-radius: 24px;
+    padding: 32px 30px; max-width: 620px; width: 100%; text-align:center;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.6); max-height: 90vh; overflow-y: auto;
+  }
+  .welcome-emoji{ font-size: 40px; }
+  .welcome-box h2{ margin: 10px 0 8px; font-size: 22px; color: var(--ink); }
+  .welcome-box > p{ margin: 0 0 22px; font-size: 13px; color: var(--muted); line-height: 1.75; }
+  .welcome-choices{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .wc-card{
+    text-align:left; background: var(--nested-bg); border: 1.5px solid rgba(255,255,255,0.14); border-radius: 18px;
+    padding: 18px 18px 20px; cursor:pointer; font-family: inherit; transition: border-color .15s ease, transform .15s ease;
+  }
+  .wc-card:hover{ border-color: var(--green); transform: translateY(-2px); }
+  .wc-ico{ font-size: 26px; }
+  .wc-title{ font-size: 16px; font-weight: 800; color: var(--ink); margin: 8px 0 6px; }
+  .wc-desc{ font-size: 12px; color: var(--muted); line-height: 1.65; }
+  .welcome-foot{ margin: 20px 0 0; font-size: 11px; color: var(--muted); }
+  @media (max-width: 560px){ .welcome-choices{ grid-template-columns: 1fr; } .welcome-box{ padding: 24px 18px; } }
 </style>
 </head>
 <body data-theme="dark">
@@ -2155,10 +2187,32 @@
     <span class="sna-val" id="snaDebt">฿0</span>
   </a>
 </nav>
+<div class="welcome-overlay" id="welcomeOverlay" style="display:none;">
+  <div class="welcome-box">
+    <div class="welcome-emoji">🌱</div>
+    <h2>ยินดีต้อนรับสู่สมุดออม DCA</h2>
+    <p>เครื่องมือวางแผนการเงินรายเดือน บันทึกงบ ดูพอร์ตลงทุน และคำนวณว่าจะเกษียณได้เมื่อไหร่ · ข้อมูลทั้งหมดเก็บในเบราว์เซอร์ของคุณเท่านั้น ไม่ได้ส่งไปที่ไหน</p>
+    <div class="welcome-choices">
+      <button type="button" class="wc-card" onclick="startFresh()">
+        <div class="wc-ico">✏️</div>
+        <div class="wc-title">เริ่มจากศูนย์</div>
+        <div class="wc-desc">หน้าว่าง กรอกตัวเลขของตัวเองตั้งแต่ต้น — แนะนำถ้าพร้อมกรอกเลย</div>
+      </button>
+      <button type="button" class="wc-card" onclick="startDemo()">
+        <div class="wc-ico">👀</div>
+        <div class="wc-title">ดูตัวอย่างก่อน</div>
+        <div class="wc-desc">ใส่ตัวเลขสมมติให้ดูว่าหน้าตาเป็นยังไง ลบทิ้งทีหลังได้ด้วยปุ่ม "ล้างข้อมูลของฉัน"</div>
+      </button>
+    </div>
+    <p class="welcome-foot">ถามครั้งแรกครั้งเดียว · เปลี่ยนใจภายหลังกด "🗑️ ล้างข้อมูลของฉัน" มุมขวาบนได้</p>
+  </div>
+</div>
+
 <div class="wrap">
 
   <div class="book-header">
     <div class="header-actions">
+      <button type="button" class="theme-toggle-btn" id="installBtn" style="display:none;" onclick="installApp()" title="ติดตั้งลงหน้าจอหลัก ใช้เหมือนแอป">📲 ติดตั้งแอป</button>
       <button type="button" class="theme-toggle-btn" onclick="exportBackup()" title="ดาวน์โหลดไฟล์สำรองข้อมูล (ประวัติรายเดือน, เป้าหมาย, บันทึกเงินสด)">⬇️ สำรองข้อมูล</button>
       <button type="button" class="theme-toggle-btn" onclick="document.getElementById('backupFileInput').click()" title="โหลดข้อมูลคืนจากไฟล์สำรอง">⬆️ โหลดไฟล์สำรอง</button>
       <input type="file" id="backupFileInput" accept=".json,application/json" style="display:none" onchange="importBackup(this)">
@@ -6437,6 +6491,7 @@ function toggleHistory(){
   btn.textContent = show ? '▴ ซ่อนประวัติ' : '▾ ดูประวัติที่บันทึกไว้ทั้งหมด';
 }
 
+var firstRun = false;
 (function initBudget(){
   const todayStr = todayMonthStr();
   document.getElementById('budgetMonth').value = todayStr;
@@ -6455,13 +6510,8 @@ function toggleHistory(){
       status.textContent = `ยังไม่เคยบันทึกเดือนนี้ — เอาข้อมูลจากเดือน ${monthLabelTH(prevKey)} มาให้แล้ว แก้ตัวเลขที่เปลี่ยนแล้วกด "บันทึกเดือนนี้"`;
       status.style.color = 'var(--muted)';
     } else {
-      // first-time user (no saved history yet): example prefill rows
-      addBudgetRow('income', 'เงินเดือน', 25000);
-      addBudgetRow('fixed', 'ค่าเช่า/ผ่อนที่พัก', 6000);
-      addBudgetRow('fixed', 'ค่าน้ำ-ไฟ-เน็ต-มือถือ', 1500);
-      addBudgetRow('var', 'ค่ากิน', 6000);
-      addBudgetRow('var', 'ค่าเดินทาง', 1500);
-      addBudgetRow('var', 'ช้อปปิ้ง/บันเทิง/อื่นๆ', 2000);
+      // brand-new user: no fake numbers — the welcome screen asks first
+      firstRun = true;
     }
   }
   renderHistoryTable();
@@ -6927,10 +6977,82 @@ function renderHoldings(light){
 
 loadGoals();
 renderCashLog();
+/* ---- first run: start empty or load the demo ---- */
+const ONBOARD_KEY = 'dcaOnboardedV1';
+function maybeShowWelcome(){
+  let done = false;
+  try{ done = localStorage.getItem(ONBOARD_KEY) === '1'; }catch(e){}
+  const hasData = Object.keys(loadHistoryStore()).length > 0
+    || (typeof HOLD !== 'undefined' && HOLD && HOLD.items.length > 0)
+    || document.querySelectorAll('#incomeRows .budget-row').length > 0;
+  if (done || hasData || !firstRun) return;
+  document.getElementById('welcomeOverlay').style.display = 'flex';
+}
+function finishWelcome(){
+  try{ localStorage.setItem(ONBOARD_KEY, '1'); }catch(e){}
+  document.getElementById('welcomeOverlay').style.display = 'none';
+  updateBudgetSummary();
+  updateReadiness();
+  renderHistoryTable();
+  showTab('month');
+  showStep(1);
+}
+function startFresh(){
+  addBudgetRow('income', 'เงินเดือน', '');
+  addBudgetRow('fixed', 'ค่าเช่า/ผ่อนที่พัก', '');
+  addBudgetRow('var', 'ค่ากิน', '');
+  document.getElementById('initial').value = 0;
+  document.getElementById('monthly').value = 0;
+  finishWelcome();
+}
+function startDemo(){
+  addBudgetRow('income', 'เงินเดือน (ตัวอย่าง)', 25000);
+  addBudgetRow('fixed', 'ค่าเช่า/ผ่อนที่พัก', 6000);
+  addBudgetRow('fixed', 'ค่าน้ำ-ไฟ-เน็ต-มือถือ', 1500);
+  addBudgetRow('var', 'ค่ากิน', 6000);
+  addBudgetRow('var', 'ค่าเดินทาง', 1500);
+  addBudgetRow('var', 'ช้อปปิ้ง/บันเทิง/อื่นๆ', 2000);
+  document.getElementById('emergencyFund').value = 20000;
+  document.getElementById('initial').value = 50000;
+  if (typeof HOLD !== 'undefined' && HOLD && !HOLD.items.length){
+    HOLD.items.push({ id: uid(), type:'fund', symbol:'กองทุนตัวอย่าง', mode:'amount', units:1, avgCost:50000, price:53200, hist:{} });
+    saveHoldings();
+    renderHoldings();
+  }
+  finishWelcome();
+}
+
+/* ---- install to home screen (PWA) ---- */
+var deferredInstall = null;
+window.addEventListener('beforeinstallprompt', ev => {
+  ev.preventDefault();
+  deferredInstall = ev;
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.style.display = '';
+});
+function installApp(){
+  if (!deferredInstall){
+    alertLike('ถ้าปุ่มนี้ไม่ทำงาน: บน Android กดเมนู ⋮ ของเบราว์เซอร์ → "ติดตั้งแอป/เพิ่มลงในหน้าจอหลัก" · บน iPhone ใช้ Safari กดปุ่มแชร์ → "Add to Home Screen"');
+    return;
+  }
+  deferredInstall.prompt();
+  deferredInstall.userChoice.finally(() => {
+    deferredInstall = null;
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = 'none';
+  });
+}
+if ('serviceWorker' in navigator && location.protocol === 'https:'){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
 renderHoldings();
 updateSaveReminder();
 showTab('month');
 showStep(1);
+maybeShowWelcome();
 updateTaxEstimate();
 updateNetWorth();
 calcFuel();
