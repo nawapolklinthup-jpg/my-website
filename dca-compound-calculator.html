@@ -1712,6 +1712,81 @@
     .overview-row .stat-label{ font-size: 10px; letter-spacing: 0.02em; }
     .overview-row .stat-value{ font-size: 17px; }
   }
+
+  /* ---- Breathing room: wider canvas + more spacing inside dashboard cards ---- */
+  @media (min-width: 1300px){
+    body[data-theme="dark"] .wrap{ max-width: 1480px; }
+    body[data-theme="dark"] .dashboard-grid{ column-gap: 24px; }
+    body[data-theme="dark"] .dashboard-grid > *{ margin-bottom: 24px; container-type: inline-size; }
+  }
+  body[data-theme="dark"] .readiness-card,
+  body[data-theme="dark"] .budget-card,
+  body[data-theme="dark"] .fuel-card,
+  body[data-theme="dark"] .asset-panel,
+  body[data-theme="dark"] .panel{ padding: 26px 28px; }
+  body[data-theme="dark"] .readiness-card h2{ margin-bottom: 8px; }
+  body[data-theme="dark"] .readiness-row{ gap: 18px; margin-bottom: 18px; }
+  body[data-theme="dark"] .readiness-check{ padding: 18px 20px; gap: 14px; border-radius: 14px; }
+  body[data-theme="dark"] .rc-desc{ font-size: 12.5px; line-height: 1.75; margin-bottom: 10px; }
+  body[data-theme="dark"] .rc-status{ margin-top: 10px; line-height: 1.6; }
+  body[data-theme="dark"] .hint{ line-height: 1.7; }
+  p.hint{ font-size: 11.5px; color: var(--muted); }
+  body[data-theme="dark"] .readiness-check input[type="number"],
+  body[data-theme="dark"] .readiness-check input[type="text"]{ padding: 9px 12px; }
+  /* half-width cards: stack the side-by-side check boxes instead of squeezing them */
+  @container (max-width: 760px){
+    .readiness-row{ grid-template-columns: 1fr !important; }
+  }
+  /* goal rows: inputs had no styling (browser-default white boxes) */
+  .inj-line{ gap: 12px; }
+  .inj-line + .inj-line{ margin-top: 10px; }
+  .inj-field .inj-field-label{ font-size: 11px; margin-bottom: 5px; }
+  .inj-field input, .inj-field select{
+    width: 100%; box-sizing: border-box;
+    padding: 9px 12px;
+    border: 1.5px solid var(--paper-line);
+    border-radius: 9px;
+    background: var(--input-bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Mono','Consolas',monospace;
+    font-size: 13px;
+    outline: none;
+    color-scheme: dark;
+  }
+  .inj-field input:focus, .inj-field select:focus{ border-color: var(--green); }
+  body[data-theme="dark"] .goals-card .budget-row{ padding: 18px; margin-bottom: 14px; }
+  body[data-theme="dark"] .goals-card .goal-label{ margin-bottom: 12px; }
+
+  /* ---- Net Worth visual ---- */
+  .nw-visual{ display:flex; align-items:center; gap: 24px; flex-wrap: wrap; margin: 6px 0 16px; }
+  .nw-tiles{ flex:1; min-width: 250px; margin-bottom:0; grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .cat-tile.clickable{ cursor:pointer; transition: transform .15s ease, border-color .15s ease; }
+  .cat-tile.clickable:hover{ transform: translateY(-2px); border-color: var(--green) !important; }
+  .nw-details{ margin-top: 4px; }
+  .nw-details > summary{
+    cursor:pointer; list-style:none; font-size: 12.5px; font-weight:700; color: var(--muted);
+    padding: 10px 14px; border-radius: 12px; background: var(--nested-bg); border:1px solid var(--paper-line);
+  }
+  .nw-details > summary::-webkit-details-marker{ display:none; }
+  .nw-details > summary::after{ content:" ▾"; }
+  .nw-details[open] > summary::after{ content:" ▴"; }
+  .nw-details[open] > summary{ margin-bottom: 12px; }
+  .nw-old-alloc{ display:none; }
+  @media (max-width: 560px){ .nw-visual{ justify-content:center; } }
+
+  /* ---- Short descriptions: show 2 lines, tap to read the rest ---- */
+  p.sub.clamp{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-bottom: 2px !important; }
+  .sub-more{
+    background:none; border:none; padding:0; margin: 0 0 12px; cursor:pointer;
+    font-size: 11.5px; font-weight:700; color: var(--green); font-family: inherit;
+  }
+
+  /* ---- Visual summary tiles on other cards ---- */
+  .viz-tiles{ margin: 8px 0 16px; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); }
+  .cat-item.clickable{ cursor:pointer; transition: border-color .15s ease, transform .15s ease; }
+  .cat-item.clickable:hover{ border-color: var(--green); transform: translateY(-1px); }
+  .cat-tile.st-bad{ border-color: rgba(229,72,77,0.45) !important; }
+  .cat-tile.st-ok{ border-color: rgba(47,191,113,0.35) !important; }
 </style>
 </head>
 <body data-theme="dark">
@@ -1877,7 +1952,10 @@
           </div>
           <div class="cat-tiles" id="budgetCatTiles"></div>
 
-          <div class="budget-ledger" id="budgetLedger"></div>
+          <details class="nw-details" style="margin-bottom:14px;">
+            <summary>📋 ดูตัวเลขละเอียด</summary>
+            <div class="budget-ledger" id="budgetLedger"></div>
+          </details>
 
           <div class="field" style="margin:14px 0 10px;">
             <label>💸 จะลงทุนเท่าไหร่ต่อเดือนจริงๆ <span class="hint">(ไม่ต้องลงทุนหมดยอดที่เหลือ ฿<span id="bSurplusInline">0</span> ก็ได้ เก็บสำรองไว้บ้าง)</span></label>
@@ -1980,7 +2058,10 @@
   <div class="dashboard-grid">
   <div class="readiness-card" id="secReadiness">
     <h2>✅ เช็คความพร้อมก่อนเริ่มลงทุนจริง</h2>
-    <p class="sub">มาตรฐานทั่วไปแนะนำให้เช็ค 2 เรื่องนี้ก่อนเริ่ม DCA เสมอ — ไม่ใช่กฎห้ามลงทุนถ้ายังไม่ผ่าน แค่เป็นข้อมูลประกอบการตัดสินใจ (คำนวณจากรายจ่ายที่กรอกไว้ในงบฯ ด้านบน)</p>
+    <p class="sub">เช็ค 3 เรื่องนี้ก่อนเริ่ม DCA — ไม่ใช่กฎห้ามลงทุนถ้ายังไม่ผ่าน แค่ช่วยตัดสินใจ (คำนวณจากรายจ่ายที่กรอกไว้ในงบฯ ด้านบน) · กดการ์ดเพื่อไปกรอก</p>
+    <div class="cat-tiles viz-tiles" id="rdTiles"></div>
+    <details class="nw-details" open style="margin-bottom:16px;">
+      <summary>✏️ กรอกข้อมูล / ดูรายละเอียดแต่ละข้อ</summary>
 
     <div class="readiness-row">
       <div class="readiness-check">
@@ -2048,6 +2129,7 @@
       </div>
     </div>
 
+    </details>
     <div class="readiness-summary" id="readinessSummary"></div>
   </div>
 
@@ -2065,27 +2147,48 @@
       </div>
     </div>
     <p class="hint" id="taxNetIncomeHint" style="margin:0 0 10px;font-size:10px;line-height:1.6;"></p>
-    <div class="budget-ledger" id="taxLedger"></div>
+    <div class="cat-tiles viz-tiles" id="taxTiles"></div>
+    <details class="nw-details">
+      <summary>📋 ดูวิธีคำนวณ</summary>
+      <div class="budget-ledger" id="taxLedger"></div>
+    </details>
     <p class="hint" id="taxLimitHint" style="margin-top:6px;"></p>
   </div>
 
   <div class="networth-card readiness-card" id="secNetWorth">
     <h2>📒 ทรัพย์สินสุทธิ (Net Worth)</h2>
-    <p class="sub">รวมทุกอย่างที่มี หักด้วยหนี้คงเหลือ — อัปเดตอัตโนมัติจากตัวเลขที่กรอกไว้ในเช็คความพร้อมด้านบนและเงินลงทุนเริ่มต้นด้านล่าง · กดไอคอน ↗ ท้ายแต่ละบรรทัดเพื่อไปช่องกรอกจริงของตัวเลขนั้น</p>
-    <div class="budget-ledger" id="netWorthLedger"></div>
-    <p class="hint" id="netWorthHint" style="margin-top:4px;"></p>
-    <div class="alloc-head" id="allocHead" style="display:none;">
-      <span class="alloc-title">สัดส่วนสินทรัพย์</span>
-      <span class="alloc-total" id="allocTotal"></span>
+    <p class="sub">ของที่มีทั้งหมด ลบหนี้ = ทรัพย์สินสุทธิ · กดการ์ดไหนก็ได้เพื่อไปแก้ตัวเลขนั้น (อัปเดตเองจากช่องที่กรอกไว้ในหน้านี้)</p>
+    <div class="nw-visual">
+      <div class="budget-donut-ring">
+        <div class="budget-donut big" id="nwDonut">
+          <div class="budget-donut-hole">
+            <div class="bd-value" id="nwDonutValue">฿0</div>
+            <div class="bd-label">ทรัพย์สินสุทธิ</div>
+          </div>
+        </div>
+      </div>
+      <div class="cat-tiles nw-tiles" id="nwTiles"></div>
     </div>
-    <div class="alloc-bar" id="allocBar"></div>
-    <div class="alloc-legend" id="allocLegend"></div>
+    <details class="nw-details">
+      <summary>📋 ดูตัวเลขละเอียด</summary>
+      <div class="budget-ledger" id="netWorthLedger"></div>
+      <p class="hint" id="netWorthHint" style="margin-top:4px;"></p>
+      <div class="nw-old-alloc">
+        <div class="alloc-head" id="allocHead" style="display:none;">
+          <span class="alloc-title">สัดส่วนสินทรัพย์</span>
+          <span class="alloc-total" id="allocTotal"></span>
+        </div>
+        <div class="alloc-bar" id="allocBar"></div>
+        <div class="alloc-legend" id="allocLegend"></div>
+      </div>
+    </details>
     <div id="cashLogBox" style="display:none;margin-top:14px;"></div>
   </div>
 
   <div class="goals-card readiness-card">
     <h2>🎯 เป้าหมายการเงินระยะสั้น-กลาง</h2>
     <p class="sub">แยกจากเป้าหมายเกษียณด้านล่าง — เช่น เงินดาวน์รถ, ทริปเที่ยว, กองทุนแต่งงาน ฯลฯ ใส่ยอดเป้าหมายและวันที่ต้องการ ระบบจะคำนวณให้ว่าต้องออมเดือนละเท่าไหร่ (บันทึกอัตโนมัติในเบราว์เซอร์นี้ แยกจากงบฯ รายเดือน)</p>
+    <div class="cat-tiles viz-tiles" id="goalTiles"></div>
     <div id="goalRows"></div>
     <button type="button" class="budget-addbtn" onclick="addGoalRow()">➕ เพิ่มเป้าหมาย</button>
     <div class="goals-total" id="goalsTotal" style="display:none;"></div>
@@ -2458,6 +2561,27 @@ function initTheme(){
   try{ localStorage.removeItem(THEME_KEY); }catch(e){ /* ignore */ }
 }
 initTheme();
+
+// Long card descriptions: clamp to 2 lines with a "อ่านเพิ่ม" toggle, so the
+// page reads visual-first and the detail is still one tap away.
+function initDescClamp(){
+  document.querySelectorAll('p.sub').forEach(p => {
+    if (p.dataset.clampInit) return;
+    p.dataset.clampInit = '1';
+    p.classList.add('clamp');
+    if (p.scrollHeight <= p.clientHeight + 2) { p.classList.remove('clamp'); return; }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sub-more';
+    btn.textContent = 'ℹ️ อ่านเพิ่ม';
+    btn.onclick = () => {
+      const open = p.classList.toggle('clamp');
+      btn.textContent = open ? 'ℹ️ อ่านเพิ่ม' : '▴ ย่อ';
+    };
+    p.insertAdjacentElement('afterend', btn);
+  });
+}
+window.addEventListener('load', initDescClamp);
 
 // wipes every localStorage key this tool owns (budget history, goals, API key,
 // price caches) — for demoing this page on a shared/public device without
@@ -3601,6 +3725,99 @@ const CAT_ICONS = [
   [/ออม|ลงทุน|save|invest/i, '🐷'],
   [/สัตว์|แมว|หมา|pet/i, '🐾']
 ];
+
+function jumpToBudgetRow(rowId){
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  jumpToField(row.querySelector('.bud-amt') || row);
+}
+
+/* generic ring tile used by the visual summaries on each card */
+function vizTile(o){
+  const track = o.hero ? 'rgba(255,255,255,0.15)' : 'rgba(128,128,128,0.22)';
+  const click = o.onclick ? `onclick="${o.onclick}" title="${o.title || 'กดเพื่อไปกรอก/แก้ตัวเลขนี้'}"` : '';
+  return `
+    <div class="cat-tile ${o.hero ? 'hero' : ''} ${o.onclick ? 'clickable' : ''} ${o.state ? 'st-' + o.state : ''}" ${click}>
+      <div class="ct-ring" style="background:${ringBg(o.color, o.pct || 0, track)}"><span>${o.icon}</span></div>
+      <div class="ct-name">${escHtml(o.label)}</div>
+      <div class="ct-amt" ${o.valColor ? `style="color:${o.valColor}"` : ''}>${o.value}</div>
+      <div class="ct-pct">${o.sub || ''}</div>
+    </div>`;
+}
+
+function renderReadinessTiles(r){
+  const box = document.getElementById('rdTiles');
+  if (!box) return;
+  const G = 'var(--green)', R = 'var(--red)', M = 'var(--muted)';
+  const checks = [r.emergencyState, r.debtState, r.pvdState].filter(x => x !== 'skip');
+  const passed = checks.filter(x => x === 'ok').length;
+  const total = checks.length;
+  const allOk = passed === total && r.expense > 0;
+  const tiles = [];
+  tiles.push(vizTile({ hero:true, icon: allOk ? '🎉' : '🧭', label:'ความพร้อม',
+    value: `${passed}/${total} ข้อ`, color: allOk ? '#2FBF71' : '#F2B441',
+    pct: total ? passed / total * 100 : 0, sub: allOk ? 'พร้อมลงทุนแล้ว' : (r.expense > 0 ? 'ยังมีเรื่องค้าง' : 'กรอกงบฯ ก่อน') }));
+  const ePct = r.lo > 0 ? r.fund / r.lo * 100 : (r.fund > 0 ? 100 : 0);
+  tiles.push(vizTile({ icon:'🏦', label:'เงินสำรองฉุกเฉิน', value: fmtMoney(r.fund),
+    color: r.emergencyState === 'ok' ? G : R, pct: ePct, state: r.emergencyState,
+    valColor: r.emergencyState === 'ok' ? G : (r.expense > 0 ? R : ''),
+    sub: r.expense <= 0 ? 'รอข้อมูลงบฯ' : (r.emergencyState === 'ok' ? '✓ ถึง 3 เดือนแล้ว' : `ขาดอีก ${fmtMoney(Math.max(0, r.lo - r.fund))}`),
+    onclick: "jumpToField('emergencyFund')" }));
+  tiles.push(vizTile({ icon:'💳', label:'หนี้ดอกเบี้ย', value: r.hasHighInterestDebt ? 'มี' : 'ไม่มี',
+    color: r.debtState === 'ok' ? G : R, pct: 100, state: r.debtState,
+    valColor: r.debtState === 'ok' ? G : R,
+    sub: r.debtCount === 0 ? '✓ ไม่มีหนี้' : (r.hasHighInterestDebt ? 'ควรโปะก่อน' : `ผ่อน 0% ${fmtMoney(r.debtMonthly)}/ด.`),
+    onclick: "jumpToField('debtRows')" }));
+  const pPct = !r.hasPvd ? 0 : (r.pvdEmployerRate > 0 ? r.pvdOwnRate / r.pvdEmployerRate * 100 : 100);
+  tiles.push(vizTile({ icon:'💼', label:'กองทุน PVD', value: r.hasPvd ? `${r.pvdOwnRate}% / ${r.pvdEmployerRate}%` : 'ไม่มี',
+    color: r.pvdState === 'ok' ? G : (r.pvdState === 'skip' ? M : R), pct: pPct, state: r.pvdState,
+    sub: !r.hasPvd ? 'ข้ามข้อนี้ได้' : (r.pvdState === 'ok' ? '✓ ได้สมทบเต็ม' : 'เพิ่ม % ให้เต็มสิทธิ์'),
+    onclick: "jumpToField('hasPvd')" }));
+  box.innerHTML = tiles.join('');
+}
+
+function renderTaxTiles(t){
+  const box = document.getElementById('taxTiles');
+  if (!box) return;
+  if (!t){ box.innerHTML = ''; return; }
+  const cap = Math.max(1, Math.min(t.combinedCapRemaining, t.incomeCap30pct));
+  box.innerHTML = [
+    vizTile({ hero:true, icon:'💰', label:'ประหยัดภาษีได้', value: fmtMoney(t.saved), color:'#2FBF71',
+      pct: t.before > 0 ? t.saved / t.before * 100 : 0, sub: t.before > 0 ? `ลด ${(t.saved / t.before * 100).toFixed(0)}% ของภาษี` : 'ไม่ต้องเสียภาษี' }),
+    vizTile({ icon:'🧾', label:'ภาษีก่อนซื้อ', value: fmtMoney(t.before), color:'var(--red)', pct: t.before > 0 ? 100 : 0, sub: `ขั้นภาษี ${t.marginal}%` ,
+      onclick:"jumpToField('taxNetIncome')" }),
+    vizTile({ icon:'✅', label:'ภาษีหลังซื้อ', value: fmtMoney(t.after), color:'var(--gold)',
+      pct: t.before > 0 ? t.after / t.before * 100 : 0, sub: 'ที่ต้องจ่ายจริง' }),
+    vizTile({ icon:'🐷', label:'ใช้สิทธิ์ลดหย่อน', value: fmtMoney(t.deductible), color:'var(--teal)',
+      pct: t.deductible / cap * 100, sub: `${(t.deductible / cap * 100).toFixed(0)}% ของสิทธิ์ที่เหลือ`,
+      onclick:"jumpToField('taxRmfSsf')" })
+  ].join('');
+}
+
+function renderGoalTiles(){
+  const box = document.getElementById('goalTiles');
+  if (!box) return;
+  const rows = [...document.querySelectorAll('#goalRows .budget-row')];
+  if (!rows.length){ box.innerHTML = ''; return; }
+  let totalMonthly = 0, totalTarget = 0, totalCurrent = 0;
+  const tiles = rows.map((r, i) => {
+    const label = (r.querySelector('.goal-label').value || '').trim() || 'เป้าหมาย';
+    const target = parseFloat(r.querySelector('.goal-target').value) || 0;
+    const current = parseFloat(r.querySelector('.goal-current').value) || 0;
+    const monthly = parseFloat(r.dataset.monthly) || 0;
+    totalMonthly += monthly; totalTarget += target; totalCurrent += current;
+    const pct = target > 0 ? Math.min(100, current / target * 100) : 0;
+    return vizTile({ icon: catIcon(label) === '💸' ? '🎯' : catIcon(label), label,
+      value: `${pct.toFixed(0)}%`, color: CAT_COLORS[i % CAT_COLORS.length], pct,
+      sub: pct >= 100 ? 'ครบแล้ว 🎉' : `ออม ${fmtMoney(monthly)}/ด.`,
+      onclick: `jumpToField('${r.id}')`, title: `${fmtMoney(current)} / ${fmtMoney(target)}` });
+  });
+  const hero = vizTile({ hero:true, icon:'🎯', label:'ต้องออมรวม', value: fmtMoney(totalMonthly) + '/ด.',
+    color:'#2FBF71', pct: totalTarget > 0 ? totalCurrent / totalTarget * 100 : 0,
+    sub: totalTarget > 0 ? `สะสมแล้ว ${(totalCurrent / totalTarget * 100).toFixed(0)}%` : '' });
+  box.innerHTML = hero + tiles.join('');
+}
+
 function catIcon(label){
   for (const [re, ic] of CAT_ICONS){ if (re.test(label)) return ic; }
   return '💸';
@@ -3615,7 +3832,7 @@ function collectBudgetItems(){
       const val = parseFloat(r.querySelector('.bud-amt').value) || 0;
       if (val <= 0) return;
       const label = (r.querySelector('.bud-label').value || '').trim() || 'ไม่ระบุชื่อ';
-      items.push({ label, val, kind });
+      items.push({ label, val, kind, rowId: r.id });
     });
   });
   items.sort((a,b) => b.val - a.val);
@@ -3664,7 +3881,7 @@ function renderBudgetCategories(income, expense, surplus){
 
   // Ranked list (like a "history" panel)
   const rows = items.map(it => `
-    <div class="cat-item">
+    <div class="cat-item clickable" onclick="jumpToBudgetRow('${it.rowId}')" title="กดเพื่อไปแก้รายการนี้">
       <span class="cat-ico" style="background:${it.color}22;color:${it.color}">${it.icon}</span>
       <span class="cat-name">${escHtml(it.label)}<small>รายจ่าย${it.kind}</small></span>
       <span class="cat-amt">${fmtMoney(it.val)}<small style="color:${it.color}">${expense > 0 ? (it.val / expense * 100).toFixed(0) : 0}%</small></span>
@@ -3682,7 +3899,7 @@ function renderBudgetCategories(income, expense, surplus){
   // Tiles with mini ring gauges (share of total expense)
   const expPctOfIncome = income > 0 ? expense / income * 100 : 100;
   const hero = `
-    <div class="cat-tile hero">
+    <div class="cat-tile hero clickable" onclick="switchBudgetTab('input')" title="ไปแท็บกรอกรายรับ-รายจ่าย">
       <div class="ct-ring" style="background:${ringBg('#F2B441', expPctOfIncome, 'rgba(255,255,255,0.15)')}"><span>📊</span></div>
       <div class="ct-name">ใช้ไปทั้งหมด</div>
       <div class="ct-amt">${fmtMoney(expense)}</div>
@@ -3691,7 +3908,7 @@ function renderBudgetCategories(income, expense, surplus){
   tiles.innerHTML = hero + items.map(it => {
     const pct = expense > 0 ? it.val / expense * 100 : 0;
     return `
-    <div class="cat-tile">
+    <div class="cat-tile clickable" onclick="jumpToBudgetRow('${it.rowId}')" title="กดเพื่อไปแก้รายการนี้">
       <div class="ct-ring" style="background:${ringBg(it.color, pct, 'rgba(128,128,128,0.22)')}"><span>${it.icon}</span></div>
       <div class="ct-name" title="${escHtml(it.label)}">${escHtml(it.label)}</div>
       <div class="ct-amt">${fmtMoney(it.val)}</div>
@@ -3993,6 +4210,7 @@ function updateTaxEstimate(){
 
   if (netIncome <= 0){
     ledger.innerHTML = '';
+    renderTaxTiles(null);
     document.getElementById('taxLimitHint').textContent = '';
     return;
   }
@@ -4022,6 +4240,8 @@ function updateTaxEstimate(){
     row('ภาษีที่ต้องจ่าย (หลังซื้อ)', after.tax),
     row('= ประหยัดภาษีได้ประมาณ', saved, 'bl-final')
   ].join('');
+  renderTaxTiles({ before: before.tax, after: after.tax, saved, deductible,
+    combinedCapRemaining, incomeCap30pct, marginal: before.marginalRate });
 
   const limitHint = document.getElementById('taxLimitHint');
   if (rmfSsfWanted > deductible + 0.5){
@@ -4151,6 +4371,14 @@ function updateReadiness(){
     pStatus.style.color = 'var(--red)';
   }
 
+  renderReadinessTiles({
+    expense, lo, fund, hasHighInterestDebt, hasPvd, pvdOwnRate, pvdEmployerRate,
+    debtCount: debts.length, debtMonthly: totalDebtMonthly,
+    emergencyState: expense <= 0 ? (fund > 0 ? 'ok' : 'bad') : (emergencyOk ? 'ok' : 'bad'),
+    debtState: hasHighInterestDebt ? 'bad' : 'ok',
+    pvdState: !hasPvd ? 'skip' : (income <= 0 ? 'bad' : (pvdOk ? 'ok' : 'bad'))
+  });
+
   const summary = document.getElementById('readinessSummary');
   if (expense > 0 && emergencyOk && !hasHighInterestDebt && pvdOk){
     summary.textContent = '🎉 พร้อมลงทุนจริงจังแล้ว ผ่านครบทุกเกณฑ์!';
@@ -4174,8 +4402,15 @@ function updateReadiness(){
 // "↗" jump links on each Net Worth line so it's obvious where each number
 // actually comes from, instead of it just appearing in the ledger unexplained.
 function jumpToField(id){
-  const el = document.getElementById(id);
+  const el = typeof id === 'string' ? document.getElementById(id) : id;
   if (!el) return;
+  // make sure the target is actually visible: open any collapsed <details>,
+  // switch the budget card to its input tab, un-collapse the budget card
+  let d = el.closest('details');
+  while (d){ d.open = true; d = d.parentElement ? d.parentElement.closest('details') : null; }
+  if (el.closest('#budgetViewInput')) switchBudgetTab('input');
+  const bb = el.closest('#budgetBody');
+  if (bb && bb.classList.contains('closed')) toggleBudget();
   el.scrollIntoView({ behavior:'smooth', block:'center' });
   const flashTarget = el.closest('.input-row') || el.closest('.readiness-check') || el;
   flashTarget.classList.remove('field-flash');
@@ -4183,6 +4418,49 @@ function jumpToField(id){
   flashTarget.classList.add('field-flash');
   setTimeout(() => flashTarget.classList.remove('field-flash'), 1300);
   if (el.focus) setTimeout(() => el.focus({ preventScroll:true }), 350);
+}
+
+/* ---- Net Worth visual: donut of what you own + ring tiles (tap a tile to jump to its input) ---- */
+function renderNetWorthVisual(cash, gold, goldBaht, portfolio, debt, netWorth){
+  const donut = document.getElementById('nwDonut');
+  const val = document.getElementById('nwDonutValue');
+  const tiles = document.getElementById('nwTiles');
+  if (!donut || !tiles) return;
+  const assets = cash + gold + portfolio;
+  const items = [
+    { label: 'เงินสด/สำรอง', icon: '💵', val: cash, color: 'var(--green)', target: 'emergencyFund' },
+    { label: 'ทองคำ' + (goldBaht ? ` ${goldBaht} บาท` : ''), icon: '🪙', val: gold, color: 'var(--gold)', target: 'goldBaht' },
+    { label: 'พอร์ต DCA', icon: '📈', val: portfolio, color: 'var(--teal)', target: 'initial' }
+  ];
+  val.textContent = fmtMoney(netWorth);
+  val.style.color = netWorth < 0 ? 'var(--red)' : '';
+  if (assets <= 0){
+    donut.style.background = 'var(--paper-line)';
+  } else {
+    const segs = items.filter(i => i.val > 0);
+    const gap = segs.length > 1 ? 0.6 : 0;
+    let acc = 0; const stops = [];
+    segs.forEach(i => {
+      const pct = i.val / assets * 100, start = acc, end = acc + pct;
+      stops.push(`${i.color} ${start}% ${Math.max(start, end - gap)}%`);
+      if (gap) stops.push(`var(--card-bg) ${Math.max(start, end - gap)}% ${end}%`);
+      acc = end;
+    });
+    donut.style.background = `conic-gradient(${stops.join(', ')})`;
+  }
+  const track = 'rgba(128,128,128,0.22)';
+  const tile = (i, pct, extraCls) => `
+    <div class="cat-tile ${extraCls||''}" ${i.target ? `onclick="jumpToField('${i.target}')" title="กดเพื่อไปแก้ตัวเลขนี้"` : ''}>
+      <div class="ct-ring" style="background:${ringBg(i.color, pct, track)}"><span>${i.icon}</span></div>
+      <div class="ct-name">${escHtml(i.label)}</div>
+      <div class="ct-amt">${fmtMoney(i.val)}</div>
+      <div class="ct-pct">${i.sub || (pct.toFixed(0) + '%')}</div>
+    </div>`;
+  let html = items.map(i => tile(i, assets > 0 ? i.val / assets * 100 : 0, 'clickable')).join('');
+  html += tile({ label: 'หนี้คงเหลือ', icon: '💳', val: debt, color: 'var(--red)',
+                 target: debt > 0 ? 'debtRows' : '', sub: debt > 0 ? `${assets > 0 ? (debt / assets * 100).toFixed(0) : 100}% ของทรัพย์สิน` : 'ไม่มีหนี้ 👍' },
+               assets > 0 ? debt / assets * 100 : (debt > 0 ? 100 : 0), debt > 0 ? 'clickable' : '');
+  tiles.innerHTML = html;
 }
 
 function updateNetWorth(){
@@ -4217,6 +4495,7 @@ function updateNetWorth(){
   }
 
   updateAssetAllocation(cashFund, goldValue, portfolio);
+  renderNetWorthVisual(cashFund, goldValue, goldBaht, portfolio, totalDebtBalance, netWorth);
   updateFireProgress();
   updateMoneyFlow();
   updateOverviewRow();
@@ -4634,6 +4913,7 @@ function calcGoalRow(id){
 function updateGoalsTotal(){
   const rows = document.querySelectorAll('#goalRows .budget-row');
   const box = document.getElementById('goalsTotal');
+  renderGoalTiles();
   if (rows.length === 0){
     box.style.display = 'none';
     return;
