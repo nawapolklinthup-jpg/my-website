@@ -1614,6 +1614,14 @@
   .cc-col.pending .cc-bar{ background:repeating-linear-gradient(45deg, rgba(47,191,113,.55) 0 6px, rgba(47,191,113,.2) 6px 12px); }
   .cc-val{ font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--muted); }
   .cc-m{ font-size:10.5px; color:var(--muted); }
+  .money-eq{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:0 0 16px; padding:12px 14px; border-radius:12px; border:1px solid var(--paper-line); background:rgba(128,128,128,0.06); }
+  .money-eq i{ font-style:normal; color:var(--muted); font-weight:700; }
+  .eq-part{ display:flex; flex-direction:column; line-height:1.3; }
+  .eq-part small{ font-size:10.5px; color:var(--muted); }
+  .eq-part b{ font-family:'JetBrains Mono',monospace; font-size:15px; }
+  .eq-part.zero{ opacity:.45; }
+  .eq-part.res{ padding:4px 10px; border-radius:8px; background:rgba(47,191,113,0.15); } .eq-part.res b{ color:var(--green); font-size:17px; }
+  .eq-part.neg b{ color:var(--red); }
   .close-ledger{ margin:16px 0 4px; }
   .close-ledger h3{ margin:0 0 4px; font-size:14px; }
   .close-row{ display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px dashed var(--paper-line); font-size:13px; }
@@ -2397,7 +2405,7 @@
               <div class="stat-value" id="bExpense">฿0</div>
             </div>
             <div class="stat gain">
-              <div class="stat-label">เหลือหลังหักรายจ่าย</div>
+              <div class="stat-label">เหลือเข้าเงินสด</div>
               <div class="stat-value" id="bSurplus">฿0</div>
             </div>
             <div class="stat">
@@ -2454,7 +2462,7 @@
           </div>
       </div>
       <div class="step-card net-card" id="step3Net"></div>
-      <div class="flow-card readiness-card" id="flowCard">
+      <div class="flow-card readiness-card" id="flowCard" style="display:none">
     <h2>🧭 เส้นทางเงินของคุณ</h2>
     <p class="sub">ภาพรวมว่าเงินเดือนไหลไปที่ไหนบ้าง — อัปเดตอัตโนมัติจากงบฯ, เงินลงทุน, เงินสำรอง, เป้าหมาย และทองคำด้านบนทั้งหมด</p>
     <div id="flowDiagram"></div>
@@ -2558,8 +2566,9 @@
           <div class="rc-desc">ควรมี 3-6 เท่าของรายจ่ายต่อเดือน (<span id="rcExpenseRef">฿0</span>/เดือน) = <b id="rcEmergencyRange">฿0 - ฿0</b> เผื่อตกงาน/เจ็บป่วยกะทันหัน จะได้ไม่ต้องถอนเงินลงทุนตอนตลาดร่วง — นับทั้งเงินสดและทองคำ (ขายได้ไว) รวมกัน</div>
           <div class="input-row" style="max-width:220px;">
             <input type="number" id="emergencyFund" value="0" min="0" step="1000" oninput="updateReadiness()">
-            <span class="unit">บาท (เงินสด)</span>
+            <span class="unit">บาท (ตั้งต้น)</span>
           </div>
+          <div class="hint" id="efDerived" style="margin-top:4px;"></div>
           <div style="display:flex;gap:8px;margin-top:8px;">
             <div style="flex:1;">
               <label class="inj-field-label" style="display:block;font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:600;">🪙 ทองคำที่มี (บาท)</label>
@@ -3776,7 +3785,7 @@ function renderGoalTiles(){
   const tiles = rows.map((r, i) => {
     const label = (r.querySelector('.goal-label').value || '').trim() || 'เป้าหมาย';
     const target = parseFloat(r.querySelector('.goal-target').value) || 0;
-    const current = parseFloat(r.querySelector('.goal-current').value) || 0;
+    const current = goalSaved(r);
     const monthly = parseFloat(r.dataset.monthly) || 0;
     totalMonthly += monthly; totalTarget += target; totalCurrent += current;
     const pct = target > 0 ? Math.min(100, current / target * 100) : 0;
@@ -3862,10 +3871,16 @@ function renderBudgetCategories(income, expense, surplus){
     return;
   }
 
-  // Donut: each expense item + leftover (green), as share of whichever is bigger (income or expense)
-  const base = Math.max(income, expense) || 1;
+  // Donut = the whole salary: every expense + each goal + investing + what's left for cash
+  const P = closePlan(curMonthKey());
+  const splits = [];
+  P.goals.forEach(g => splits.push({ label: 'เป้าหมาย: ' + g.name, val: g.amt, color: '#9B6DFF', icon: '🎯', jump: 'goalRows', sub: 'เก็บเข้าเป้าหมาย' }));
+  if (P.invest > 0) splits.push({ label: 'ลงทุน', val: P.invest, color: '#2EC4B6', icon: '📈', jump: 'investAmt', sub: 'เข้าพอร์ต' });
+  const cashLeft = P.calcCash;
+  const base = Math.max(income, expense + P.goalsSum + P.invest) || 1;
   const segs = items.map(it => ({ color: it.color, pct: it.val / base * 100 }));
-  if (surplus > 0) segs.push({ color: 'var(--green)', pct: surplus / base * 100 });
+  splits.forEach(x => segs.push({ color: x.color, pct: x.val / base * 100 }));
+  if (cashLeft > 0) segs.push({ color: 'var(--green)', pct: cashLeft / base * 100 });
   const gap = segs.length > 1 ? 0.6 : 0;
   let acc = 0; const stops = [];
   segs.forEach(s => {
@@ -3876,27 +3891,32 @@ function renderBudgetCategories(income, expense, surplus){
   });
   if (acc < 100) stops.push(`var(--paper-line) ${acc}% 100%`);
   donut.style.background = `conic-gradient(${stops.join(', ')})`;
-  donutValue.textContent = fmtMoney(expense);
-  donutLabel.textContent = income > 0
-    ? `รายจ่ายรวม · ${(expense / income * 100).toFixed(0)}% ของรายรับ`
-    : 'รายจ่ายรวม';
+  donutValue.textContent = fmtMoney(cashLeft);
+  donutValue.style.color = cashLeft < 0 ? 'var(--red)' : 'var(--green)';
+  donutLabel.textContent = `เหลือเข้าเงินสด · จากเงินเข้า ${fmtMoney(income)}`;
 
   // Ranked list (like a "history" panel)
   const rows = items.map(it => `
     <div class="cat-item clickable" onclick="jumpToBudgetRow('${it.rowId}')" title="กดเพื่อไปแก้รายการนี้">
       <span class="cat-ico" style="background:${it.color}22;color:${it.color}">${it.icon}</span>
       <span class="cat-name">${escHtml(it.label)}<small>รายจ่าย${it.kind} ${it.delta}</small></span>
-      <span class="cat-amt">${fmtMoney(it.val)}<small style="color:${it.color}">${expense > 0 ? (it.val / expense * 100).toFixed(0) : 0}%</small></span>
+      <span class="cat-amt">${fmtMoney(it.val)}<small style="color:${it.color}">${income > 0 ? (it.val / income * 100).toFixed(0) : 0}%</small></span>
     </div>`);
+  splits.forEach(x => rows.push(`
+    <div class="cat-item clickable" onclick="jumpToField('${x.jump}')">
+      <span class="cat-ico" style="background:${x.color}22;color:${x.color}">${x.icon}</span>
+      <span class="cat-name">${escHtml(x.label)}<small>${x.sub}</small></span>
+      <span class="cat-amt">${fmtMoney(x.val)}<small style="color:${x.color}">${income > 0 ? (x.val / income * 100).toFixed(0) : 0}%</small></span>
+    </div>`));
   if (income > 0){
     rows.push(`
     <div class="cat-item">
-      <span class="cat-ico" style="background:rgba(47,191,113,0.15)">🌱</span>
-      <span class="cat-name">เหลือหลังหักรายจ่าย<small>จากรายรับ ${fmtMoney(income)}</small></span>
-      <span class="cat-amt" style="color:${surplus < 0 ? 'var(--red)' : 'var(--green)'}">${fmtMoney(surplus)}<small>${(surplus / income * 100).toFixed(0)}%</small></span>
+      <span class="cat-ico" style="background:rgba(47,191,113,0.15)">💵</span>
+      <span class="cat-name"><b>เหลือเข้าเงินสด</b><small>หักรายจ่าย เป้าหมาย และลงทุนแล้ว</small></span>
+      <span class="cat-amt" style="color:${cashLeft < 0 ? 'var(--red)' : 'var(--green)'}">${fmtMoney(cashLeft)}<small>${(cashLeft / income * 100).toFixed(0)}%</small></span>
     </div>`);
   }
-  list.innerHTML = `<div class="cat-list-title">รายจ่ายแยกตามหมวด${prev ? ` <span class="cat-list-cmp">▲▼ เทียบกับ ${monthLabelTH(prev.key)}</span>` : ''}</div>` + rows.join('');
+  list.innerHTML = `<div class="cat-list-title">เงินเข้า ${fmtMoney(income)} ไปไหนบ้าง${prev ? ` <span class="cat-list-cmp">▲▼ เทียบกับ ${monthLabelTH(prev.key)}</span>` : ''}</div>` + rows.join('');
 
   // Tiles with mini ring gauges (share of total expense)
   const expPctOfIncome = income > 0 ? expense / income * 100 : 100;
@@ -3908,7 +3928,21 @@ function renderBudgetCategories(income, expense, surplus){
       <div class="ct-pct">${income > 0 ? expPctOfIncome.toFixed(0) + '% ของรายรับ' : '—'}</div>
       ${prev ? `<div class="ct-delta">${deltaHtml(expense, prev.total)}</div>` : ''}
     </div>`;
-  tiles.innerHTML = hero + items.map(it => {
+  const splitTiles = splits.map(x => `
+    <div class="cat-tile clickable" onclick="jumpToField('${x.jump}')">
+      <div class="ct-ring" style="background:${ringBg(x.color, income > 0 ? x.val / income * 100 : 0, 'rgba(128,128,128,0.22)')}"><span>${x.icon}</span></div>
+      <div class="ct-name" title="${escHtml(x.label)}">${escHtml(x.label)}</div>
+      <div class="ct-amt">${fmtMoney(x.val)}</div>
+      <div class="ct-pct">${income > 0 ? (x.val / income * 100).toFixed(0) : 0}% ของเงินเข้า</div>
+    </div>`).join('');
+  const cashTile = income > 0 ? `
+    <div class="cat-tile hero" style="background:linear-gradient(135deg,rgba(47,191,113,.25),rgba(47,191,113,.08));">
+      <div class="ct-ring" style="background:${ringBg('var(--green)', Math.max(0, cashLeft / income * 100), 'rgba(255,255,255,0.15)')}"><span>💵</span></div>
+      <div class="ct-name">เหลือเข้าเงินสด</div>
+      <div class="ct-amt" style="color:${cashLeft < 0 ? 'var(--red)' : ''}">${fmtMoney(cashLeft)}</div>
+      <div class="ct-pct">${(cashLeft / income * 100).toFixed(0)}% ของเงินเข้า</div>
+    </div>` : '';
+  tiles.innerHTML = cashTile + hero + splitTiles + items.map(it => {
     const pct = expense > 0 ? it.val / expense * 100 : 0;
     return `
     <div class="cat-tile clickable" onclick="jumpToBudgetRow('${it.rowId}')" title="กดเพื่อไปแก้รายการนี้">
@@ -3931,8 +3965,10 @@ function updateBudgetSummary(){
 
   document.getElementById('bIncome').textContent  = fmtMoney(income);
   document.getElementById('bExpense').textContent = fmtMoney(expense);
-  document.getElementById('bSurplus').textContent = fmtMoney(surplus);
-  document.getElementById('bSurplus').style.color = surplus < 0 ? 'var(--red)' : '';
+  // the headline "left" number = after expenses, goals AND investing (what really goes to cash)
+  const cashLeftNow = (typeof closePlan === 'function') ? closePlan(curMonthKey()).calcCash : surplus;
+  document.getElementById('bSurplus').textContent = fmtMoney(cashLeftNow);
+  document.getElementById('bSurplus').style.color = cashLeftNow < 0 ? 'var(--red)' : '';
   document.getElementById('bRate').textContent = rate.toFixed(1) + '%';
 
   renderBudgetCategories(income, expense, surplus);
@@ -4558,8 +4594,10 @@ function getDebts(){
     const amount = parseFloat(r.querySelector('.debt-amt').value) || 0;
     const hasInterest = r.querySelector('.debt-interest-toggle').checked;
     const rate = hasInterest ? (parseFloat(r.querySelector('.debt-rate').value) || 0) : 0;
-    const balance = parseFloat(r.querySelector('.debt-balance').value) || 0;
-    if (amount > 0 || balance > 0) list.push({ label, amount, hasInterest, rate, balance, id: r.dataset.did });
+    const baseBalance = parseFloat(r.querySelector('.debt-balance').value) || 0;
+    const paid = closedTotals().debts[r.dataset.did] || 0;
+    const balance = Math.max(0, baseBalance - paid);
+    if (amount > 0 || baseBalance > 0) list.push({ label, amount, hasInterest, rate, balance, baseBalance, id: r.dataset.did });
   });
   return list;
 }
@@ -4571,7 +4609,7 @@ function clearDebtRows(){
 function updateReadiness(){
   const expense = getBudgetTotal('fixedRows') + getBudgetTotal('varRows');
   const lo = expense * 3, hi = expense * 6;
-  const cashFund = parseFloat(document.getElementById('emergencyFund').value) || 0;
+  const cashFund = cashTotal();
   const goldBaht = parseFloat(document.getElementById('goldBaht').value) || 0;
   const goldPrice = parseFloat(document.getElementById('goldPrice').value) || 0;
   const goldValue = goldBaht * goldPrice;
@@ -4727,7 +4765,8 @@ function renderNetWorthVisual(cash, gold, goldBaht, portfolio, debt, netWorth, g
   if (!donut || !tiles) return;
   const assets = cash + gold + portfolio + goals;
   const items = [
-    { label: 'เงินสด/สำรอง', icon: '💵', val: cash, color: 'var(--green)', target: 'emergencyFund' },
+    { label: 'เงินสด/สำรอง', icon: '💵', val: cash, color: 'var(--green)', target: 'emergencyFund',
+      sub: cashFromMonths() ? `ตั้งต้น ${fmtMoney(cashBase())} + จากเงินเดือน ${fmtMoney(cashFromMonths())}` : '' },
     { label: 'ทองคำ' + (goldBaht ? ` ${goldBaht} บาท` : ''), icon: '🪙', val: gold, color: 'var(--gold)', target: 'goldBaht' },
     { label: 'พอร์ต DCA', icon: '📈', val: portfolio, color: 'var(--teal)', target: 'initial' }
   ];
@@ -4765,7 +4804,7 @@ function renderNetWorthVisual(cash, gold, goldBaht, portfolio, debt, netWorth, g
 
 // the ONE place net worth is computed — every card/tile/KPI reads from here
 function getBalances(){
-  const cash = parseFloat(document.getElementById('emergencyFund').value) || 0;
+  const cash = cashTotal();
   const goldBaht = parseFloat(document.getElementById('goldBaht').value) || 0;
   const goldPrice = parseFloat(document.getElementById('goldPrice').value) || 0;
   const gold = goldBaht * goldPrice;
@@ -4787,7 +4826,8 @@ function updateNetWorth(){
   const jumpLink = (targetId) => targetId ? ` <a href="#" class="nw-jump" onclick="jumpToField('${targetId}');return false;" title="ไปช่องกรอกตัวเลขนี้">↗ ที่มา</a>` : '';
   const row = (label, val, cls, targetId) => `<div class="bl-row ${cls||''}"><span class="bl-label">${label}${jumpLink(targetId)}</span><span class="${val<0?'bl-neg':''}">${val<0?'-':'+'}${fmtMoney(Math.abs(val))}</span></div>`;
   box.innerHTML = [
-    row('เงินสด (สำรองฉุกเฉิน)', cashFund, '', 'emergencyFund'),
+    row('เงินสดตั้งต้น', cashBase(), '', 'emergencyFund'),
+    row('เงินเหลือสะสมจากเงินเดือน', cashFromMonths(), ''),
     row(`ทองคำ (${goldBaht} บาท)`, goldValue, '', 'goldBaht'),
     row('พอร์ตลงทุนปัจจุบัน', portfolio, '', 'initial'),
     row('เงินเก็บตามเป้าหมาย', B.goals, '', 'goalRows'),
@@ -4807,6 +4847,8 @@ function updateNetWorth(){
   renderNetWorthVisual(cashFund, goldValue, goldBaht, portfolio, totalDebtBalance, netWorth, B.goals);
   renderNetWorthPending(B);
   renderCashChart();
+  const efd = document.getElementById('efDerived');
+  if (efd) efd.innerHTML = cashFromMonths() ? `เงินสดตั้งต้น ${fmtMoney(cashBase())} + เงินเหลือสะสมจากเงินเดือน ${fmtMoney(cashFromMonths())} = <b>${fmtMoney(B.cash)}</b>` : 'ใส่เงินสด/เงินฝากที่มีตอนเริ่มใช้แอป — เดือนที่บันทึกแล้ว ระบบบวกเงินเหลือให้เอง';
   updateFireProgress();
   updateMoneyFlow();
   updateOverviewRow();
@@ -5027,7 +5069,7 @@ function buildPrintSummary(){
       <table class="ps-table">
         <tr><td>รายรับรวม</td><td>${document.getElementById('bIncome').textContent}</td></tr>
         <tr><td>รายจ่ายรวม</td><td>${document.getElementById('bExpense').textContent}</td></tr>
-        <tr><td>เหลือหลังหักรายจ่าย</td><td>${document.getElementById('bSurplus').textContent}</td></tr>
+        <tr><td>เหลือเข้าเงินสด</td><td>${document.getElementById('bSurplus').textContent}</td></tr>
         <tr><td>อัตราออม</td><td>${document.getElementById('bRate').textContent}</td></tr>
       </table>
     `;
@@ -5046,7 +5088,7 @@ function buildPrintSummary(){
     goalRows.forEach(r => {
       const name = r.querySelector('.goal-label').value || 'เป้าหมาย';
       const target = parseFloat(r.querySelector('.goal-target').value) || 0;
-      const current = parseFloat(r.querySelector('.goal-current').value) || 0;
+      const current = goalSaved(r);
       const resultEl = document.getElementById('goalResult_' + r.id);
       const resultText = resultEl ? resultEl.textContent : '';
       html += `<tr><td>${name}<br><span style="color:#888;font-size:10.5px;">เป้า ${fmtMoney(target)} · มีแล้ว ${fmtMoney(current)}</span></td><td>${resultText}</td></tr>`;
@@ -5140,7 +5182,7 @@ function addGoalRow(name, target, current, targetMonth, rate, gid){
         <input type="number" class="goal-target" value="${target !== undefined ? target : 50000}" min="0" step="1000" oninput="calcGoalRow('${id}')">
       </div>
       <div class="inj-field">
-        <label class="inj-field-label">มีอยู่แล้ว (บาท)</label>
+        <label class="inj-field-label">มีอยู่แล้วตอนเริ่ม (บาท)</label>
         <input type="number" class="goal-current" value="${current !== undefined ? current : 0}" min="0" step="500" oninput="calcGoalRow('${id}')">
       </div>
     </div>
@@ -5169,40 +5211,28 @@ function calcGoalRow(id){
   const row = document.getElementById(id);
   if (!row) return;
   const target = parseFloat(row.querySelector('.goal-target').value) || 0;
-  const current = parseFloat(row.querySelector('.goal-current').value) || 0;
+  const current = goalSaved(row);
+  const fromMonths = goalFromMonths(row);
   const monthStr = row.querySelector('.goal-month').value;
   const ratePct = parseFloat(row.querySelector('.goal-rate').value) || 0;
   const resultBox = document.getElementById('goalResult_' + id);
 
-  let n = 0;
-  if (monthStr){
-    const [ty, tm] = monthStr.split('-').map(Number);
-    const now = new Date();
-    n = (ty - now.getFullYear()) * 12 + (tm - (now.getMonth() + 1));
-  }
-
+  const mk = (document.getElementById('budgetMonth') || {}).value || todayMonthStr();
+  const G = goalMonthlyFor(row, mk);
+  const n = G.n;
   if (!monthStr || n <= 0){
     resultBox.className = 'goal-result gr-warn';
-    resultBox.textContent = 'เลือกเดือนเป้าหมายในอนาคตด้วย ถึงจะคำนวณยอดที่ต้องออมต่อเดือนได้';
+    resultBox.textContent = 'เลือกเดือนเป้าหมายที่อยู่หลังเดือนที่บันทึกอยู่ ถึงจะคำนวณยอดที่ต้องออมต่อเดือนได้';
+    row.dataset.monthly = 0;
     saveGoals();
     updateGoalsTotal();
     return { monthly: 0, ok: false };
   }
-
-  const rm = ratePct / 100 / 12;
-  const futureCurrent = current * Math.pow(1 + rm, n);
-  const needed = target - futureCurrent;
-
-  let monthly;
-  if (needed <= 0){
-    resultBox.className = 'goal-result';
-    resultBox.textContent = `มีเงินที่มีอยู่แล้ว + ดอกเบี้ยพอเกินเป้าหมายนี้แล้ว (ครบใน ${n} เดือน) 🎉`;
-    monthly = 0;
-  } else {
-    monthly = rm > 0 ? (needed * rm) / (Math.pow(1 + rm, n) - 1) : needed / n;
-    resultBox.className = 'goal-result';
-    resultBox.textContent = `ต้องออมเดือนละ ${fmtMoney(monthly)} เป็นเวลา ${n} เดือน (ถึง ${monthLabelTH(monthStr)})`;
-  }
+  const monthly = G.monthly;
+  resultBox.className = 'goal-result';
+  resultBox.textContent = monthly <= 0
+    ? `ครบเป้าแล้ว 🎉 สะสม ${fmtMoney(current)} / ${fmtMoney(target)}`
+    : `${monthLabelTH(mk)} ต้องเก็บ ${fmtMoney(monthly)} · อีก ${n} เดือนถึง ${monthLabelTH(monthStr)} · สะสมแล้ว ${fmtMoney(current)} / ${fmtMoney(target)}` + (fromMonths ? ` (เก็บจากเงินเดือน ${fmtMoney(fromMonths)})` : '');
   row.dataset.monthly = monthly;
   saveGoals();
   updateGoalsTotal();
@@ -5232,8 +5262,7 @@ function updateGoalsTotal(){
 function getGoalsCurrentSum(){
   let sum = 0;
   document.querySelectorAll('#goalRows .budget-row').forEach(r => {
-    const el = r.querySelector('.goal-current');
-    if (el) sum += parseFloat(el.value) || 0;
+    sum += goalSaved(r);
   });
   return sum;
 }
@@ -5257,7 +5286,7 @@ function updateMoneyFlow(){
   const investAmt = parseFloat(document.getElementById('investAmt').value) || 0;
   const leftoverCash = Math.max(0, surplus - investAmt);
   const portfolio = parseFloat(document.getElementById('initial').value) || 0;
-  const cashFund = parseFloat(document.getElementById('emergencyFund').value) || 0;
+  const cashFund = cashTotal();
   const goldBaht = parseFloat(document.getElementById('goldBaht').value) || 0;
   const goldPrice = parseFloat(document.getElementById('goldPrice').value) || 0;
   const goldValue = goldBaht * goldPrice;
@@ -5342,7 +5371,9 @@ function loadGoals(){
   try{
     const raw = localStorage.getItem(GOALS_KEY);
     const list = raw ? JSON.parse(raw) : [];
-    list.forEach(g => addGoalRow(g.name, g.target, g.current, g.targetMonth, g.rate, g.gid));
+    const ct = NEED_V2 ? closedTotals() : null;
+    list.forEach(g => addGoalRow(g.name, g.target, ct ? Math.max(0, (g.current || 0) - (ct.goals[g.gid] || 0)) : g.current, g.targetMonth, g.rate, g.gid));
+    if (ct) saveGoals();
   }catch(e){ /* ignore */ }
 }
 
@@ -5591,7 +5622,7 @@ function serializeBudgetState(){
     emergencyFund: parseFloat(document.getElementById('emergencyFund').value) || 0,
     goldBaht: parseFloat(document.getElementById('goldBaht').value) || 0,
     goldPrice: parseFloat(document.getElementById('goldPrice').value) || 0,
-    debts: getDebts(),
+    debts: getDebts().map(d => Object.assign({}, d, { balance: d.baseBalance })),
     hasPvd: document.getElementById('hasPvd').checked,
     pvdEmployerRate: parseFloat(document.getElementById('pvdEmployerRate').value) || 0,
     pvdOwnRate: parseFloat(document.getElementById('pvdOwnRate').value) || 0,
@@ -5604,16 +5635,58 @@ function serializeBudgetState(){
 // keep a snapshot of them for the history charts.
 const LIVE_KEY = 'dcaLiveV1';
 var liveReady = false;
+// data saved by v11-v13 had month amounts baked into the typed fields — taken back out once on load
+var NEED_V2 = (function(){ try{ const l = JSON.parse(localStorage.getItem('dcaLiveV1') || 'null'); return !!(l && l.model !== 2); }catch(e){ return false; } })();
+// sums of what every saved month put into cash / each goal / off each debt
+var _ctRaw = null, _ctVal = null;
+function closedTotals(){
+  let raw = null;
+  try{ raw = localStorage.getItem('dcaBudgetHistoryV1') || '{}'; }catch(e){ raw = '{}'; }
+  if (raw === _ctRaw && _ctVal) return _ctVal;
+  const t = { cash: 0, goals: {}, debts: {} };
+  let st = {};
+  try{ st = JSON.parse(raw) || {}; }catch(e){}
+  Object.values(st).forEach(r => {
+    t.cash += r.cashApplied || 0;
+    Object.entries(r.goalsApplied || {}).forEach(([g, a]) => { t.goals[g] = (t.goals[g] || 0) + a; });
+    Object.entries(r.debtApplied || {}).forEach(([d, a]) => { t.debts[d] = (t.debts[d] || 0) + a; });
+  });
+  _ctRaw = raw; _ctVal = t;
+  return t;
+}
+function cashBase(){ return parseFloat(document.getElementById('emergencyFund').value) || 0; }
+function cashFromMonths(){ return closedTotals().cash; }
+function cashTotal(){ return cashBase() + cashFromMonths(); }
+function goalBase(row){ return parseFloat(row.querySelector('.goal-current').value) || 0; }
+function goalFromMonths(row){ return closedTotals().goals[row.dataset.gid] || 0; }
+function goalSaved(row){ return goalBase(row) + goalFromMonths(row); }
+function goalMonthlyFor(row, mk){
+  const target = parseFloat(row.querySelector('.goal-target').value) || 0;
+  const tm = row.querySelector('.goal-month').value;
+  if (!tm || !mk) return { monthly: 0, n: 0 };
+  const [ty, tmm] = tm.split('-').map(Number), [y, m] = mk.split('-').map(Number);
+  const n = (ty - y) * 12 + (tmm - m);
+  if (n <= 0) return { monthly: 0, n };
+  // saved before this month = starting amount + every OTHER saved month
+  let st = {}; try{ st = JSON.parse(localStorage.getItem('dcaBudgetHistoryV1') || '{}'); }catch(e){}
+  let before = goalBase(row);
+  Object.entries(st).forEach(([k, r]) => { if (k !== mk) before += ((r.goalsApplied || {})[row.dataset.gid] || 0); });
+  const rm = (parseFloat(row.querySelector('.goal-rate').value) || 0) / 1200;
+  const need = target - before * Math.pow(1 + rm, n);
+  if (need <= 0) return { monthly: 0, n };
+  return { monthly: rm > 0 ? need * rm / (Math.pow(1 + rm, n) - 1) : need / n, n };
+}
 function serializeLive(){
   return {
     emergencyFund: parseFloat(document.getElementById('emergencyFund').value) || 0,
     goldBaht: parseFloat(document.getElementById('goldBaht').value) || 0,
     goldPrice: parseFloat(document.getElementById('goldPrice').value) || 0,
-    debts: getDebts(),
+    debts: getDebts().map(d => Object.assign({}, d, { balance: d.baseBalance })),
     hasPvd: document.getElementById('hasPvd').checked,
     pvdEmployerRate: parseFloat(document.getElementById('pvdEmployerRate').value) || 0,
     pvdOwnRate: parseFloat(document.getElementById('pvdOwnRate').value) || 0,
-    initial: parseFloat(document.getElementById('initial').value) || 0
+    initial: parseFloat(document.getElementById('initial').value) || 0,
+    model: 2
   };
 }
 function saveLive(){
@@ -5721,6 +5794,8 @@ function monthlyCheckinSave(){
     }
     saveHistoryStore(store);
   }
+  document.querySelectorAll('#goalRows .budget-row').forEach(r => calcGoalRow(r.id));
+  updateReadiness();
   justSaved = monthKey;
   step4Draft = null;
   s5CashEdit = null;
@@ -5785,15 +5860,17 @@ function confirmQuickDiv(){
 function renderStep3(){
   const box = document.getElementById('step3Emergency');
   if (!box) return;
+  { const inc = getBudgetTotal('incomeRows'), exp = getBudgetTotal('fixedRows') + getBudgetTotal('varRows'); renderBudgetCategories(inc, exp, inc - exp); }
+  { const cl = closePlan(curMonthKey()).calcCash, el = document.getElementById('bSurplus'); if (el){ el.textContent = fmtMoney(cl); el.style.color = cl < 0 ? 'var(--red)' : ''; } }
   const barBox = document.getElementById('step3Bar');
-  if (barBox) barBox.innerHTML = getBudgetTotal('incomeRows') > 0 ? moneyBarHtml(closePlan(curMonthKey())) : '';
+  if (barBox) barBox.innerHTML = getBudgetTotal('incomeRows') > 0 ? moneyEqHtml(closePlan(curMonthKey())) : '';
   const income = getBudgetTotal('incomeRows');
   const expense = getBudgetTotal('fixedRows') + getBudgetTotal('varRows');
   const surplus = income - expense;
   const invest = investActualFor(curMonthKey());
   const goalsM = goalPlanFor(curMonthKey()).reduce((a, g) => a + g.amt, 0);
   const rest = surplus - invest - goalsM;
-  const fund = parseFloat(document.getElementById('emergencyFund').value) || 0;
+  const fund = cashTotal();
   const target = expense * 3;
   const pct = target > 0 ? Math.min(100, fund / target * 100) : 0;
   const base = Math.max(surplus, invest + goalsM, 1);
@@ -5830,7 +5907,8 @@ function renderStep3(){
       <div class="s3-ef-body">
         <div class="s3-ef-title">เงินสำรองตอนนี้ <b>${fmtMoney(fund)}</b> ${target > 0 ? `/ เป้า 3 เดือน ${fmtMoney(target)}` : ''}</div>
         <div class="hint">${target <= 0 ? 'กรอกรายจ่ายก่อน' : pct >= 100 ? '✓ ครบ 3 เดือนแล้ว — เงินที่เหลือเอาไปเป้าหมาย/ลงทุนได้เต็มที่' : `ยังขาด ${fmtMoney(target - fund)} — ควรเก็บกองนี้ก่อนลงทุนหนัก`}</div>
-        <label class="s3-ef-edit">แก้ยอดเงินสำรองที่มีจริง <input type="number" min="0" step="100" value="${fund}" onchange="document.getElementById('emergencyFund').value=this.value;updateReadiness();renderStep3();"></label>
+        <label class="s3-ef-edit">เงินสำรองตั้งต้น (ก่อนเริ่มบันทึกในแอป) <input type="number" min="0" step="100" value="${cashBase()}" onchange="document.getElementById('emergencyFund').value=this.value;updateReadiness();renderStep3();"></label>
+        ${cashFromMonths() ? `<div class="hint">+ เงินเหลือสะสมจากเงินเดือน ${fmtMoney(cashFromMonths())} = <b>${fmtMoney(fund)}</b></div>` : ''}
       </div>
     </div>`;
 }
@@ -6079,7 +6157,7 @@ function goalPlanFor(mk){
   const out = [];
   document.querySelectorAll('#goalRows .budget-row').forEach(r => {
     const gid = r.dataset.gid;
-    const amt = frozen[gid] !== undefined ? frozen[gid] : Math.round(parseFloat(r.dataset.monthly) || 0);
+    const amt = frozen[gid] !== undefined ? frozen[gid] : Math.round(goalMonthlyFor(r, mk).monthly);
     if (amt > 0) out.push({ gid, amt, name: (r.querySelector('.goal-label').value || '').trim() || 'เป้าหมาย' });
   });
   return out;
@@ -6116,69 +6194,15 @@ function closePlan(mk){
            netChange: cash + goalsSum + invest + principal };
 }
 function applyMonthClose(mk, plan){
-  const store = loadHistoryStore();
-  const prev = store[mk] || {};
-  const out = {};
-  // cash (never below zero; what was really applied is what gets stored)
-  const ef = document.getElementById('emergencyFund');
-  const efNow = parseFloat(ef.value) || 0;
-  const efNew = Math.max(0, efNow + plan.cash - (prev.cashApplied || 0));
-  out.cashApplied = (prev.cashApplied || 0) + (efNew - efNow);
-  ef.value = efNew;
+  const out = { cashApplied: Math.round(plan.cash), goalsApplied: {}, debtApplied: {} };
+  plan.goals.forEach(g => { if (g.gid) out.goalsApplied[g.gid] = g.amt; });
+  plan.debts.forEach(d => { if (d.principal > 0) out.debtApplied[d.id] = d.principal; });
   setMonthCashLog(mk, out.cashApplied);
-  // goals
-  const pg = prev.goalsApplied || {};
-  out.goalsApplied = {};
-  plan.goals.forEach(g => {
-    const row = document.querySelector(`#goalRows .budget-row[data-gid="${g.gid}"]`);
-    if (!row) return;
-    const el = row.querySelector('.goal-current');
-    const now = parseFloat(el.value) || 0;
-    const nv = Math.max(0, now + g.amt - (pg[g.gid] || 0));
-    el.value = nv;
-    out.goalsApplied[g.gid] = (pg[g.gid] || 0) + (nv - now);
-  });
-  // a goal dropped from this month's plan gives back what an earlier save put in
-  Object.keys(pg).forEach(gid => {
-    if (out.goalsApplied[gid] !== undefined) return;
-    const row = document.querySelector(`#goalRows .budget-row[data-gid="${gid}"]`);
-    if (!row) return;
-    const el = row.querySelector('.goal-current');
-    el.value = Math.max(0, (parseFloat(el.value) || 0) - pg[gid]);
-  });
-  document.querySelectorAll('#goalRows .budget-row').forEach(r => calcGoalRow(r.id));
-  // debts
-  const pd = prev.debtApplied || {};
-  out.debtApplied = {};
-  plan.debts.forEach(d => {
-    const row = document.querySelector(`#debtRows .budget-row[data-did="${d.id}"]`);
-    if (!row) return;
-    const el = row.querySelector('.debt-balance');
-    const now = parseFloat(el.value) || 0;
-    const nv = Math.max(0, now - (d.principal - (pd[d.id] || 0)));
-    el.value = nv;
-    out.debtApplied[d.id] = (pd[d.id] || 0) + (now - nv);
-  });
   return out;
 }
 function reverseMonthClose(rec){
   if (!rec) return;
-  const ef = document.getElementById('emergencyFund');
-  if (rec.cashApplied) ef.value = Math.max(0, (parseFloat(ef.value) || 0) - rec.cashApplied);
   if (rec.initApplied){ const ie = document.getElementById('initial'); ie.value = Math.max(0, (parseFloat(ie.value) || 0) - rec.initApplied); }
-  Object.entries(rec.goalsApplied || {}).forEach(([gid, amt]) => {
-    const row = document.querySelector(`#goalRows .budget-row[data-gid="${gid}"]`);
-    if (!row) return;
-    const el = row.querySelector('.goal-current');
-    el.value = Math.max(0, (parseFloat(el.value) || 0) - amt);
-    calcGoalRow(row.id);
-  });
-  Object.entries(rec.debtApplied || {}).forEach(([did, amt]) => {
-    const row = document.querySelector(`#debtRows .budget-row[data-did="${did}"]`);
-    if (!row) return;
-    const el = row.querySelector('.debt-balance');
-    el.value = (parseFloat(el.value) || 0) + amt;
-  });
 }
 function renderNetWorthPending(B){
   const box = document.getElementById('nwPending');
@@ -6195,14 +6219,13 @@ function renderNetWorthPending(B){
   if (P.principal > 0) parts.push(`💳 หนี้ลด <b>${fmtMoney(P.principal)}</b>`);
   if (rec && rec.cashApplied !== undefined){
     box.className = 'nw-pending done';
-    box.innerHTML = `✅ บันทึกเดือน <b>${monthLabelTH(mk)}</b> แล้ว — ตัวเลขด้านล่างรวมเงินเดือนนี้แล้ว
-      ${moneyBarHtml(P)}`;
+    box.innerHTML = `✅ บันทึกเดือน <b>${monthLabelTH(mk)}</b> แล้ว — ตัวเลขด้านล่างรวมเงินเดือนนี้แล้ว ${moneyEqHtml(P)}`;
     return;
   }
   box.className = 'nw-pending';
   box.innerHTML = `⏳ <b>${monthLabelTH(mk)}</b> ${rec ? 'บันทึกไว้ด้วยเวอร์ชันเก่า เงินเหลือยังไม่ถูกรวม — กด "บันทึกทับ" ในขั้น 5 อีกครั้งเดียว' : 'ยังไม่ได้บันทึก — เงินเดือนนี้ยังไม่รวมในตัวเลขด้านล่าง'}
-    ${moneyBarHtml(P)}
-    ทรัพย์สินสุทธิหลังบันทึกเดือน ≈ <b>${fmtMoney(B.net + P.netChange)}</b> <small>(ตอนนี้ ${fmtMoney(B.net)})</small><br>
+    ${moneyEqHtml(P)}
+    เงินสดหลังบันทึก ≈ <b>${fmtMoney(B.cash + P.cash)}</b>${P.goalsSum ? ` · เงินเก็บเป้าหมาย ≈ <b>${fmtMoney(B.goals + P.goalsSum)}</b>` : ''}<br>
     <button type="button" class="sr-btn" onclick="showTab('month');showStep(5)">ไปขั้น 5 บันทึกเดือน →</button>`;
 }
 
@@ -6236,7 +6259,7 @@ function renderCashChart(){
   }
   rows.sort((a, b) => a.k < b.k ? -1 : 1);
   const last = rows.slice(-12);
-  if (!last.length){ box.innerHTML = ''; return; }
+  if (last.length < 2){ box.innerHTML = ''; return; }
   const max = Math.max(...last.map(r => Math.abs(r.v)), 1);
   const total = rows.filter(r => r.done).reduce((a, r) => a + r.v, 0);
   const cols = last.map(r => {
@@ -6252,23 +6275,37 @@ function renderCashChart(){
     ${last.some(r => !r.done) ? '<div style="margin-top:6px;font-size:11px;color:var(--muted);">* แท่งลาย = เดือนนี้ ยังไม่บันทึก (ยังไม่รวมในเงินสด)</div>' : ''}`;
 }
 
+// the month in one line of arithmetic — same numbers everywhere
+function moneyEqHtml(P){
+  const part = (lbl, v, cls) => `<span class="eq-part ${cls || ''}"><small>${lbl}</small><b>${fmtMoney(v)}</b></span>`;
+  return `<div class="money-eq">
+    ${part('💰 เงินเข้า', P.income)}<i>−</i>${part('🧾 ใช้ไป', P.expense)}<i>−</i>${part('🎯 เป้าหมาย', P.goalsSum, P.goalsSum ? '' : 'zero')}<i>−</i>${part('📈 ลงทุน', P.invest, P.invest ? '' : 'zero')}<i>=</i>${part('💵 เหลือเข้าเงินสด', P.calcCash, P.calcCash < 0 ? 'neg' : 'res')}
+  </div>`;
+}
 function closeLedgerHtml(mk, saved){
   const P = closePlan(mk);
-  const rec = loadHistoryStore()[mk];
-  const fm = v => (v < 0 ? '-' : '+') + fmtMoney(Math.abs(v));
+  const rec = loadHistoryStore()[mk] || {};
+  const ct = closedTotals();
+  const cashAfter = cashBase() + ct.cash - (rec.cashApplied || 0) + P.cash;
   const rows = [];
-  rows.push(`<div class="close-row"><span class="cr-ico">💵</span><span class="cr-label">เงินเหลือ → เงินสด/สำรอง
-      <small>คำนวณได้ ${fmtMoney(P.calcCash)} (รายรับ − รายจ่าย − ลงทุน − เป้าหมาย) · ถ้าเหลือจริงไม่เท่านี้ แก้ช่องขวาได้</small></span>
-      <input type="number" id="s5Cash" step="100" value="${P.cash}" oninput="s5CashEdit={mk:'${mk}',val:Math.round(parseFloat(this.value)||0)};refreshCloseTotals()"></div>`);
-  P.goals.forEach(g => rows.push(`<div class="close-row"><span class="cr-ico">🎯</span><span class="cr-label">เข้าเป้าหมาย: ${escHtml(g.name)}</span><span class="cr-amt up">+${fmtMoney(g.amt)}</span></div>`));
-  if (P.invest > 0) rows.push(`<div class="close-row"><span class="cr-ico">📈</span><span class="cr-label">ลงทุน → พอร์ต <small>ตามที่แบ่งไว้ในขั้น 4</small></span><span class="cr-amt up">+${fmtMoney(P.invest)}</span></div>`);
+  rows.push(`<div class="close-row"><span class="cr-ico">💵</span><span class="cr-label">เหลือเข้าเงินสด/สำรอง
+      <small>เงินสดรวมหลังบันทึก ${fmtMoney(cashAfter)} (ตั้งต้น ${fmtMoney(cashBase())} + เงินเหลือสะสมจากทุกเดือน)</small></span>
+      <span class="cr-amt ${P.cash < 0 ? 'down' : 'up'}">${P.cash < 0 ? '−' : '+'}${fmtMoney(Math.abs(P.cash))}</span></div>`);
+  P.goals.forEach(g => {
+    const row = document.querySelector(`#goalRows .budget-row[data-gid="${g.gid}"]`);
+    const after = row ? goalSaved(row) - ((rec.goalsApplied || {})[g.gid] || 0) + g.amt : g.amt;
+    const tgt = row ? parseFloat(row.querySelector('.goal-target').value) || 0 : 0;
+    rows.push(`<div class="close-row"><span class="cr-ico">🎯</span><span class="cr-label">เข้าเป้าหมาย: ${escHtml(g.name)}
+      <small>สะสมหลังบันทึก ${fmtMoney(after)}${tgt ? ` / ${fmtMoney(tgt)}` : ''}</small></span><span class="cr-amt up">+${fmtMoney(g.amt)}</span></div>`);
+  });
+  if (P.invest > 0) rows.push(`<div class="close-row"><span class="cr-ico">📈</span><span class="cr-label">ลงทุน → พอร์ต <small>พอร์ตหลังบันทึก ${fmtMoney(portAfterSave(mk))}</small></span><span class="cr-amt up">+${fmtMoney(P.invest)}</span></div>`);
   P.debts.forEach(d => rows.push(`<div class="close-row"><span class="cr-ico">💳</span><span class="cr-label">ตัดเงินต้น: ${escHtml(d.label)}
       <small>${d.interest > 0 ? `ผ่อน ${fmtMoney(d.principal + d.interest)} เป็นดอกเบี้ย ${fmtMoney(d.interest)} เงินต้น ${fmtMoney(d.principal)}` : 'ไม่มีดอกเบี้ย ผ่อนเท่าไหร่หนี้ลดเท่านั้น'}</small></span><span class="cr-amt up">หนี้ −${fmtMoney(d.principal)}</span></div>`));
-  return `${moneyBarHtml(P)}<div class="close-ledger budget-ledger">
-    <h3>🔁 กดบันทึกแล้ว แต่ละก้อนจะไปอยู่ตรงไหนในทรัพย์สิน</h3>
+  return `${moneyEqHtml(P)}<div class="close-ledger budget-ledger">
+    <h3>🔁 กดบันทึกแล้ว เงินแต่ละก้อนไปอยู่ตรงไหน</h3>
     ${rows.join('')}
-    <div class="close-row" style="border-top:1px solid var(--green);margin-top:4px;"><span class="cr-ico">📒</span><span class="cr-label"><b>ทรัพย์สินสุทธิเพิ่มขึ้นรวม</b><small>= เงินสด + พอร์ต + เป้าหมาย + หนี้ที่ลด${saved ? ' · บันทึกซ้ำ = ปรับเฉพาะส่วนที่เปลี่ยน ไม่บวกซ้ำ' : ''}</small></span><span class="cr-amt" id="s5NetChange">${fm(P.netChange)}</span></div>
-    ${P.cash < -0.5 ? `<p class="hint" style="color:var(--red);margin:6px 0 0;">⚠ เดือนนี้ใช้เกิน — จะดึงจากเงินสด/สำรอง ${fmtMoney(-P.cash)}</p>` : ''}
+    ${saved ? '<p class="hint" style="margin:6px 0 0;">บันทึกทับได้ — ระบบใช้ตัวเลขล่าสุดแทนของเดิม ไม่บวกซ้ำ</p>' : ''}
+    ${P.cash < -0.5 ? `<p class="hint" style="color:var(--red);margin:6px 0 0;">⚠ เดือนนี้ใช้เกิน — เงินสดจะลดลง ${fmtMoney(-P.cash)}</p>` : ''}
   </div>`;
 }
 function refreshCloseTotals(){
@@ -6308,7 +6345,7 @@ function renderStep5(){
       ${vizTile({ hero:true, icon:'📅', label: monthLabelTH(mk), value: saved ? 'บันทึกแล้ว ✓' : 'ยังไม่บันทึก', color: saved ? '#2FBF71' : '#F2B441', pct: saved ? 100 : 60, sub: saved ? 'แก้แล้วกดบันทึกซ้ำได้' : 'กดปุ่มด้านล่าง' })}
       ${vizTile({ icon:'💰', label:'เงินเข้า', value: fmtMoney(income), color:'var(--green)', pct:100, onclick:'showStep(1)' })}
       ${vizTile({ icon:'🧾', label:'ใช้ไป', value: fmtMoney(expense), color:'var(--red)', pct: income > 0 ? expense / income * 100 : 0, sub: income > 0 ? `${(expense / income * 100).toFixed(0)}% ของเงินเข้า` : '', onclick:'showStep(2)' })}
-      ${vizTile({ icon:'🐷', label:'เหลือหลังรายจ่าย', value: fmtMoney(surplus), color:'var(--teal)', pct: Math.max(0, rate), sub: `ออมได้ ${rate.toFixed(0)}%`, valColor: surplus < 0 ? 'var(--red)' : '', onclick:'showStep(3)' })}
+      ${vizTile({ icon:'🐷', label:'เหลือเข้าเงินสด', value: fmtMoney(closePlan(mk).calcCash), color:'var(--teal)', pct: Math.max(0, rate), sub: `ออมได้ ${rate.toFixed(0)}%`, valColor: surplus < 0 ? 'var(--red)' : '', onclick:'showStep(3)' })}
       ${vizTile({ icon:'📈', label:'ลงทุน', value: fmtMoney(actual), color:'var(--gold)', pct: surplus > 0 ? Math.min(100, actual / surplus * 100) : 0, sub: actual > 0 ? 'ตามขั้น 4' : 'เดือนนี้ไม่ลง', onclick:'showStep(4)' })}
       ${vizTile({ icon:'💼', label: saved && store[mk].cashApplied !== undefined ? 'พอร์ต' : 'พอร์ตหลังบันทึก', value: fmtMoney(portAfterSave(mk)), color:'var(--teal)', pct: 100,
           sub: move === null ? 'เดือนแรก' : `${move >= 0 ? '▲' : '▼'} ${fmtMoney(Math.abs(move))} จากเดือนก่อน`, valColor: '', onclick:'showStep(4)' })}
@@ -6602,6 +6639,7 @@ function onMonthChange(){
     status.style.color = 'var(--muted)';
   }
   s5CashEdit = null;
+  document.querySelectorAll('#goalRows .budget-row').forEach(r => calcGoalRow(r.id));
   updateBudgetSummary();
   if (currentStep === 3) renderStep3();
   if (currentStep === 4) renderStep4();
@@ -6700,6 +6738,7 @@ function deleteMonth(k){
   delete st[k];
   saveHistoryStore(st);
   if (justSaved === k) justSaved = null;
+  document.querySelectorAll('#goalRows .budget-row').forEach(r => calcGoalRow(r.id));
   updateBudgetSummary();
   renderHistoryTable();
   updateNetWorth();
@@ -6739,6 +6778,15 @@ var firstRun = false;
     }
   }
   if (live) applyBalances(live);
+  if (NEED_V2){
+    const ct = closedTotals();
+    const ef = document.getElementById('emergencyFund');
+    ef.value = Math.max(0, (parseFloat(ef.value) || 0) - ct.cash);
+    document.querySelectorAll('#debtRows .budget-row').forEach(r => {
+      const el = r.querySelector('.debt-balance');
+      if (ct.debts[r.dataset.did]) el.value = (parseFloat(el.value) || 0) + ct.debts[r.dataset.did];
+    });
+  }
   liveReady = true;
   saveLive();
   renderHistoryTable();
