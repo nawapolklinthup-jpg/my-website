@@ -1591,6 +1591,29 @@
   .nw-pending b{ font-family:'JetBrains Mono',monospace; }
   .nw-pending .np-rows{ display:flex; flex-wrap:wrap; gap:4px 14px; margin:6px 0; }
   .nw-pending .sr-btn{ margin-top:6px; }
+  .money-bar{ margin:10px 0 6px; padding:12px 14px; border-radius:12px; background:var(--card-bg); border:1px solid var(--paper-line); font-size:12.5px; }
+  .nw-pending .money-bar{ margin:10px 0; }
+  .mb-head{ margin-bottom:8px; } .mb-head b{ font-family:'JetBrains Mono',monospace; }
+  .mb-bar{ display:flex; height:22px; border-radius:8px; overflow:hidden; background:rgba(128,128,128,0.18); gap:2px; }
+  .mb-bar i{ display:block; height:100%; }
+  .mb-legend{ display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:8px; }
+  .mb-item{ display:inline-flex; align-items:center; gap:6px; }
+  .mb-item b{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+  .mb-item em{ font-style:normal; font-weight:700; font-family:'JetBrains Mono',monospace; }
+  .mb-item.zero{ opacity:.45; }
+  .mb-eq{ margin-top:8px; color:var(--muted); font-size:11.5px; }
+  .mb-eq b{ color:var(--green); } .mb-eq b.neg{ color:var(--red); }
+  .nw-cashchart:empty{ display:none; }
+  .nw-cashchart{ margin:0 0 16px; padding:12px 14px; border-radius:12px; border:1px solid var(--paper-line); }
+  .cc-head{ display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:12.5px; font-weight:700; margin-bottom:10px; }
+  .cc-head span{ color:var(--green); font-family:'JetBrains Mono',monospace; }
+  .cc-chart{ display:flex; align-items:flex-end; gap:8px; height:130px; }
+  .cc-col{ flex:1; max-width:70px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:3px; }
+  .cc-bar{ width:100%; border-radius:6px 6px 2px 2px; background:var(--green); min-height:3px; }
+  .cc-bar.neg{ background:var(--red); }
+  .cc-col.pending .cc-bar{ background:repeating-linear-gradient(45deg, rgba(47,191,113,.55) 0 6px, rgba(47,191,113,.2) 6px 12px); }
+  .cc-val{ font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--muted); }
+  .cc-m{ font-size:10.5px; color:var(--muted); }
   .close-ledger{ margin:16px 0 4px; }
   .close-ledger h3{ margin:0 0 4px; font-size:14px; }
   .close-row{ display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px dashed var(--paper-line); font-size:13px; }
@@ -2455,6 +2478,7 @@
     <h2>📒 ทรัพย์สินสุทธิ (Net Worth)</h2>
     <p class="sub">ของที่มีทั้งหมด ลบหนี้ = ทรัพย์สินสุทธิ · กดการ์ดไหนก็ได้เพื่อไปแก้ตัวเลขนั้น (อัปเดตเองจากช่องที่กรอกไว้ในหน้านี้)</p>
     <div class="nw-pending" id="nwPending"></div>
+    <div class="nw-cashchart" id="nwCashChart"></div>
     <div class="nw-visual">
       <div class="budget-donut-ring">
         <div class="budget-donut big" id="nwDonut">
@@ -3962,7 +3986,7 @@ function syncInvestEverywhere(){
   // re-split step 4 with the new amount unless this month was already saved
   const mk = document.getElementById('budgetMonth').value || todayMonthStr();
   const rec = loadHistoryStore()[mk];
-  if (!(rec && rec.dcaApplied)) step4Draft = null;
+  step4Draft = null;
   refreshInvestHint();
   if (typeof renderStep3 === 'function') renderStep3();
   if (typeof renderStep4 === 'function' && currentStep === 4) renderStep4();
@@ -4767,6 +4791,7 @@ function updateNetWorth(){
   updateAssetAllocation(cashFund, goldValue, portfolio, B.goals);
   renderNetWorthVisual(cashFund, goldValue, goldBaht, portfolio, totalDebtBalance, netWorth, B.goals);
   renderNetWorthPending(B);
+  renderCashChart();
   updateFireProgress();
   updateMoneyFlow();
   updateOverviewRow();
@@ -4867,6 +4892,16 @@ function logCashEvent(amount, label){
   if (!amount || Math.abs(amount) < 1) return;
   const list = loadCashLog();
   list.push({ ts: Date.now(), amount, label: label || 'เงินก้อน' });
+  while (list.length > 50) list.shift();
+  saveCashLog(list);
+  renderCashLog();
+}
+
+// one line per month in the cash log, always showing that month's current total
+function setMonthCashLog(mk, amount){
+  const label = `เงินเหลือเดือน ${monthLabelTH(mk)}`;
+  const list = loadCashLog().filter(e => e.label !== label);
+  if (amount && Math.abs(amount) >= 1) list.push({ ts: Date.now(), amount, label });
   while (list.length > 50) list.shift();
   saveCashLog(list);
   renderCashLog();
@@ -5816,7 +5851,8 @@ function ensureStep4Draft(mk){
   if (!step4Draft || step4Draft.monthKey !== mk){
     const rec = loadHistoryStore()[mk];
     const plan = parseFloat(document.getElementById('investAmt').value) || 0;
-    step4Draft = { monthKey: mk, amounts: (rec && rec.dcaApplied) ? Object.assign({}, rec.dcaApplied) : defaultSplit(plan) };
+    const samePlan = rec && rec.dcaApplied && Math.abs((rec.investAmt || 0) - plan) < 0.5;
+    step4Draft = { monthKey: mk, amounts: samePlan ? Object.assign({}, rec.dcaApplied) : defaultSplit(plan) };
   }
   HOLD.items.forEach(h => { if (step4Draft.amounts[h.id] === undefined) step4Draft.amounts[h.id] = 0; });
   return step4Draft;
@@ -5832,7 +5868,7 @@ function renderStep4(){
   const portfolioNow = parseFloat(document.getElementById('initial').value) || 0;
 
   if (!has){
-    const actualPrefill = rec && rec.actualInvested !== undefined ? rec.actualInvested : plan;
+    const actualPrefill = investActualFor(mk);
     box.innerHTML = `
       <div class="s4-top"><div>เงินลงทุนเดือนนี้ <b>${fmtMoney(plan)}</b> <small>(จากขั้นที่ 3)</small></div></div>${plan <= 0 ? '<p class="hint">⏸ เดือนนี้ตั้งไว้ว่าไม่ลงทุน — ข้ามไปขั้น 5 ได้เลย</p>' : ''}
       <p class="hint" style="margin:6px 0 14px;">ยังไม่มีหุ้น/กองทุนในพอร์ต — เลือกเลยว่าเดือนนี้จะเอาเงินไปลงอะไร แล้วระบบจะจำไว้ให้ เดือนหน้าเลือกตัวเดิมหรือเปลี่ยนก็ได้</p>
@@ -6044,7 +6080,8 @@ function investActualFor(mk){
   const el = document.getElementById('ciActual');
   if (el && el.dataset.mk === mk && el.value !== '') return Math.max(0, parseFloat(el.value) || 0);
   const rec = loadHistoryStore()[mk];
-  if (rec && rec.actualInvested !== undefined) return rec.actualInvested;
+  const plan = parseFloat(document.getElementById('investAmt').value) || 0;
+  if (rec && rec.actualInvested !== undefined && Math.abs((rec.investAmt || 0) - plan) < 0.5) return rec.actualInvested;
   return parseFloat(document.getElementById('investAmt').value) || 0;
 }
 // everything that happens to your balances when this month is saved
@@ -6071,7 +6108,7 @@ function applyMonthClose(mk, plan){
   const efNew = Math.max(0, efNow + plan.cash - (prev.cashApplied || 0));
   out.cashApplied = (prev.cashApplied || 0) + (efNew - efNow);
   ef.value = efNew;
-  if (Math.abs(efNew - efNow) >= 1) logCashEvent(efNew - efNow, `เงินเหลือเดือน ${monthLabelTH(mk)}`);
+  setMonthCashLog(mk, out.cashApplied);
   // goals
   const pg = prev.goalsApplied || {};
   out.goalsApplied = {};
@@ -6141,14 +6178,61 @@ function renderNetWorthPending(B){
   if (P.principal > 0) parts.push(`💳 หนี้ลด <b>${fmtMoney(P.principal)}</b>`);
   if (rec && rec.cashApplied !== undefined){
     box.className = 'nw-pending done';
-    box.innerHTML = `✅ ปิดเดือน <b>${monthLabelTH(mk)}</b> แล้ว — ตัวเลขด้านล่างรวมเงินเดือนนี้แล้ว (เงินเหลือ ${fmtMoney(rec.cashApplied)} เข้าเงินสด)`;
+    box.innerHTML = `✅ บันทึกเดือน <b>${monthLabelTH(mk)}</b> แล้ว — ตัวเลขด้านล่างรวมเงินเดือนนี้แล้ว
+      ${moneyBarHtml(P)}`;
     return;
   }
   box.className = 'nw-pending';
   box.innerHTML = `⏳ <b>${monthLabelTH(mk)}</b> ${rec ? 'บันทึกไว้ด้วยเวอร์ชันเก่า เงินเหลือยังไม่ถูกรวม — กด "บันทึกทับ" ในขั้น 5 อีกครั้งเดียว' : 'ยังไม่ได้บันทึก — เงินเดือนนี้ยังไม่รวมในตัวเลขด้านล่าง'}
-    <div class="np-rows">${parts.join('') ? parts.join('<span>·</span>') : 'ไม่มีเงินเหลือ'}</div>
+    ${moneyBarHtml(P)}
     ทรัพย์สินสุทธิหลังบันทึกเดือน ≈ <b>${fmtMoney(B.net + P.netChange)}</b> <small>(ตอนนี้ ${fmtMoney(B.net)})</small><br>
     <button type="button" class="sr-btn" onclick="showTab('month');showStep(5)">ไปขั้น 5 บันทึกเดือน →</button>`;
+}
+
+// one bar = this month's income, split into what was spent / invested / put in goals / left over
+function moneyBarHtml(P){
+  const segs = [
+    { k:'ใช้ไป', v: Math.max(0, P.expense), c:'#E5484D', ico:'🧾' },
+    { k:'ลงทุน', v: P.invest, c:'var(--teal)', ico:'📈' },
+    { k:'เป้าหมาย', v: P.goalsSum, c:'#9B6DFF', ico:'🎯' },
+    { k:'เหลือเข้าเงินสด', v: Math.max(0, P.cash), c:'var(--green)', ico:'💵' }
+  ];
+  const base = Math.max(P.income, segs.reduce((a, x) => a + x.v, 0), 1);
+  const bar = segs.filter(x => x.v > 0).map(x => `<i style="width:${x.v / base * 100}%;background:${x.c}" title="${x.k} ${fmtMoney(x.v)}"></i>`).join('');
+  const legend = segs.map(x => `<span class="mb-item${x.v > 0 ? '' : ' zero'}"><b style="background:${x.c}"></b>${x.ico} ${x.k} <em>${fmtMoney(x.v)}</em></span>`).join('');
+  return `<div class="money-bar">
+    <div class="mb-head">💰 เงินเข้าเดือนนี้ <b>${fmtMoney(P.income)}</b> ไปไหนบ้าง</div>
+    <div class="mb-bar">${bar}</div>
+    <div class="mb-legend">${legend}</div>
+    <div class="mb-eq">${fmtMoney(P.income)} − ใช้ ${fmtMoney(P.expense)} − ลงทุน ${fmtMoney(P.invest)} − เป้าหมาย ${fmtMoney(P.goalsSum)} = <b class="${P.calcCash < 0 ? 'neg' : ''}">เหลือ ${fmtMoney(P.calcCash)}</b></div>
+  </div>`;
+}
+// bar per month: how much cash each month's salary actually added
+function renderCashChart(){
+  const box = document.getElementById('nwCashChart');
+  if (!box) return;
+  const store = loadHistoryStore();
+  const mk = curMonthKey();
+  const rows = Object.keys(store).sort().filter(k => store[k].cashApplied !== undefined).map(k => ({ k, v: store[k].cashApplied, done: true }));
+  if (!store[mk] || store[mk].cashApplied === undefined){
+    if (getBudgetTotal('incomeRows') > 0) rows.push({ k: mk, v: closePlan(mk).cash, done: false });
+  }
+  rows.sort((a, b) => a.k < b.k ? -1 : 1);
+  const last = rows.slice(-12);
+  if (!last.length){ box.innerHTML = ''; return; }
+  const max = Math.max(...last.map(r => Math.abs(r.v)), 1);
+  const total = rows.filter(r => r.done).reduce((a, r) => a + r.v, 0);
+  const cols = last.map(r => {
+    const h = Math.max(3, Math.abs(r.v) / max * 100);
+    const [y, m] = r.k.split('-');
+    return `<div class="cc-col${r.done ? '' : ' pending'}" title="${monthLabelTH(r.k)} ${fmtMoney(r.v)}${r.done ? '' : ' (ยังไม่บันทึก)'}">
+      <span class="cc-val">${r.v < 0 ? '-' : ''}${fmtMoney(Math.abs(r.v)).replace('฿', '')}</span>
+      <div class="cc-bar${r.v < 0 ? ' neg' : ''}" style="height:${h}%"></div>
+      <span class="cc-m">${TH_MONTHS[+m - 1].slice(0, 3)}${r.done ? '' : '*'}</span></div>`;
+  }).join('');
+  box.innerHTML = `<div class="cc-head">💵 เงินเหลือจากเงินเดือน ที่เก็บเข้าเงินสดแต่ละเดือน <span>รวม ${fmtMoney(total)}</span></div>
+    <div class="cc-chart">${cols}</div>
+    ${last.some(r => !r.done) ? '<div style="margin-top:6px;font-size:11px;color:var(--muted);">* แท่งลาย = เดือนนี้ ยังไม่บันทึก (ยังไม่รวมในเงินสด)</div>' : ''}`;
 }
 
 function closeLedgerHtml(mk, saved){
@@ -6163,10 +6247,10 @@ function closeLedgerHtml(mk, saved){
   if (P.invest > 0) rows.push(`<div class="close-row"><span class="cr-ico">📈</span><span class="cr-label">ลงทุน → พอร์ต <small>ตามที่แบ่งไว้ในขั้น 4</small></span><span class="cr-amt up">+${fmtMoney(P.invest)}</span></div>`);
   P.debts.forEach(d => rows.push(`<div class="close-row"><span class="cr-ico">💳</span><span class="cr-label">ตัดเงินต้น: ${escHtml(d.label)}
       <small>${d.interest > 0 ? `ผ่อน ${fmtMoney(d.principal + d.interest)} เป็นดอกเบี้ย ${fmtMoney(d.interest)} เงินต้น ${fmtMoney(d.principal)}` : 'ไม่มีดอกเบี้ย ผ่อนเท่าไหร่หนี้ลดเท่านั้น'}</small></span><span class="cr-amt up">หนี้ −${fmtMoney(d.principal)}</span></div>`));
-  return `<div class="close-ledger budget-ledger">
-    <h3>🔁 กดบันทึกแล้วเงินจะไปอยู่ที่ไหน</h3>
+  return `${moneyBarHtml(P)}<div class="close-ledger budget-ledger">
+    <h3>🔁 กดบันทึกแล้ว แต่ละก้อนจะไปอยู่ตรงไหนในทรัพย์สิน</h3>
     ${rows.join('')}
-    <div class="close-row" style="border-top:1px solid var(--green);margin-top:4px;"><span class="cr-ico">📒</span><span class="cr-label"><b>ทรัพย์สินสุทธิเพิ่มขึ้น</b>${saved ? '<small>บันทึกซ้ำ = ปรับเฉพาะส่วนที่เปลี่ยน ไม่บวกซ้ำ</small>' : ''}</span><span class="cr-amt" id="s5NetChange">${fm(P.netChange)}</span></div>
+    <div class="close-row" style="border-top:1px solid var(--green);margin-top:4px;"><span class="cr-ico">📒</span><span class="cr-label"><b>ทรัพย์สินสุทธิเพิ่มขึ้นรวม</b><small>= เงินสด + พอร์ต + เป้าหมาย + หนี้ที่ลด${saved ? ' · บันทึกซ้ำ = ปรับเฉพาะส่วนที่เปลี่ยน ไม่บวกซ้ำ' : ''}</small></span><span class="cr-amt" id="s5NetChange">${fm(P.netChange)}</span></div>
     ${P.cash < -0.5 ? `<p class="hint" style="color:var(--red);margin:6px 0 0;">⚠ เดือนนี้ใช้เกิน — จะดึงจากเงินสด/สำรอง ${fmtMoney(-P.cash)}</p>` : ''}
   </div>`;
 }
@@ -6585,6 +6669,7 @@ function deleteMonth(k){
     step4Draft = null;
   }
   reverseMonthClose(rec);
+  setMonthCashLog(k, 0);
   saveGoals();
   const st = loadHistoryStore();
   delete st[k];
