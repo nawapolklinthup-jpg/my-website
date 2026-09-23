@@ -1622,6 +1622,24 @@
   .eq-part.zero{ opacity:.45; }
   .eq-part.res{ padding:4px 10px; border-radius:8px; background:rgba(47,191,113,0.15); } .eq-part.res b{ color:var(--green); font-size:17px; }
   .eq-part.neg b{ color:var(--red); }
+  .spend-add{ display:grid; grid-template-columns: 1.2fr 0.8fr 1.2fr auto; gap:8px; }
+  .spend-add select, .spend-add input{ padding:10px; border-radius:10px; border:1.5px solid var(--paper-line); background:var(--input-bg); color:var(--ink); font-family:inherit; font-size:14px; min-width:0; }
+  .spend-add .use-btn{ width:auto; padding:10px 16px; }
+  @media (max-width:700px){ .spend-add{ grid-template-columns: 1fr 1fr; } .spend-add #spNote{ grid-column: 1 / -1; order:3; } .spend-add .use-btn{ grid-column: 1 / -1; order:4; } }
+  .sp-bars{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+  .sp-bar-top{ display:flex; justify-content:space-between; gap:8px; font-size:12.5px; margin-bottom:4px; }
+  .sp-bar-top .down{ color:var(--red); font-weight:700; }
+  .sp-track{ height:8px; border-radius:6px; background:rgba(128,128,128,0.2); overflow:hidden; }
+  .sp-track i{ display:block; height:100%; background:var(--green); border-radius:6px; }
+  .sp-del{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:13px; padding:2px 6px; }
+  .bud-track{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .bud-track .down{ color:var(--red); }
+  .goal-use-btn{ width:auto !important; flex:1; padding:8px 12px !important; font-size:12px !important; background:#6E4BD8 !important; }
+  /* small ✕ in the corner instead of a big red button under every row */
+  .budget-row{ position:relative; }
+  .budget-row > .bg-remove, .budget-row .inj-line + .bg-remove{ position:absolute; top:8px; right:8px; width:30px; height:30px; padding:0 !important; font-size:0 !important; border-radius:8px !important; border-width:1px !important; opacity:.75; }
+  .budget-row > .bg-remove::before{ content:'✕'; font-size:14px; }
+  .budget-row > input[type="text"]:first-child{ padding-right:44px !important; }
   .close-ledger{ margin:16px 0 4px; }
   .close-ledger h3{ margin:0 0 4px; font-size:14px; }
   .close-row{ display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px dashed var(--paper-line); font-size:13px; }
@@ -1740,6 +1758,17 @@
     body{ padding-bottom: 84px; }
   }
   @media print{ .bottom-nav{ display:none !important; } }
+  /* phones: on "เดือนนี้" the title card + 4 stat cards are hidden so the step is on screen right away;
+     month picker + step buttons stick to the top */
+  @media (max-width: 700px){
+    body[data-tab="month"] .book-header, body[data-tab="month"] #overviewRow, body[data-tab="month"] #saveReminder{ display:none !important; }
+    .month-top{ position: sticky; top: 0; z-index: 40; padding: 10px 12px !important; margin-bottom: 12px !important; border-radius: 0 0 16px 16px !important; box-shadow: 0 8px 20px rgba(0,0,0,0.35); }
+    .month-bar{ margin-bottom: 8px !important; padding: 0 !important; background: none !important; border: none !important; }
+    .month-bar .pct-btn, #monthSaveStatus{ display:none !important; }
+    .month-bar label{ font-size: 12px; }
+    .stepper .step-chip{ padding: 8px 2px !important; }
+    .sym-list{ max-height: 45vh; }
+  }
 
   .fuel-maps-row input[type="text"]{
     width:100%; box-sizing:border-box; padding: 10px 12px; border-radius: 9px;
@@ -2116,7 +2145,7 @@
   .pc-chip .pc-x{ color: var(--muted); padding: 5px 8px; }
 </style>
 </head>
-<body data-theme="dark">
+<body data-theme="dark" data-tab="month">
 <nav class="bottom-nav" id="bottomNav">
   <a href="#" data-tab="month" onclick="showTab('month');return false;">📝<span>เดือนนี้</span></a>
   <a href="#" data-tab="assets" onclick="showTab('assets');return false;">🏦<span>ทรัพย์สิน</span></a>
@@ -2301,6 +2330,17 @@
     </section>
     <section class="step-panel" id="step2" data-step="2">
       <div class="step-head"><span class="step-num">2</span><div><h2>🧾 รายจ่ายเดือนนี้</h2><p class="step-sub">คงที่ = จ่ายเท่าเดิมทุกเดือน (ค่าเช่า, ผ่อน, ค่าเน็ต) · ผันแปร = ขึ้นลงได้ (ค่ากิน, เดินทาง, ช้อปปิ้ง)</p></div></div>
+      <div class="step-card spend-card" id="spendCard">
+        <h3 class="step-h3">✍️ จดรายจ่ายจริง</h3>
+        <p class="hint" style="margin:0 0 10px;">ใช้เงินไปเมื่อไหร่ จดตรงนี้ — หมวดที่จดจะใช้ยอดจริง ถ้าเกินงบ เงินเหลือจะลดลงให้เอง</p>
+        <div class="spend-add">
+          <select id="spCat" onchange="if(this.value!=='__new')this.dataset.user=this.value"></select>
+          <input type="number" id="spAmt" inputmode="decimal" min="0" step="any" placeholder="กี่บาท" onkeydown="if(event.key==='Enter')addSpend()">
+          <input type="text" id="spNote" placeholder="โน้ต (ไม่ใส่ก็ได้)" onkeydown="if(event.key==='Enter')addSpend()">
+          <button type="button" class="use-btn" onclick="addSpend()">+ จด</button>
+        </div>
+        <div id="spList"></div>
+      </div>
       <div class="step-card"><div class="budget-cols two"><div class="budget-col">
             <h4>🧾 รายจ่ายคงที่</h4>
             <div id="fixedRows"></div>
@@ -2441,6 +2481,7 @@
     <div id="goalRows"></div>
     <button type="button" class="budget-addbtn" onclick="addGoalRow()">➕ เพิ่มเป้าหมาย</button>
     <div class="goals-total" id="goalsTotal" style="display:none;"></div>
+    <div id="goalUseBox"></div>
   </div>
       <div class="step-card">
         <h3 class="step-h3">📈 กองที่ 3: ลงทุน</h3>
@@ -3039,7 +3080,7 @@ function clearAllToolData(){
   const ok = confirm('ล้างข้อมูลที่กรอกไว้ทั้งหมดของเครื่องมือนี้ในเบราว์เซอร์นี้ (งบรายเดือน, เป้าหมาย, ประวัติที่บันทึกไว้, API key ที่จำไว้)?\n\nเบราว์เซอร์/เครื่องอื่นไม่โดนกระทบ เพราะข้อมูลเก็บแยกเป็นของแต่ละเบราว์เซอร์อยู่แล้ว — กดแล้วกู้คืนไม่ได้');
   if (!ok) return;
   try{
-    const exactKeys = ['avApiKey', 'secApiKey', 'dcaGoalsV1', 'dcaBudgetHistoryV1', 'dcaCashLogV1', 'dcaLastBackupV1', 'dcaHoldingsV1', 'dcaPlacesV1', 'dcaLiveV1'];
+    const exactKeys = ['avApiKey', 'secApiKey', 'dcaGoalsV1', 'dcaBudgetHistoryV1', 'dcaCashLogV1', 'dcaLastBackupV1', 'dcaHoldingsV1', 'dcaPlacesV1', 'dcaLiveV1', 'dcaSpendV1', 'dcaGoalsArchV1', 'dcaGoalUseV1'];
     const prefixes = ['avCache_', 'avCandles3_', 'avOverview_'];
     Object.keys(localStorage).forEach(k => {
       if (exactKeys.indexOf(k) !== -1 || prefixes.some(p => k.indexOf(p) === 0)){
@@ -3637,12 +3678,45 @@ function addBudgetRow(type, label, amount){
   updateBudgetSummary();
 }
 
+// what you actually spent this month, per category (logged in step 2)
+const SPEND_KEY = 'dcaSpendV1';
+var _spRaw = null, _spVal = {};
+function loadSpend(){
+  let raw = '{}';
+  try{ raw = localStorage.getItem(SPEND_KEY) || '{}'; }catch(e){}
+  if (raw !== _spRaw){ try{ _spVal = JSON.parse(raw) || {}; }catch(e){ _spVal = {}; } _spRaw = raw; }
+  return _spVal;
+}
+function saveSpend(o){ try{ localStorage.setItem(SPEND_KEY, JSON.stringify(o)); }catch(e){} }
+function spendMonthKey(){ const el = document.getElementById('budgetMonth'); return (el && el.value) || todayMonthStr(); }
+function spentByCat(mk){
+  const m = {};
+  (loadSpend()[mk] || []).forEach(x => { m[x.cat] = (m[x.cat] || 0) + (x.amt || 0); });
+  return m;
+}
+// a category you logged uses real spending: while the month is running, whichever is higher
+// (budget or spent so far); once the month is over, exactly what you spent
+function rowExpense(r){
+  const budget = parseFloat(r.querySelector('.bud-amt').value) || 0;
+  const cat = (r.querySelector('.bud-label').value || '').trim();
+  const mk = spendMonthKey();
+  const actual = spentByCat(mk)[cat];
+  if (actual === undefined) return budget;
+  return mk < todayMonthStr() ? actual : Math.max(budget, actual);
+}
+function orphanSpend(){
+  const labels = new Set([...document.querySelectorAll('#fixedRows .budget-row, #varRows .budget-row')].map(r => (r.querySelector('.bud-label').value || '').trim()));
+  const m = spentByCat(spendMonthKey());
+  return Object.entries(m).filter(([c]) => !labels.has(c)).reduce((a, [, v]) => a + v, 0);
+}
 function getBudgetTotal(containerId){
   const rows = document.querySelectorAll('#' + containerId + ' .budget-row');
   let total = 0;
+  const isExp = containerId === 'fixedRows' || containerId === 'varRows';
   rows.forEach(r => {
-    total += parseFloat(r.querySelector('.bud-amt').value) || 0;
+    total += isExp ? rowExpense(r) : (parseFloat(r.querySelector('.bud-amt').value) || 0);
   });
+  if (containerId === 'varRows') total += orphanSpend();
   // monthly debt payments (entered once in the debt list) are a fixed expense —
   // counted here so every total/leftover in the app includes them exactly once
   if (containerId === 'fixedRows') total += getDebtPayTotal();
@@ -3666,12 +3740,21 @@ function switchBudgetTab(tab){
 var currentTab = 'month', currentStep = 1;
 function showTab(name){
   currentTab = name;
+  document.body.dataset.tab = name;
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
   document.querySelectorAll('[data-tab]').forEach(b => { if (!b.classList.contains('tab-panel')) b.classList.toggle('active', b.dataset.tab === name); });
   document.querySelectorAll('.side-sub').forEach(x => x.classList.toggle('open', x.dataset.for === name));
   const more = document.getElementById('bottomMore'); if (more) more.classList.remove('open');
   if (name === 'future' && typeof calc === 'function') calc();   // charts need a visible box to size against
   if (typeof initDescClamp === 'function') setTimeout(initDescClamp, 0);
+}
+function scrollToStep(n){
+  const panel = document.getElementById('step' + n);
+  if (!panel || !panel.offsetParent) return;
+  const bar = document.querySelector('.month-top');
+  const sticky = bar && getComputedStyle(bar).position === 'sticky' ? bar.offsetHeight : 0;
+  const y = panel.getBoundingClientRect().top + window.scrollY - sticky - 8;
+  if (Math.abs(window.scrollY - y) > 4) window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
 }
 function showStep(n){
   if (!n) return;
@@ -3686,8 +3769,7 @@ function showStep(n){
   if (n === 4) renderStep4();
   if (n === 5) renderStep5();
   if (n === 1) renderQuickDiv();
-  const top = document.getElementById('mainTabs');
-  if (top && window.scrollY > top.offsetTop) window.scrollTo({ top: Math.max(0, top.offsetTop - 10), behavior: 'smooth' });
+  scrollToStep(n);
   if (typeof initDescClamp === 'function') setTimeout(initDescClamp, 0);
 }
 
@@ -3811,12 +3893,13 @@ function collectBudgetItems(){
   const items = [];
   [['fixedRows','คงที่'],['varRows','ผันแปร']].forEach(([cid, kind]) => {
     document.querySelectorAll('#' + cid + ' .budget-row').forEach(r => {
-      const val = parseFloat(r.querySelector('.bud-amt').value) || 0;
+      const val = rowExpense(r);
       if (val <= 0) return;
       const label = (r.querySelector('.bud-label').value || '').trim() || 'ไม่ระบุชื่อ';
       items.push({ label, val, kind, rowId: r.id });
     });
   });
+  if (orphanSpend() > 0) items.push({ label: 'อื่นๆ (จดไว้ ไม่มีหมวด)', val: orphanSpend(), kind: 'ผันแปร', rowId: 'spendCard' });
   if (document.getElementById('debtRows')) getDebts().forEach(d => {
     if (d.amount > 0) items.push({ label: 'ผ่อน: ' + d.label, val: d.amount, kind: 'คงที่', rowId: 'debtRows' });
   });
@@ -3972,6 +4055,17 @@ function updateBudgetSummary(){
   document.getElementById('bRate').textContent = rate.toFixed(1) + '%';
 
   renderBudgetCategories(income, expense, surplus);
+  if (typeof renderSpendCard === 'function') renderSpendCard();
+  { const by = spentByCat(spendMonthKey());
+    document.querySelectorAll('#fixedRows .budget-row, #varRows .budget-row').forEach(r => {
+      let t = r.querySelector('.bud-track');
+      const cat = (r.querySelector('.bud-label').value || '').trim();
+      const v = by[cat];
+      if (v === undefined){ if (t) t.remove(); return; }
+      if (!t){ t = document.createElement('div'); t.className = 'bud-track'; r.appendChild(t); }
+      const b = parseFloat(r.querySelector('.bud-amt').value) || 0;
+      t.innerHTML = `ใช้จริง <b class="${v > b ? 'down' : ''}">${fmtMoney(v)}</b> / งบ ${fmtMoney(b)}${v > b ? ` · เกิน ${fmtMoney(v - b)}` : ` · เหลือ ${fmtMoney(b - v)}`}`;
+    }); }
   const dpi = document.getElementById('debtPayInfo');
   if (dpi){
     const ds = getDebts().filter(d => d.amount > 0);
@@ -4443,6 +4537,10 @@ function togglePvdFields(checkbox){
 // when the row actually needs to change, so the recursive call on the
 // second pass finds nothing left to change and stops.
 function syncPvdToBudget(){
+  if (applyingState) return;
+  // never more than one PVD row
+  const pvdRows = [...document.querySelectorAll('#fixedRows .budget-row')].filter(r => r.querySelector('.bud-label').value.trim().indexOf('หัก PVD') === 0);
+  pvdRows.slice(1).forEach(r => r.remove());
   const hasPvd = document.getElementById('hasPvd').checked;
   const ownRate = parseFloat(document.getElementById('pvdOwnRate').value) || 0;
   const income = getBudgetTotal('incomeRows');
@@ -5167,12 +5265,13 @@ function defaultGoalMonth(){
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
 }
 
-function addGoalRow(name, target, current, targetMonth, rate, gid){
+function addGoalRow(name, target, current, targetMonth, rate, gid, spent){
   goalSeq++;
   const id = 'goal' + goalSeq;
   const row = document.createElement('div');
   row.className = 'budget-row';
   row.id = id;
+  row.dataset.spent = spent || 0;
   row.dataset.gid = gid || ('g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
   row.innerHTML = `
     <input type="text" class="goal-label" placeholder="เช่น เงินดาวน์รถ, ทริปเที่ยวญี่ปุ่น" value="${name !== undefined ? name : ''}" oninput="calcGoalRow('${id}')">
@@ -5199,7 +5298,7 @@ function addGoalRow(name, target, current, targetMonth, rate, gid){
     <p class="hint" style="margin:2px 0 0;font-size:10px;">เป้าหมายระยะสั้น-กลางควรเก็บในที่เสี่ยงต่ำ (บัญชีออมทรัพย์ดอกสูง/กองทุนตลาดเงิน) ไม่ใช่หุ้น — ค่าเริ่มต้น 1.5%/ปี อิงดอกเบี้ยเงินฝากออมทรัพย์ทั่วไป ไม่ใช่ตัวเลขยืนยันจากที่ไหนเฉพาะ แก้เป็นอัตราจริงที่ใช้ได้เลย</p>
     <div class="goal-result" id="goalResult_${id}"></div>
     <div style="display:flex;gap:8px;">
-      <span class="hint" style="flex:1;margin:0;font-size:11px;">ยอดต่อเดือนนี้ถูกหักในขั้น 3 และบวกเข้า "มีอยู่แล้ว" ให้ตอนบันทึกเดือน</span>
+      <button type="button" class="use-btn goal-use-btn" onclick="useGoalMoney('${id}')">🛍️ ใช้เงินก้อนนี้แล้ว</button>
       <button type="button" class="bg-remove" style="width:auto;padding:7px 12px;" onclick="removeGoalRow('${id}')">✕ ลบ</button>
     </div>
   `;
@@ -5268,12 +5367,51 @@ function removeGoalRow(id){
   if (!row) return;
   const saved = goalSaved(row);
   const name = (row.querySelector('.goal-label').value || '').trim() || 'เป้าหมายนี้';
-  if (saved > 0 && !confirm(`ลบ "${name}"?\nเงินที่เก็บไว้ ${fmtMoney(saved)} จะกลับไปอยู่ในเงินสด`)) return;
+  if (saved > 0 && !confirm(`ลบ "${name}"?\nเงินที่เก็บไว้ ${fmtMoney(saved)} จะกลับไปอยู่ในเงินสด\n(ถ้าเอาเงินไปใช้แล้ว กด "ใช้เงินก้อนนี้แล้ว" แทน)`)) return;
   const base = goalBase(row);
   if (base > 0){ const ef = document.getElementById('emergencyFund'); ef.value = (parseFloat(ef.value) || 0) + base; }
+  const arch = loadGoalArch().filter(x => x.gid !== row.dataset.gid);
+  arch.push({ gid: row.dataset.gid, name, base: 0, spent: goalSpent(row), reason: 'deleted', ts: Date.now() });
+  saveGoalArch(arch);
   row.remove();
   saveGoals();
   updateGoalsTotal();
+}
+// the trip happened / the down payment was paid: the money leaves your net worth for real
+function useGoalMoney(id){
+  const row = document.getElementById(id);
+  if (!row) return;
+  const saved = Math.round(goalSaved(row));
+  const name = (row.querySelector('.goal-label').value || '').trim() || 'เป้าหมาย';
+  if (saved <= 0){ alertLike(`"${name}" ยังไม่มีเงินเก็บไว้`); return; }
+  const ans = prompt(`ใช้เงินจาก "${name}" ไปเท่าไหร่? (มีเก็บไว้ ${fmtMoney(saved)})\nใช้หมด = เป้าหมายนี้เสร็จแล้ว`, saved);
+  if (ans === null) return;
+  const amt = Math.round(parseFloat(String(ans).replace(/,/g, '')) || 0);
+  if (amt <= 0) return;
+  const use = Math.min(amt, saved);
+  const uses = loadGoalUse();
+  uses.push({ ts: Date.now(), mk: curMonthKey(), name, amount: use });
+  saveGoalUse(uses);
+  if (use >= saved){
+    const arch = loadGoalArch().filter(x => x.gid !== row.dataset.gid);
+    arch.push({ gid: row.dataset.gid, name, base: goalBase(row), spent: goalSpent(row) + use, reason: 'used', ts: Date.now() });
+    saveGoalArch(arch);
+    row.remove();
+  } else {
+    row.dataset.spent = goalSpent(row) + use;
+  }
+  saveGoals();
+  document.querySelectorAll('#goalRows .budget-row').forEach(r => calcGoalRow(r.id));
+  updateGoalsTotal();
+  renderGoalUse();
+}
+function renderGoalUse(){
+  const box = document.getElementById('goalUseBox');
+  if (!box) return;
+  const list = loadGoalUse();
+  if (!list.length){ box.innerHTML = ''; return; }
+  box.innerHTML = `<div class="cat-list-title" style="margin-top:14px;">🛍️ ใช้เงินเป้าหมายไปแล้ว</div><div class="budget-ledger">` + list.slice().reverse().map(u =>
+    `<div class="bl-row"><span class="bl-label">${new Date(u.ts).toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit' })} — ${escHtml(u.name)}</span><span>${fmtMoney(u.amount)}</span></div>`).join('') + `</div>`;
 }
 
 // sum of "มีอยู่แล้ว" across all short/medium-term goal rows — used by the
@@ -5380,7 +5518,8 @@ function saveGoals(){
       current: parseFloat(r.querySelector('.goal-current').value) || 0,
       targetMonth: r.querySelector('.goal-month').value,
       rate: parseFloat(r.querySelector('.goal-rate').value) || 0,
-      gid: r.dataset.gid
+      gid: r.dataset.gid,
+      spent: goalSpent(r)
     }));
     localStorage.setItem(GOALS_KEY, JSON.stringify(list));
   }catch(e){ /* private browsing etc — ignore */ }
@@ -5391,7 +5530,7 @@ function loadGoals(){
     const raw = localStorage.getItem(GOALS_KEY);
     const list = raw ? JSON.parse(raw) : [];
     const ct = NEED_V2 ? closedTotals() : null;
-    list.forEach(g => addGoalRow(g.name, g.target, ct ? Math.max(0, (g.current || 0) - (ct.goals[g.gid] || 0)) : g.current, g.targetMonth, g.rate, g.gid));
+    list.forEach(g => addGoalRow(g.name, g.target, ct ? Math.max(0, (g.current || 0) - (ct.goals[g.gid] || 0)) : g.current, g.targetMonth, g.rate, g.gid, g.spent));
     if (ct) saveGoals();
   }catch(e){ /* ignore */ }
 }
@@ -5678,13 +5817,27 @@ function cashFromMonths(){
   const ct = closedTotals();
   const live = new Set([...document.querySelectorAll('#goalRows .budget-row')].map(r => r.dataset.gid));
   let orphan = 0;
-  Object.entries(ct.goals).forEach(([g, a]) => { if (!live.has(g)) orphan += a; });
+  const arch = {};
+  loadGoalArch().forEach(x => { arch[x.gid] = x; });
+  const gids = new Set([...Object.keys(ct.goals), ...Object.keys(arch)]);
+  gids.forEach(g => {
+    if (live.has(g)) return;
+    const x = arch[g];
+    orphan += (ct.goals[g] || 0) + (x ? (x.base || 0) - (x.spent || 0) : 0);
+  });
   return ct.cash + orphan;
 }
 function cashTotal(){ return cashBase() + cashFromMonths(); }
 function goalBase(row){ return parseFloat(row.querySelector('.goal-current').value) || 0; }
 function goalFromMonths(row){ return closedTotals().goals[row.dataset.gid] || 0; }
-function goalSaved(row){ return goalBase(row) + goalFromMonths(row); }
+function goalSpent(row){ return parseFloat(row.dataset.spent) || 0; }
+function goalSaved(row){ return goalBase(row) + goalFromMonths(row) - goalSpent(row); }
+// finished / deleted goals keep their bookkeeping so money never appears or disappears
+const GOAL_ARCH_KEY = 'dcaGoalsArchV1', GOAL_USE_KEY = 'dcaGoalUseV1';
+function loadGoalArch(){ try{ return JSON.parse(localStorage.getItem(GOAL_ARCH_KEY) || '[]'); }catch(e){ return []; } }
+function saveGoalArch(a){ try{ localStorage.setItem(GOAL_ARCH_KEY, JSON.stringify(a)); }catch(e){} }
+function loadGoalUse(){ try{ return JSON.parse(localStorage.getItem(GOAL_USE_KEY) || '[]'); }catch(e){ return []; } }
+function saveGoalUse(a){ try{ localStorage.setItem(GOAL_USE_KEY, JSON.stringify(a)); }catch(e){} }
 function goalMonthlyFor(row, mk){
   const target = parseFloat(row.querySelector('.goal-target').value) || 0;
   const tm = row.querySelector('.goal-month').value;
@@ -5694,7 +5847,7 @@ function goalMonthlyFor(row, mk){
   if (n <= 0) return { monthly: 0, n };
   // saved before this month = starting amount + every OTHER saved month
   let st = {}; try{ st = JSON.parse(localStorage.getItem('dcaBudgetHistoryV1') || '{}'); }catch(e){}
-  let before = goalBase(row);
+  let before = goalBase(row) - goalSpent(row);
   Object.entries(st).forEach(([k, r]) => { if (k !== mk) before += ((r.goalsApplied || {})[row.dataset.gid] || 0); });
   const rm = (parseFloat(row.querySelector('.goal-rate').value) || 0) / 1200;
   const need = target - before * Math.pow(1 + rm, n);
@@ -5723,11 +5876,14 @@ function loadLive(){
 }
 
 // flowsOnly = just this month's income/expenses/invest plan (used when switching months)
+var applyingState = false;
 function applyBudgetState(state, flowsOnly){
+  applyingState = true;          // no PVD auto-row while rows are half loaded (it caused a duplicate)
   clearBudgetRows();
   (state.income || []).forEach(r => addBudgetRow('income', r.label, r.amount));
   (state.fixed  || []).forEach(r => addBudgetRow('fixed', r.label, r.amount));
   (state.varr   || []).forEach(r => addBudgetRow('var', r.label, r.amount));
+  applyingState = false;
   if (state.investAmt !== undefined){
     document.getElementById('investAmt').value = state.investAmt;
     investTouched = true;
@@ -6167,6 +6323,72 @@ function onStep4Price(inp){
 }
 
 
+/* ---- spending log UI ---- */
+function spendCats(){
+  const out = [];
+  [...document.querySelectorAll('#varRows .budget-row'), ...document.querySelectorAll('#fixedRows .budget-row')].forEach(r => {
+    const l = (r.querySelector('.bud-label').value || '').trim();
+    if (l && l.indexOf('หัก PVD') !== 0 && !out.includes(l)) out.push(l);
+  });
+  return out;
+}
+function renderSpendCard(){
+  const sel = document.getElementById('spCat');
+  if (!sel) return;
+  const cur = sel.dataset.user;   // only a category the user picked is remembered
+  const cats = spendCats();
+  sel.innerHTML = cats.map(c => `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join('') + `<option value="__new">➕ หมวดใหม่...</option>`;
+  if (cur && cats.includes(cur)) sel.value = cur;
+  const mk = spendMonthKey();
+  const list = (loadSpend()[mk] || []);
+  const box = document.getElementById('spList');
+  if (!list.length){ box.innerHTML = `<p class="hint" style="margin:8px 0 0;">${monthLabelTH(mk)} ยังไม่ได้จดอะไร</p>`; return; }
+  const by = spentByCat(mk);
+  const budgets = {};
+  document.querySelectorAll('#varRows .budget-row, #fixedRows .budget-row').forEach(r => { budgets[(r.querySelector('.bud-label').value || '').trim()] = parseFloat(r.querySelector('.bud-amt').value) || 0; });
+  const bars = Object.entries(by).map(([c, v]) => {
+    const b = budgets[c] || 0, pct = b > 0 ? Math.min(100, v / b * 100) : 100, over = v > b;
+    return `<div class="sp-bar"><div class="sp-bar-top"><span>${escHtml(c)}</span><span class="${over ? 'down' : ''}">${fmtMoney(v)} / ${b ? fmtMoney(b) : 'ไม่มีงบ'}${over && b ? ` · เกิน ${fmtMoney(v - b)}` : ''}</span></div>
+      <div class="sp-track"><i style="width:${pct}%;${over ? 'background:var(--red)' : ''}"></i></div></div>`;
+  }).join('');
+  const total = list.reduce((a, x) => a + x.amt, 0);
+  box.innerHTML = `<div class="sp-bars">${bars}</div>
+    <details class="nw-details" style="margin-top:10px;"><summary>📋 รายการที่จด (${list.length}) รวม ${fmtMoney(total)}</summary>
+    <div class="budget-ledger" style="margin:8px 0 0;">${list.slice().reverse().map(x => `<div class="bl-row"><span class="bl-label">${new Date(x.ts).toLocaleDateString('th-TH', { day:'numeric', month:'short' })} · ${escHtml(x.cat)}${x.note ? ` — ${escHtml(x.note)}` : ''}</span><span>${fmtMoney(x.amt)} <button type="button" class="sp-del" onclick="delSpend('${x.id}')">✕</button></span></div>`).join('')}</div>
+    </details>`;
+}
+function addSpend(){
+  const sel = document.getElementById('spCat'), amtEl = document.getElementById('spAmt'), noteEl = document.getElementById('spNote');
+  let cat = sel.value;
+  const amt = Math.round((parseFloat(amtEl.value) || 0) * 100) / 100;
+  if (amt <= 0){ amtEl.focus(); return; }
+  if (cat === '__new' || !cat){
+    const n = (prompt('ชื่อหมวดใหม่ (เช่น ค่าหมอ, ของขวัญ)') || '').trim();
+    if (!n) return;
+    cat = n;
+    addBudgetRow('var', n, 0);
+  }
+  const all = loadSpend(), mk = spendMonthKey();
+  (all[mk] = all[mk] || []).push({ id: 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), cat, amt, note: noteEl.value.trim(), ts: Date.now() });
+  saveSpend(all);
+  amtEl.value = ''; noteEl.value = '';
+  sel.dataset.user = cat;
+  afterSpendChange();
+  amtEl.focus();
+}
+function delSpend(id){
+  const all = loadSpend(), mk = spendMonthKey();
+  all[mk] = (all[mk] || []).filter(x => x.id !== id);
+  saveSpend(all);
+  afterSpendChange();
+}
+function afterSpendChange(){
+  updateBudgetSummary();
+  renderSpendCard();
+  if (currentStep === 3) renderStep3();
+  if (currentStep === 5) renderStep5();
+}
+
 /* ================= MONTH CLOSE =================
    Saving a month = closing it: the leftover goes into cash, goal contributions into
    each goal, the invested amount into the portfolio (applyMonthlyBuys), and the
@@ -6184,6 +6406,13 @@ function goalPlanFor(mk){
     const gid = r.dataset.gid;
     const amt = frozen[gid] !== undefined ? frozen[gid] : Math.round(goalMonthlyFor(r, mk).monthly);
     if (amt > 0) out.push({ gid, amt, name: (r.querySelector('.goal-label').value || '').trim() || 'เป้าหมาย' });
+  });
+  const live = new Set(out.map(g => g.gid).concat([...document.querySelectorAll('#goalRows .budget-row')].map(r => r.dataset.gid)));
+  const arch = loadGoalArch();
+  Object.entries(frozen).forEach(([gid, amt]) => {
+    if (live.has(gid) || !(amt > 0)) return;
+    const x = arch.find(a => a.gid === gid);
+    if (x && x.reason === 'used') out.push({ gid, amt, name: x.name, archived: true });
   });
   return out;
 }
@@ -6390,7 +6619,7 @@ function renderHistoryCharts(){
   const sum = arr => (arr || []).reduce((a, r) => a + (r.amount || 0), 0);
   const rows = keys.map(k => {
     const s = store[k];
-    const income = sum(s.income), expense = sum(s.fixed) + sum(s.varr) + snapDebtPay(s);
+    const income = sum(s.income), expense = s.expenseTotal !== undefined ? s.expenseTotal : sum(s.fixed) + sum(s.varr) + snapDebtPay(s);
     const actual = s.actualInvested !== undefined && s.actualInvested !== '' ? (parseFloat(s.actualInvested) || 0) : null;
     return { key: k, label: shortLabel(k), income, expense, surplus: income - expense,
              portfolio: s.initial || 0, plan: s.investAmt || 0, actual };
@@ -6550,7 +6779,7 @@ function toggleTip(btn){
 /* ---- Backup file: export / import this tool's own saved data ---- */
 // the API key is deliberately NOT included — the backup file might get
 // shared or uploaded somewhere, and the key isn't something to carry around.
-const BACKUP_KEYS = ['dcaBudgetHistoryV1', 'dcaGoalsV1', 'dcaCashLogV1', 'dcaHoldingsV1', 'dcaPlacesV1', 'dcaLiveV1'];
+const BACKUP_KEYS = ['dcaBudgetHistoryV1', 'dcaGoalsV1', 'dcaCashLogV1', 'dcaHoldingsV1', 'dcaPlacesV1', 'dcaLiveV1', 'dcaSpendV1', 'dcaGoalsArchV1', 'dcaGoalUseV1'];
 function exportBackup(){
   const data = {};
   try{ BACKUP_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) data[k] = v; }); }catch(e){}
@@ -6604,6 +6833,7 @@ function saveBudgetMonth(){
   // plan shouldn't wipe out a retrospective entry the user already made
   const existingActual = store[monthStr] ? store[monthStr].actualInvested : undefined;
   const newState = serializeBudgetState();
+  newState.expenseTotal = getBudgetTotal('fixedRows') + getBudgetTotal('varRows');
   if (existingActual !== undefined) newState.actualInvested = existingActual;
   if (store[monthStr]) ['dcaApplied','cashApplied','goalsApplied','debtApplied','goalsTotal','initApplied'].forEach(k => {
     if (store[monthStr][k] !== undefined) newState[k] = store[monthStr][k];
@@ -6668,7 +6898,7 @@ function renderHistoryTable(){
   body.innerHTML = keys.map(k => {
     const s = store[k];
     const income = (s.income || []).reduce((sum,r) => sum + (r.amount||0), 0);
-    const expense = (s.fixed || []).reduce((sum,r) => sum + (r.amount||0), 0) + (s.varr || []).reduce((sum,r) => sum + (r.amount||0), 0) + snapDebtPay(s);
+    const expense = s.expenseTotal !== undefined ? s.expenseTotal : (s.fixed || []).reduce((sum,r) => sum + (r.amount||0), 0) + (s.varr || []).reduce((sum,r) => sum + (r.amount||0), 0) + snapDebtPay(s);
     const surplus = income - expense;
     const rate = income > 0 ? (surplus/income*100) : 0;
     const plan = s.investAmt || 0;
@@ -7251,6 +7481,8 @@ function renderHoldings(light){
 
 loadGoals();
 goalsReady = true;
+renderGoalUse();
+updateBudgetSummary();
 renderCashLog();
 /* ---- first run: start empty or load the demo ---- */
 const ONBOARD_KEY = 'dcaOnboardedV1';
@@ -7378,6 +7610,13 @@ function attachSymbolPicker(input, opts){
   wrap.appendChild(list);
 
   const close = () => { list.classList.remove('open'); list.innerHTML = ''; };
+  input.addEventListener('focus', () => {
+    if (window.innerWidth > 900) return;
+    setTimeout(() => {
+      const r = input.getBoundingClientRect();
+      if (r.top > window.innerHeight * 0.35) window.scrollBy({ top: r.top - 90, behavior: 'smooth' });
+    }, 250);
+  });
   const pick = item => {
     input._justPicked = Date.now();
     input.value = item.s;
