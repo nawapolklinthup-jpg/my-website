@@ -2386,6 +2386,7 @@
     <section class="step-panel" id="step3" data-step="3">
       <div class="step-head"><span class="step-num">3</span><div><h2>🗂️ เหลือเท่าไหร่ แบ่งไปไหน</h2><p class="step-sub">เงินที่เหลือหลังหักรายจ่าย แบ่งเป็น 3 กอง: เงินสำรอง → เป้าหมาย → ลงทุน</p></div></div>
       <div class="step-card budget-summary" id="budgetViewSummary">
+        <div id="step3Bar"></div>
         <div class="budget-sum-grid">
             <div class="stat">
               <div class="stat-label">รายรับรวม</div>
@@ -2396,7 +2397,7 @@
               <div class="stat-value" id="bExpense">฿0</div>
             </div>
             <div class="stat gain">
-              <div class="stat-label">เหลือ (ลงทุนได้)</div>
+              <div class="stat-label">เหลือหลังหักรายจ่าย</div>
               <div class="stat-value" id="bSurplus">฿0</div>
             </div>
             <div class="stat">
@@ -3891,7 +3892,7 @@ function renderBudgetCategories(income, expense, surplus){
     rows.push(`
     <div class="cat-item">
       <span class="cat-ico" style="background:rgba(47,191,113,0.15)">🌱</span>
-      <span class="cat-name">เหลือ / ลงทุนได้<small>จากรายรับ ${fmtMoney(income)}</small></span>
+      <span class="cat-name">เหลือหลังหักรายจ่าย<small>จากรายรับ ${fmtMoney(income)}</small></span>
       <span class="cat-amt" style="color:${surplus < 0 ? 'var(--red)' : 'var(--green)'}">${fmtMoney(surplus)}<small>${(surplus / income * 100).toFixed(0)}%</small></span>
     </div>`);
   }
@@ -3973,7 +3974,7 @@ function skipInvestThisMonth(){
 
 // one number drives everything: step 3 summary, step 4 split, step 5 tiles,
 // and the long-term projection (a skipped month doesn't wipe the long-term plan)
-function syncInvestEverywhere(){
+function syncInvestEverywhere(keepDraft){
   const amt = Math.max(0, Math.round(parseFloat(document.getElementById('investAmt').value) || 0));
   const monthlyEl = document.getElementById('monthly');
   if (amt > 0 && monthlyEl && (parseFloat(monthlyEl.value) || 0) !== amt){
@@ -3986,11 +3987,25 @@ function syncInvestEverywhere(){
   // re-split step 4 with the new amount unless this month was already saved
   const mk = document.getElementById('budgetMonth').value || todayMonthStr();
   const rec = loadHistoryStore()[mk];
-  step4Draft = null;
+  if (!keepDraft) step4Draft = null;
   refreshInvestHint();
   if (typeof renderStep3 === 'function') renderStep3();
-  if (typeof renderStep4 === 'function' && currentStep === 4) renderStep4();
+  if (!keepDraft && typeof renderStep4 === 'function' && currentStep === 4) renderStep4();
   if (typeof renderStep5 === 'function' && currentStep === 5) renderStep5();
+}
+// step 4 edits write their total back into step 3, so both always show the same number
+function setPlanFromSplit(){
+  if (!step4Draft) return;
+  const sum = HOLD.items.filter(canBuy).reduce((a, h) => a + Math.max(0, parseFloat(step4Draft.amounts[h.id]) || 0), 0);
+  document.getElementById('investAmt').value = Math.round(sum);
+  investTouched = true;
+  syncInvestEverywhere(true);
+}
+// money still free this month after expenses, goals and what's already put into other holdings
+function freeToInvest(exceptHid){
+  const P = closePlan(curMonthKey());
+  const others = step4Draft ? HOLD.items.filter(h => h.id !== exceptHid && canBuy(h)).reduce((a, h) => a + (step4Draft.amounts[h.id] || 0), 0) : 0;
+  return Math.max(0, Math.round(P.income - P.expense - P.goalsSum - others));
 }
 
 function refreshInvestHint(){
@@ -5012,7 +5027,7 @@ function buildPrintSummary(){
       <table class="ps-table">
         <tr><td>รายรับรวม</td><td>${document.getElementById('bIncome').textContent}</td></tr>
         <tr><td>รายจ่ายรวม</td><td>${document.getElementById('bExpense').textContent}</td></tr>
-        <tr><td>เหลือ (ลงทุนได้)</td><td>${document.getElementById('bSurplus').textContent}</td></tr>
+        <tr><td>เหลือหลังหักรายจ่าย</td><td>${document.getElementById('bSurplus').textContent}</td></tr>
         <tr><td>อัตราออม</td><td>${document.getElementById('bRate').textContent}</td></tr>
       </table>
     `;
@@ -5082,7 +5097,7 @@ function renderBudgetLedger(income, fixed, varr, surplus, invest, leftover){
     row('รายรับรวม', income),
     row('หัก รายจ่ายคงที่', -fixed),
     row('หัก รายจ่ายผันแปร', -varr),
-    row('= เหลือ (ลงทุนได้)', surplus, 'bl-total'),
+    row('= เหลือหลังหักรายจ่าย', surplus, 'bl-total'),
     row('หัก เงินลงทุนที่เลือก', -invest),
     row('= เหลือเป็นเงินสด/เงินสำรอง', leftover, 'bl-final')
   ].join('');
@@ -5770,10 +5785,12 @@ function confirmQuickDiv(){
 function renderStep3(){
   const box = document.getElementById('step3Emergency');
   if (!box) return;
+  const barBox = document.getElementById('step3Bar');
+  if (barBox) barBox.innerHTML = getBudgetTotal('incomeRows') > 0 ? moneyBarHtml(closePlan(curMonthKey())) : '';
   const income = getBudgetTotal('incomeRows');
   const expense = getBudgetTotal('fixedRows') + getBudgetTotal('varRows');
   const surplus = income - expense;
-  const invest = parseFloat(document.getElementById('investAmt').value) || 0;
+  const invest = investActualFor(curMonthKey());
   const goalsM = goalPlanFor(curMonthKey()).reduce((a, g) => a + g.amt, 0);
   const rest = surplus - invest - goalsM;
   const fund = parseFloat(document.getElementById('emergencyFund').value) || 0;
@@ -5851,7 +5868,8 @@ function ensureStep4Draft(mk){
   if (!step4Draft || step4Draft.monthKey !== mk){
     const rec = loadHistoryStore()[mk];
     const plan = parseFloat(document.getElementById('investAmt').value) || 0;
-    const samePlan = rec && rec.dcaApplied && Math.abs((rec.investAmt || 0) - plan) < 0.5;
+    const savedSum = rec && rec.dcaApplied ? Object.values(rec.dcaApplied).reduce((a, b) => a + (b || 0), 0) : -1;
+    const samePlan = savedSum >= 0 && Math.abs(savedSum - plan) < 0.5;
     step4Draft = { monthKey: mk, amounts: samePlan ? Object.assign({}, rec.dcaApplied) : defaultSplit(plan) };
   }
   HOLD.items.forEach(h => { if (step4Draft.amounts[h.id] === undefined) step4Draft.amounts[h.id] = 0; });
@@ -5875,7 +5893,7 @@ function renderStep4(){
       <div class="s4-add"><span>➕ ลงในตัวไหน?</span><input type="text" id="s4NewSym" placeholder="พิมพ์ชื่อ เช่น K-US500X, SCB, VOO"></div>
       <details class="nw-details" style="margin-top:14px;"><summary>ไม่อยากแยกรายตัว? ใส่แค่ยอดรวมก็ได้</summary>
         <label class="ci-field big"><span>💸 เดือนนี้ลงทุนจริงไปเท่าไหร่</span>
-          <input type="number" id="ciActual" data-mk="${mk}" min="0" step="100" value="${Math.round(actualPrefill || 0)}" oninput="if(currentStep===5)renderStep5()"></label>
+          <input type="number" id="ciActual" data-mk="${mk}" min="0" step="100" value="${Math.round(actualPrefill || 0)}" oninput="document.getElementById('investAmt').value=Math.max(0,Math.round(parseFloat(this.value)||0));investTouched=true;syncInvestEverywhere(true);"></label>
         <label class="ci-field big"><span>💼 มูลค่าพอร์ตรวมตอนนี้ <small>(ดูจากแอป)</small></span>
           <input type="number" id="ciPortfolio" min="0" step="100" value="${Math.round(portfolioNow)}" oninput="document.getElementById('initial').value=this.value;portTypedMonth=curMonthKey();updateNetWorth();calc();"></label>
       </details>`;
@@ -5905,18 +5923,16 @@ function renderStep4(){
         </div>
         ${h.fresh ? `<label class="s4-have">ถืออยู่แล้วก่อนเดือนนี้? <input type="number" min="0" step="100" placeholder="0" value="${h.avgCost ? Math.round(h.avgCost) : ''}" onchange="s4SetHave('${h.id}',this.value)"> บาท <small>(ไม่มีเว้นว่าง)</small></label>` : ''}
         <div class="s4-chips">
-          <button type="button" onclick="s4Set('${h.id}','all')">ใส่ที่เหลือทั้งหมด</button>
-          <button type="button" onclick="s4Set('${h.id}','half')">ครึ่งเดียว</button>
+          <button type="button" onclick="s4Set('${h.id}','all')">ใส่เงินที่ว่างทั้งหมด</button>
+          <button type="button" onclick="s4Set('${h.id}','half')">ครึ่งของเงินที่ว่าง</button>
           <button type="button" onclick="s4Set('${h.id}','zero')">เดือนนี้ไม่ลง</button>
         </div>
       </div>`;
   }).join('');
-  const pctUsed = plan > 0 ? Math.min(100, total / plan * 100) : 0;
   box.innerHTML = `
     <div class="s4-top">
-      <div>${plan > 0 ? `เงินลงทุนเดือนนี้ <b>${fmtMoney(plan)}</b> <small>(จากขั้นที่ 3)</small> — เลือกว่าจะลงตัวไหนเท่าไหร่` : `⏸ เดือนนี้ตั้งไว้ว่า<b>ไม่ลงทุน</b> <small>(ขั้นที่ 3)</small> — ข้ามไปขั้น 5 ได้เลย หรือใส่ยอดด้านล่างถ้าเปลี่ยนใจ`}</div>
-      <div class="s4-bar"><i style="width:${pctUsed}%;${left < -0.5 ? 'background:var(--red)' : ''}"></i></div>
-      <div class="s4-left">แบ่งแล้ว <b>${fmtMoney(total)}</b> · ${left > 0.5 ? `ยังเหลือ <b class="warn">${fmtMoney(left)}</b>` : left < -0.5 ? `<b class="bad">เกินแผน ${fmtMoney(-left)}</b> (ลงมากกว่าที่วางไว้ก็ได้ ถ้าตั้งใจ)` : '<b class="ok">ครบพอดี ✓</b>'}</div>
+      <div>${total > 0 ? `เดือนนี้ลงทุนรวม <b>${fmtMoney(total)}</b> — แก้ยอดแต่ละตัวได้เลย ขั้น 3 และขั้น 5 เปลี่ยนตาม` : `⏸ เดือนนี้<b>ไม่ลงทุน</b> — ข้ามไปขั้น 5 ได้เลย หรือใส่ยอดในตัวที่อยากลง`}</div>
+      <div class="s4-left">${s4LeftText()}</div>
     </div>
     <div class="s4-grid">${cards}</div>
     <div class="s4-add"><span>➕ เดือนนี้ลงตัวใหม่?</span><input type="text" id="s4NewSym" placeholder="พิมพ์ชื่อ เช่น K-US500X, SCB, VOO"></div>
@@ -5926,7 +5942,13 @@ function renderStep4(){
     </details>
     <input type="hidden" id="ciActual" data-mk="${mk}" value="${total}">
     <div class="step4-total">ยอดพอร์ตหลังบันทึก ≈ <b id="step4Total">${fmtMoney(portfolioNow + estimateAdd())}</b></div>`;
-  attachNewAssetPicker(Math.max(0, left));
+  attachNewAssetPicker(0);
+}
+function s4LeftText(){
+  const P = closePlan(curMonthKey());
+  return P.calcCash >= 0
+    ? `หลังหักรายจ่าย ${fmtMoney(P.expense)}${P.goalsSum ? ` · เป้าหมาย ${fmtMoney(P.goalsSum)}` : ''} · ลงทุน ${fmtMoney(P.invest)} → <b class="ok">เหลือเข้าเงินสด ${fmtMoney(P.calcCash)}</b>`
+    : `<b class="bad">ลงทุนเกินเงินที่เหลือ ${fmtMoney(-P.calcCash)}</b> — จะดึงจากเงินสด/สำรอง`;
 }
 function estimateAdd(){
   // what the save will add to the portfolio value (amount-mode holdings whose value wasn't typed this month)
@@ -5941,12 +5963,12 @@ function estimateAdd(){
   return add;
 }
 function s4Set(hid, how){
-  const plan = parseFloat(document.getElementById('investAmt').value) || 0;
   const am = step4Draft.amounts;
-  const others = Object.keys(am).filter(k => k !== hid).reduce((x, k) => x + (am[k] || 0), 0);
+  const free = freeToInvest(hid);
   if (how === 'zero') am[hid] = 0;
-  else if (how === 'all') am[hid] = Math.max(0, plan - others);
-  else if (how === 'half') am[hid] = Math.round(Math.max(0, plan) / 2);
+  else if (how === 'all') am[hid] = free;
+  else if (how === 'half') am[hid] = Math.round(free / 2);
+  setPlanFromSplit();
   renderStep4();
 }
 function s4SetHave(hid, v){
@@ -5984,20 +6006,20 @@ function addAssetFromStep4(it, amt){
     step4Draft.amounts[h.id] = amt;
     renderHoldings();
   }
+  setPlanFromSplit();
   renderStep4();
 }
 function onStep4Buy(inp){
   if (inp && step4Draft) step4Draft.amounts[inp.dataset.hid] = Math.max(0, parseFloat(inp.value) || 0);
+  setPlanFromSplit();
   let sum = 0;
   document.querySelectorAll('.s4-buy').forEach(i => sum += parseFloat(i.value) || 0);
   const hid = document.getElementById('ciActual');
   if (hid) hid.value = sum;
-  const plan = parseFloat(document.getElementById('investAmt').value) || 0;
-  const left = plan - sum;
   const lbox = document.querySelector('#step4Box .s4-left');
-  if (lbox) lbox.innerHTML = `แบ่งแล้ว <b>${fmtMoney(sum)}</b> · ${left > 0.5 ? `ยังเหลือ <b class="warn">${fmtMoney(left)}</b>` : left < -0.5 ? `<b class="bad">เกินแผน ${fmtMoney(-left)}</b> (ลงมากกว่าที่วางไว้ก็ได้ ถ้าตั้งใจ)` : '<b class="ok">ครบพอดี ✓</b>'}`;
-  const bar = document.querySelector('#step4Box .s4-bar i');
-  if (bar){ bar.style.width = (plan > 0 ? Math.min(100, sum / plan * 100) : 0) + '%'; bar.style.background = left < -0.5 ? 'var(--red)' : ''; }
+  if (lbox) lbox.innerHTML = s4LeftText();
+  const top = document.querySelector('#step4Box .s4-top > div');
+  if (top) top.innerHTML = sum > 0 ? `เดือนนี้ลงทุนรวม <b>${fmtMoney(sum)}</b> — แก้ยอดแต่ละตัวได้เลย ขั้น 3 และขั้น 5 เปลี่ยนตาม` : `⏸ เดือนนี้<b>ไม่ลงทุน</b> — ข้ามไปขั้น 5 ได้เลย หรือใส่ยอดในตัวที่อยากลง`;
   if (inp){ const card = inp.closest('.s4-card'); if (card) card.classList.toggle('on', (parseFloat(inp.value) || 0) > 0); }
   const t = document.getElementById('step4Total');
   if (t) t.textContent = fmtMoney((parseFloat(document.getElementById('initial').value) || 0) + estimateAdd());
@@ -6077,12 +6099,7 @@ function investActualFor(mk){
     const d = ensureStep4Draft(mk);
     return HOLD.items.filter(canBuy).reduce((a, h) => a + Math.max(0, parseFloat(d.amounts[h.id]) || 0), 0);
   }
-  const el = document.getElementById('ciActual');
-  if (el && el.dataset.mk === mk && el.value !== '') return Math.max(0, parseFloat(el.value) || 0);
-  const rec = loadHistoryStore()[mk];
-  const plan = parseFloat(document.getElementById('investAmt').value) || 0;
-  if (rec && rec.actualInvested !== undefined && Math.abs((rec.investAmt || 0) - plan) < 0.5) return rec.actualInvested;
-  return parseFloat(document.getElementById('investAmt').value) || 0;
+  return Math.max(0, parseFloat(document.getElementById('investAmt').value) || 0);
 }
 // everything that happens to your balances when this month is saved
 function closePlan(mk){
@@ -6261,6 +6278,14 @@ function refreshCloseTotals(){
   updateNetWorth();
 }
 
+// portfolio value once this month is saved (re-save aware: only the change is added)
+function portAfterSave(mk){
+  const now = parseFloat(document.getElementById('initial').value) || 0;
+  if (hasHoldings()){ ensureStep4Draft(mk); return Math.max(0, now + estimateAdd()); }
+  const rec = loadHistoryStore()[mk] || {};
+  if (portTypedMonth === mk) return now;
+  return Math.max(0, now + investActualFor(mk) - (rec.initApplied || 0));
+}
 /* ---- step 5: month summary + save ---- */
 function renderStep5(){
   const box = document.getElementById('step5Box');
@@ -6283,9 +6308,9 @@ function renderStep5(){
       ${vizTile({ hero:true, icon:'📅', label: monthLabelTH(mk), value: saved ? 'บันทึกแล้ว ✓' : 'ยังไม่บันทึก', color: saved ? '#2FBF71' : '#F2B441', pct: saved ? 100 : 60, sub: saved ? 'แก้แล้วกดบันทึกซ้ำได้' : 'กดปุ่มด้านล่าง' })}
       ${vizTile({ icon:'💰', label:'เงินเข้า', value: fmtMoney(income), color:'var(--green)', pct:100, onclick:'showStep(1)' })}
       ${vizTile({ icon:'🧾', label:'ใช้ไป', value: fmtMoney(expense), color:'var(--red)', pct: income > 0 ? expense / income * 100 : 0, sub: income > 0 ? `${(expense / income * 100).toFixed(0)}% ของเงินเข้า` : '', onclick:'showStep(2)' })}
-      ${vizTile({ icon:'🐷', label:'เหลือ', value: fmtMoney(surplus), color:'var(--teal)', pct: Math.max(0, rate), sub: `ออมได้ ${rate.toFixed(0)}%`, valColor: surplus < 0 ? 'var(--red)' : '', onclick:'showStep(3)' })}
-      ${vizTile({ icon:'📈', label:'ลงทุนจริง', value: fmtMoney(actual), color:'var(--gold)', pct: invest > 0 ? Math.min(100, actual / invest * 100) : 0, sub: `แผน ${fmtMoney(invest)}`, onclick:'showStep(4)' })}
-      ${vizTile({ icon:'💼', label:'พอร์ต', value: fmtMoney(portfolio), color:'var(--teal)', pct: 100,
+      ${vizTile({ icon:'🐷', label:'เหลือหลังรายจ่าย', value: fmtMoney(surplus), color:'var(--teal)', pct: Math.max(0, rate), sub: `ออมได้ ${rate.toFixed(0)}%`, valColor: surplus < 0 ? 'var(--red)' : '', onclick:'showStep(3)' })}
+      ${vizTile({ icon:'📈', label:'ลงทุน', value: fmtMoney(actual), color:'var(--gold)', pct: surplus > 0 ? Math.min(100, actual / surplus * 100) : 0, sub: actual > 0 ? 'ตามขั้น 4' : 'เดือนนี้ไม่ลง', onclick:'showStep(4)' })}
+      ${vizTile({ icon:'💼', label: saved && store[mk].cashApplied !== undefined ? 'พอร์ต' : 'พอร์ตหลังบันทึก', value: fmtMoney(portAfterSave(mk)), color:'var(--teal)', pct: 100,
           sub: move === null ? 'เดือนแรก' : `${move >= 0 ? '▲' : '▼'} ${fmtMoney(Math.abs(move))} จากเดือนก่อน`, valColor: '', onclick:'showStep(4)' })}
     </div>
     ${closeLedgerHtml(mk, saved)}
