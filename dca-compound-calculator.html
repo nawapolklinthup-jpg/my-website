@@ -2403,11 +2403,11 @@
               <button type="button" class="pct-btn" onclick="setInvestPct(0.75)">75%</button>
               <button type="button" class="pct-btn" onclick="setInvestPct(0.5)">50%</button>
               <button type="button" class="pct-btn" onclick="setInvestPct(0.25)">25%</button>
+              <button type="button" class="pct-btn" style="border-color:var(--muted);color:var(--muted);" onclick="skipInvestThisMonth()">⏸ เดือนนี้ไม่ลง</button>
             </div>
             <p class="hint" id="investLeftoverHint" style="margin-top:8px;"></p>
+            <p class="hint" id="investSyncHint" style="margin-top:4px;color:var(--green);"></p>
           </div>
-        <button type="button" class="use-btn" style="width:auto;padding:10px 18px;background:var(--green);" onclick="applyBudgetToMonthly()">↓ ใช้จำนวนนี้เป็นเงินลงทุนรายเดือน</button>
-          <p class="hint" id="budgetApplyHint" style="margin-top:8px;"></p>
       </div>
       <div class="step-card net-card" id="step3Net"></div>
       <div class="flow-card readiness-card" id="flowCard">
@@ -2610,7 +2610,7 @@
       </div>
 
       <div class="field">
-        <label>🔁 เงินลงทุนรายเดือน <span class="hint">(จากนี้ไป)</span> <button type="button" class="info-i" onclick="toggleTip(this)" data-tip="เงินที่จะโอนเข้าพอร์ตทุกเดือนต่อจากนี้ — กดปุ่ม "ใช้จำนวนนี้เป็นเงินลงทุนรายเดือน" ในงบฯ ก็ได้ ไม่ต้องพิมพ์เอง" aria-label="คำอธิบาย">ⓘ</button></label>
+        <label>🔁 เงินลงทุนรายเดือน <span class="hint">(จากนี้ไป)</span> <button type="button" class="info-i" onclick="toggleTip(this)" data-tip="เงินที่จะโอนเข้าพอร์ตทุกเดือนต่อจากนี้ — ดึงมาจากช่อง "จะลงทุนเท่าไหร่ต่อเดือน" ในขั้นที่ 3 ให้อัตโนมัติ" aria-label="คำอธิบาย">ⓘ</button></label>
         <div class="input-row">
           <input type="number" id="monthly" value="3000" min="0" step="100" oninput="updateStepupPreview(); clearMonthlyLink();">
           <span class="unit">บาท/ด.</span>
@@ -3891,7 +3891,7 @@ function updateBudgetSummary(){
 
 function onInvestAmtInput(){
   investTouched = true;
-  refreshInvestHint();
+  syncInvestEverywhere();
 }
 
 function setInvestPct(pct){
@@ -3900,7 +3900,35 @@ function setInvestPct(pct){
   const surplus = income - expense;
   document.getElementById('investAmt').value = Math.max(0, Math.round(Math.max(0, surplus) * pct));
   investTouched = true;
+  syncInvestEverywhere();
+}
+
+function skipInvestThisMonth(){
+  document.getElementById('investAmt').value = 0;
+  investTouched = true;
+  syncInvestEverywhere();
+}
+
+// one number drives everything: step 3 summary, step 4 split, step 5 tiles,
+// and the long-term projection (a skipped month doesn't wipe the long-term plan)
+function syncInvestEverywhere(){
+  const amt = Math.max(0, Math.round(parseFloat(document.getElementById('investAmt').value) || 0));
+  const monthlyEl = document.getElementById('monthly');
+  if (amt > 0 && monthlyEl && (parseFloat(monthlyEl.value) || 0) !== amt){
+    monthlyEl.value = amt;
+    const linkEl = document.getElementById('monthlyLinkHint');
+    if (linkEl){ linkEl.dataset.linked = '1'; linkEl.style.display = 'block'; }
+    if (typeof updateStepupPreview === 'function') updateStepupPreview();
+    if (typeof calc === 'function') calc();
+  }
+  // re-split step 4 with the new amount unless this month was already saved
+  const mk = document.getElementById('budgetMonth').value || todayMonthStr();
+  const rec = loadHistoryStore()[mk];
+  if (!(rec && rec.dcaApplied)) step4Draft = null;
   refreshInvestHint();
+  if (typeof renderStep3 === 'function') renderStep3();
+  if (typeof renderStep4 === 'function' && currentStep === 4) renderStep4();
+  if (typeof renderStep5 === 'function' && currentStep === 5) renderStep5();
 }
 
 function refreshInvestHint(){
@@ -4974,28 +5002,6 @@ function renderBudgetLedger(income, fixed, varr, surplus, invest, leftover){
   ].join('');
 }
 
-function applyBudgetToMonthly(){
-  const income = getBudgetTotal('incomeRows');
-  const expense = getBudgetTotal('fixedRows') + getBudgetTotal('varRows');
-  const surplus = income - expense;
-  const amt = Math.max(0, Math.round(parseFloat(document.getElementById('investAmt').value) || 0));
-  const leftover = surplus - amt;
-
-  document.getElementById('monthly').value = amt;
-  updateStepupPreview();
-  calc();
-  document.getElementById('monthly').closest('.field').scrollIntoView({behavior:'smooth', block:'center'});
-
-  const hint = document.getElementById('budgetApplyHint');
-  hint.textContent = `ใส่ ${fmtMoney(amt)}/เดือน ในช่อง "เงินลงทุนรายเดือน" ด้านล่างแล้ว ✓`;
-  hint.style.color = 'var(--green)';
-
-  const linkEl = document.getElementById('monthlyLinkHint');
-  linkEl.dataset.linked = '1';
-  linkEl.style.display = 'block';
-  linkEl.innerHTML = `🔗 มาจากงบฯ ด้านบน: ลงทุน <b>${fmtMoney(amt)}</b>/ด. (เหลือเป็นเงินสด ${fmtMoney(leftover)}${leftover<0?' — ติดลบ ระวัง':''}/ด.) — <a href="#" onclick="scrollToBudget(); return false;">แก้ไขงบ ↑</a>`;
-}
-
 function clearMonthlyLink(){
   const linkEl = document.getElementById('monthlyLinkHint');
   linkEl.dataset.linked = '0';
@@ -5595,9 +5601,15 @@ function renderStep3(){
   const pct = target > 0 ? Math.min(100, fund / target * 100) : 0;
   const base = Math.max(surplus, invest + goalsM, 1);
   const seg = (v, c, l) => v > 0 ? `<div style="width:${v / base * 100}%;background:${c}" title="${l} ${fmtMoney(v)}"></div>` : '';
+  const st = document.getElementById('investSyncHint');
+  if (st){
+    st.innerHTML = invest > 0
+      ? `✓ เชื่อมอัตโนมัติ — ขั้น 4 จะให้เลือกว่าเอา <b>${fmtMoney(invest)}</b> ไปลงตัวไหน และกราฟในแท็บอนาคตใช้ยอดนี้`
+      : `⏸ เดือนนี้ไม่ลงทุน — เงินที่เหลือทั้งหมดเข้าเงินสด/สำรอง (แผนระยะยาวในแท็บอนาคตยังเหมือนเดิม)`;
+  }
   const netBox = document.getElementById('step3Net');
   if (netBox){
-    const row = (label, val, cls) => `<div class="bl-row ${cls || ''}"><span class="bl-label">${label}</span><span class="${val < 0 ? 'bl-neg' : ''}">${val < 0 ? '-' : '+'}${fmtMoney(Math.abs(val))}</span></div>`;
+    const row = (label, val, cls) => `<div class="bl-row ${cls || ''}"><span class="bl-label">${label}</span><span class="${val < -0.5 ? 'bl-neg' : ''}">${Math.abs(val) < 0.5 ? '' : val < 0 ? '-' : '+'}${fmtMoney(Math.abs(val))}</span></div>`;
     netBox.innerHTML = `
       <h3 class="step-h3">🧮 สรุปสุทธิเดือนนี้</h3>
       <div class="budget-ledger">
@@ -5662,7 +5674,7 @@ function renderStep4(){
   if (!has){
     const actualPrefill = rec && rec.actualInvested !== undefined ? rec.actualInvested : plan;
     box.innerHTML = `
-      <div class="s4-top"><div>เงินลงทุนเดือนนี้ <b>${fmtMoney(plan)}</b> <small>(จากขั้นที่ 3)</small></div></div>
+      <div class="s4-top"><div>เงินลงทุนเดือนนี้ <b>${fmtMoney(plan)}</b> <small>(จากขั้นที่ 3)</small></div></div>${plan <= 0 ? '<p class="hint">⏸ เดือนนี้ตั้งไว้ว่าไม่ลงทุน — ข้ามไปขั้น 5 ได้เลย</p>' : ''}
       <p class="hint" style="margin:6px 0 14px;">ยังไม่มีหุ้น/กองทุนในพอร์ต — เลือกเลยว่าเดือนนี้จะเอาเงินไปลงอะไร แล้วระบบจะจำไว้ให้ เดือนหน้าเลือกตัวเดิมหรือเปลี่ยนก็ได้</p>
       <div class="s4-add"><span>➕ ลงในตัวไหน?</span><input type="text" id="s4NewSym" placeholder="พิมพ์ชื่อ เช่น K-US500X, SCB, VOO"></div>
       <details class="nw-details" style="margin-top:14px;"><summary>ไม่อยากแยกรายตัว? ใส่แค่ยอดรวมก็ได้</summary>
@@ -5706,7 +5718,7 @@ function renderStep4(){
   const pctUsed = plan > 0 ? Math.min(100, total / plan * 100) : 0;
   box.innerHTML = `
     <div class="s4-top">
-      <div>เงินลงทุนเดือนนี้ <b>${fmtMoney(plan)}</b> <small>(จากขั้นที่ 3)</small> — เลือกว่าจะลงตัวไหนเท่าไหร่</div>
+      <div>${plan > 0 ? `เงินลงทุนเดือนนี้ <b>${fmtMoney(plan)}</b> <small>(จากขั้นที่ 3)</small> — เลือกว่าจะลงตัวไหนเท่าไหร่` : `⏸ เดือนนี้ตั้งไว้ว่า<b>ไม่ลงทุน</b> <small>(ขั้นที่ 3)</small> — ข้ามไปขั้น 5 ได้เลย หรือใส่ยอดด้านล่างถ้าเปลี่ยนใจ`}</div>
       <div class="s4-bar"><i style="width:${pctUsed}%;${left < -0.5 ? 'background:var(--red)' : ''}"></i></div>
       <div class="s4-left">แบ่งแล้ว <b>${fmtMoney(total)}</b> · ${left > 0.5 ? `ยังเหลือ <b class="warn">${fmtMoney(left)}</b>` : left < -0.5 ? `<b class="bad">เกินแผน ${fmtMoney(-left)}</b> (ลงมากกว่าที่วางไว้ก็ได้ ถ้าตั้งใจ)` : '<b class="ok">ครบพอดี ✓</b>'}</div>
     </div>
