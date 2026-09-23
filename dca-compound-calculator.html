@@ -178,76 +178,22 @@
     color: var(--muted);
     margin: 0 0 16px;
   }
-  .asset-tabs{
-    display:flex;
-    gap:8px;
-    margin-bottom: 16px;
-    border-bottom: 2px dashed var(--paper-line);
-  }
-  .asset-tab{
-    padding: 8px 16px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--muted);
-    background: none;
-    border: none;
-    border-bottom: 3px solid transparent;
-    cursor: pointer;
-    margin-bottom: -2px;
-  }
-  .asset-tab.active{
-    color: var(--green);
-    border-bottom-color: var(--green);
-  }
-  .asset-view{ display:none; }
-  .asset-view.active{ display:block; }
+  
+  
+  
+  
+  
 
-  .preset-grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
-  }
-  .preset-card{
-    border: 1px solid var(--paper-line);
-    border-radius: 10px;
-    padding: 14px;
-    background: var(--paper);
-  }
-  .preset-card .pname{
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--ink);
-    margin-bottom: 2px;
-  }
-  .preset-card .pdesc{
-    font-size: 11.5px;
-    color: var(--muted);
-    margin-bottom: 10px;
-    line-height: 1.5;
-    min-height: 32px;
-  }
-  .preset-card .prow{
-    display:flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 10px;
-  }
-  .preset-card .prate{
-    font-family:'IBM Plex Mono','Consolas',monospace;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--green);
-  }
-  .risk-tag{
-    font-size: 10.5px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 20px;
-    letter-spacing: 0.3px;
-  }
-  .risk-low{ background:var(--green-soft); color: var(--green-deep); }
-  .risk-mid{ background: var(--gold-soft); color: var(--gold-deep); }
-  .risk-high{ background:var(--red-soft); color: var(--red-deep); }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   .use-btn{
     width:100%;
     padding: 8px;
@@ -313,57 +259,16 @@
   }
   .apikey-hint a{ color: var(--green); font-weight:600; }
 
-  .fetch-result{
-    border: 1px solid var(--paper-line);
-    border-radius: 10px;
-    padding: 14px 16px;
-    background: var(--paper);
-    display:none;
-  }
-  .fetch-result.show{ display:block; }
-  .fetch-result.error{ border-color: var(--red); background:var(--alert-red-bg); }
-  .fetch-result .fr-title{
-    font-weight:700;
-    font-size:14px;
-    margin-bottom:8px;
-    color: var(--ink);
-  }
-  .fetch-result .fr-stats{
-    display:flex;
-    gap:24px;
-    margin-bottom:10px;
-    flex-wrap:wrap;
-  }
-  .fetch-result .fr-stat-label{
-    font-size:10.5px;
-    color:var(--muted);
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-    font-weight:700;
-  }
-  .fetch-result .fr-stat-val{
-    font-family:'IBM Plex Mono','Consolas',monospace;
-    font-size:18px;
-    font-weight:700;
-    color: var(--green);
-  }
-  .fetch-result.error .fr-stat-val{ color: var(--red); }
-  .fetch-result .fr-note{
-    font-size: 11px;
-    color:var(--muted-soft);
-    margin-top:8px;
-    line-height:1.5;
-  }
-  .spinner{
-    display:inline-block;
-    width:14px; height:14px;
-    border:2px solid rgba(255,255,255,0.5);
-    border-top-color:#fff;
-    border-radius:50%;
-    animation: spin .7s linear infinite;
-    vertical-align:middle;
-    margin-right:6px;
-  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   @keyframes spin{ to{ transform: rotate(360deg); } }
 
   /* ---- Budget / income-expense ---- */
@@ -375,48 +280,13 @@
     padding: 20px;
     margin-bottom: 20px;
   }
-  .budget-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    cursor:pointer;
-    user-select:none;
-    gap:12px;
-  }
-  .budget-head h2{
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--green);
-    margin: 0;
-    font-weight: 700;
-  }
-  .budget-head .sub{
-    font-size: 12.5px;
-    color: var(--muted);
-    margin: 6px 0 0;
-    max-width: 620px;
-  }
-  .budget-toggle{
-    font-size: 13px;
-    color: var(--muted);
-    transition: transform .2s ease;
-    flex: none;
-    margin-top: 2px;
-  }
-  .budget-toggle.closed{ transform: rotate(-90deg); }
-  .budget-body{
-    margin-top: 18px;
-    overflow:hidden;
-    max-height: 3000px;
-    transition: max-height .25s ease, opacity .2s ease, margin .2s ease;
-    opacity: 1;
-  }
-  .budget-body.closed{
-    max-height: 0 !important;
-    opacity: 0;
-    margin-top: 0;
-  }
+  
+  
+  
+  
+  
+  
+  
   .budget-cols{
     display:grid;
     grid-template-columns: repeat(3, 1fr);
@@ -505,16 +375,9 @@
     margin-bottom: 8px;
     background: var(--paper-line);
   }
-  .budget-bar-legend{
-    display:flex;
-    gap:16px;
-    flex-wrap:wrap;
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
-  .budget-bar-legend span{ display:flex; align-items:center; gap:5px; }
-  .budget-bar-legend i{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+  
+  
+  
 
   /* ---- Budget donut chart (summary tab) ---- */
   .budget-donut-wrap{
@@ -1118,7 +981,7 @@
   .switch input:checked + .track{ background: var(--green); }
   .switch input:checked + .track::before{ transform: translateX(18px); }
 
-  #stepupField, #inflationNote, #volField{
+  #stepupField, #volField{
     overflow:hidden;
     max-height:0;
     opacity:0;
@@ -1301,61 +1164,27 @@
   .swatch.contrib{ background: repeating-linear-gradient(90deg, var(--gold) 0 5px, transparent 5px 9px); }
 
   /* ---- Stock quote header + range tabs ---- */
-  .stock-header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:10px;
-  }
-  .stock-badge{
-    flex:none;
-    width:38px; height:38px;
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    color:#fff; font-weight:700; font-size:13.5px;
-    font-family:'IBM Plex Mono','Consolas',monospace;
-    letter-spacing:-0.5px;
-  }
-  .stock-id{ flex:1; min-width:0; }
-  .stock-ticker{ font-weight:700; font-size:15px; color:var(--ink); line-height:1.3; }
-  .stock-name{ font-size:11px; color:var(--muted); margin-top:1px; line-height:1.3; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
-  .stock-price-block{ text-align:right; flex:none; }
-  .stock-price{ font-family:'IBM Plex Mono','Consolas',monospace; font-size:21px; font-weight:700; color:var(--ink); line-height:1.2; }
-  .stock-change{ font-family:'IBM Plex Mono','Consolas',monospace; font-size:11.5px; font-weight:700; margin-top:2px; color:var(--muted); }
-  .stock-change.up{ color: var(--green); }
-  .stock-change.down{ color: var(--red); }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
-  .range-tabs{
-    display:flex;
-    gap:4px;
-    margin: 8px 0 2px;
-    flex-wrap:wrap;
-  }
-  .range-tab{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:1px;
-    padding: 5px 9px;
-    background:var(--input-bg);
-    border:1.5px solid var(--paper-line);
-    border-radius:10px;
-    font-family:inherit;
-    cursor:pointer;
-    flex:1;
-    min-width:38px;
-  }
-  .range-tab .rt-label{ font-size:11px; font-weight:700; color:var(--muted); }
-  .range-tab .rt-return{ font-size:9px; font-family:'IBM Plex Mono','Consolas',monospace; color:var(--muted); min-height:11px; }
-  .range-tab .rt-return.up{ color: var(--green); }
-  .range-tab .rt-return.down{ color: var(--red); }
-  .range-tab.active{ background: var(--green-soft); border-color: var(--green); }
-  .range-tab.active .rt-label{ color: var(--green-deep); }
-  .range-tab:hover:not(.active){ border-color: var(--green); }
-  @media (max-width: 500px){
-    .range-tab{ padding: 5px 4px; }
-    .range-tab .rt-label{ font-size:10px; }
-  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   svg text{ font-family:'IBM Plex Mono','Consolas',monospace; }
 
@@ -1419,13 +1248,13 @@
   }
 
   /* ---- subtle hover polish for main cards ---- */
-  .budget-card, .readiness-card, .fuel-card, .asset-panel, .panel, .preset-card, .stat{
+  .budget-card, .readiness-card, .fuel-card, .asset-panel, .panel, .stat{
     transition: box-shadow .2s ease, border-color .2s ease;
   }
   .budget-card:hover, .readiness-card:hover, .fuel-card:hover, .asset-panel:hover, .panel:hover{
     box-shadow: 0 3px 0 rgba(31,42,31,0.07), 0 14px 30px rgba(31,42,31,0.11);
   }
-  .preset-card:hover{ border-color: var(--green); }
+  
   .use-btn, .pct-btn, .budget-addbtn, .calc-btn, .fetch-btn, .bg-remove, .inj-row .inj-remove{
     transition: transform .08s ease, filter .15s ease;
   }
@@ -1488,15 +1317,13 @@
   body[data-theme="dark"] .fuel-card,
   body[data-theme="dark"] .panel,
   body[data-theme="dark"] .chart-card,
-  body[data-theme="dark"] .table-card,
-  body[data-theme="dark"] .preset-card{
+  body[data-theme="dark"] .table-card{
     border-radius: 20px;
     border-color: rgba(255,255,255,0.16);
     box-shadow: var(--card-shadow), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   body[data-theme="dark"] .chart-card,
   body[data-theme="dark"] .table-card,
-  body[data-theme="dark"] .preset-card,
   body[data-theme="dark"] .budget-row{
     background: var(--card-bg);
   }
@@ -1509,7 +1336,6 @@
   body[data-theme="dark"] .budget-ledger,
   body[data-theme="dark"] .flow-box,
   body[data-theme="dark"] .month-bar,
-  body[data-theme="dark"] .fetch-result,
   body[data-theme="dark"] .api-row input[type="text"],
   body[data-theme="dark"] .api-row input[type="password"],
   body[data-theme="dark"] .api-row select{
@@ -1535,7 +1361,7 @@
   /* Section dividers: solid instead of the passbook "dashed rule" look.
      Only the side that actually carries a border is touched, so rows/panels
      that have no border at all don't suddenly grow one on every side. */
-  body[data-theme="dark"] .asset-tabs{ border-bottom-style: solid; }
+  
   body[data-theme="dark"] .budget-summary{ border-top-style: solid; }
   body[data-theme="dark"] .readiness-summary{ border-top-style: solid; }
   body[data-theme="dark"] .goals-total{ border-top-style: solid; }
@@ -1691,15 +1517,7 @@
     body[data-theme="dark"]{ padding-left: 280px; }
   }
 
-  @media (min-width: 1300px){
-    body[data-theme="dark"] .dashboard-grid{
-      column-count: 2;
-      column-gap: 20px;
-    }
-    body[data-theme="dark"] .dashboard-grid > *{
-      break-inside: avoid;
-    }
-  }
+  
 
   /* ---- Overview row: quick-glance stat cards right under the header ---- */
   .overview-row{
@@ -1723,8 +1541,8 @@
   /* ---- Breathing room: wider canvas + more spacing inside dashboard cards ---- */
   @media (min-width: 1300px){
     body[data-theme="dark"] .wrap{ max-width: 1480px; }
-    body[data-theme="dark"] .dashboard-grid{ column-gap: 24px; }
-    body[data-theme="dark"] .dashboard-grid > *{ margin-bottom: 24px; container-type: inline-size; }
+    
+    
   }
   body[data-theme="dark"] .readiness-card,
   body[data-theme="dark"] .budget-card,
@@ -1792,8 +1610,8 @@
   .viz-tiles{ margin: 8px 0 16px; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); }
   .cat-item.clickable{ cursor:pointer; transition: border-color .15s ease, transform .15s ease; }
   .cat-item.clickable:hover{ border-color: var(--green); transform: translateY(-1px); }
-  .cat-tile.st-bad{ border-color: rgba(229,72,77,0.45) !important; }
-  .cat-tile.st-ok{ border-color: rgba(47,191,113,0.35) !important; }
+  
+  
 
   /* ---- Save / backup reminder ---- */
   .save-reminder{ margin-bottom: 18px; display:flex; flex-direction:column; gap: 10px; }
@@ -1822,17 +1640,17 @@
   /* ---- bonus donut + fuel tiles + preset meters ---- */
   .bonus-visual{ display:flex; align-items:center; gap: 20px; flex-wrap:wrap; margin: 4px 0 16px; }
   .fuel-result{ display:none !important; }
-  .pviz{ display:flex; flex-direction:column; gap:6px; margin: 8px 0 10px; }
-  .pviz-row{ display:flex; align-items:center; gap:10px; font-size: 11px; color: var(--muted); }
-  .pviz-row > span{ width: 62px; flex:none; }
-  .pbar{ flex:1; height: 8px; border-radius: 999px; background: rgba(128,128,128,0.2); overflow:hidden; }
-  .pbar i{ display:block; height:100%; border-radius: 999px; background: linear-gradient(90deg, var(--teal), var(--green)); }
-  .prisk{ display:flex; gap:4px; }
-  .prisk i{ width: 18px; height: 8px; border-radius: 3px; background: rgba(128,128,128,0.25); }
-  .prisk.r1 i:nth-child(-n+1){ background: var(--green); }
-  .prisk.r2 i:nth-child(-n+2){ background: var(--gold); }
-  .prisk.r3 i:nth-child(-n+3){ background: var(--red); }
-  .pdesc.clamp2{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   /* ---- collapsible extra tools ---- */
   .tool-collapsible .tc-head{ cursor:pointer; display:flex; align-items:center; gap:8px; user-select:none; }
@@ -1882,10 +1700,10 @@
 
   /* ---- monthly check-in ---- */
   .save-reminder{ flex-direction: column; }
-  .sr-ok{ background: rgba(47,191,113,0.10); border:1px solid rgba(47,191,113,0.40); color: #9EE3BD; }
-  .ci-box{ flex-direction: column; align-items: stretch; }
-  .ci-head{ display:flex; align-items:center; gap: 10px; font-size: 13.5px; }
-  .ci-form{ display:flex; gap: 12px; align-items:flex-end; flex-wrap:wrap; }
+  
+  
+  
+  
   .ci-field{ display:flex; flex-direction:column; gap: 5px; flex: 1; min-width: 200px; font-size: 12px; font-weight:700; color: var(--ink); }
   .ci-field small{ font-weight: 500; color: var(--muted); }
   .ci-field input{
@@ -1893,8 +1711,8 @@
     color: var(--ink); font-family:'IBM Plex Mono','Consolas',monospace; font-size: 15px; font-weight:700; outline:none;
   }
   .ci-field input:focus{ border-color: var(--green); }
-  .ci-note{ font-size: 11px; color: var(--muted); }
-  .ci-link{ margin-left:auto; background:none; border:1px solid currentColor; color: inherit; border-radius: 999px; padding: 5px 12px; font-size: 12px; cursor:pointer; font-family: inherit; }
+  
+  
   /* ---- history charts ---- */
   .hist-charts{ display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
   .hist-chart{ background: var(--nested-bg); border: 1px solid rgba(255,255,255,0.10); border-radius: 16px; padding: 14px 14px 8px; min-width: 0; }
@@ -1979,8 +1797,8 @@
   .dr-dest{ color: var(--muted); font-size: 11.5px; }
   .div-row button{ background:none; border:none; color: var(--red); cursor:pointer; font-size: 13px; }
   .ci-prices{ flex: 1 1 100%; display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-  .ci-prices-title{ grid-column: 1 / -1; font-size: 12px; font-weight: 700; color: var(--ink); }
-  .ci-prices-title small{ font-weight: 500; color: var(--muted); }
+  
+  
   .ci-price{ display:flex; flex-direction:column; gap: 4px; font-size: 11.5px; font-weight: 700; color: var(--ink); }
   .ci-price small{ color: var(--muted); font-weight: 500; }
   .ci-price input{ padding: 9px 11px; border-radius: 10px; border: 1.5px solid var(--paper-line); background: var(--input-bg); color: var(--ink); font-family:'IBM Plex Mono',monospace; font-size: 14px; font-weight: 700; outline: none; }
@@ -2092,16 +1910,14 @@
   .net-card .budget-ledger{ margin-top: 8px; }
   .net-card{ border-color: rgba(47,191,113,0.35) !important; }
 
-  .tv-quick{ background: var(--nested-bg); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
-  .tv-quick-head{ font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
-  .tv-quick-row{ display:flex; gap: 10px; flex-wrap: wrap; }
-  .tv-quick-row input{ flex:1; min-width: 200px; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--paper-line);
-    background: var(--input-bg); color: var(--ink); font-family:'IBM Plex Mono',monospace; font-size: 13px; outline:none; }
-  .tv-quick-row input:focus{ border-color: var(--green); }
-  .chart-src{ display:flex; gap: 8px; margin: 10px 0 12px; flex-wrap: wrap; }
-  .src-btn{ border: 1px solid rgba(255,255,255,0.18); background: var(--card-bg); color: var(--muted); border-radius: 999px;
-    padding: 7px 16px; font-size: 12.5px; cursor:pointer; font-family: inherit; }
-  .src-btn.active{ border-color: var(--green); color: var(--green); background: rgba(47,191,113,0.12); font-weight: 700; }
+  
+  
+  
+  
+  
+  
+  
+  
 
   /* ---- first-run welcome ---- */
   .welcome-overlay{
@@ -2128,19 +1944,18 @@
   .welcome-foot{ margin: 20px 0 0; font-size: 11px; color: var(--muted); }
   @media (max-width: 560px){ .welcome-choices{ grid-template-columns: 1fr; } .welcome-box{ padding: 24px 18px; } }
 
-  .s4-list{ display:flex; flex-direction:column; gap: 10px; }
-  .s4-row{ display:grid; grid-template-columns: minmax(140px,1fr) minmax(150px,1fr) minmax(150px,1fr); gap: 12px; align-items:end;
-    background: var(--nested-bg); border: 1px solid rgba(255,255,255,0.10); border-radius: 14px; padding: 12px 14px; }
+  
+  
   .s4-name{ font-size: 14px; font-weight: 700; color: var(--ink); }
   .s4-name small{ display:block; font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 2px; }
-  .s4-sum{ margin-top: 14px; font-size: 13.5px; color: var(--muted); }
-  .s4-sum b{ color: var(--green); font-family:'IBM Plex Mono',monospace; font-size: 18px; margin: 0 6px; }
+  
+  
   .hold-monthly{ display:flex; flex-direction:column; gap: 5px; margin-top: 12px; font-size: 12px; font-weight: 700; color: var(--muted); }
   .hold-monthly input{ max-width: 260px; padding: 9px 11px; border-radius: 9px; border: 1.5px solid var(--paper-line);
     background: var(--input-bg); color: var(--ink); font-family:'IBM Plex Mono',monospace; font-size: 13px; outline:none; }
   .hold-monthly input:focus{ border-color: var(--green); }
   .hold-monthly small{ font-weight: 500; font-size: 11px; }
-  @media (max-width: 700px){ .s4-row{ grid-template-columns: 1fr; } }
+  
 
   /* ---- symbol type-ahead ---- */
   .sym-wrap{ position: relative; flex: 1; min-width: 0; display:flex; }
@@ -2185,16 +2000,15 @@
   .ap-rate-in input{ width: 90px; padding: 8px 10px; border-radius: 10px; border: 1.5px solid var(--paper-line); background: var(--input-bg);
     color: var(--green); font-family:'IBM Plex Mono',monospace; font-size: 16px; font-weight: 800; outline: none; }
   .ap-actions{ display:flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-  .quick-rates{ margin-bottom: 14px; }
-  .qr-title{ font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
-  .qr-chips{ display:flex; gap: 8px; flex-wrap: wrap; }
-  .qr-chip{ border: 1px solid rgba(255,255,255,0.16); background: var(--nested-bg); color: var(--ink); border-radius: 999px;
-    padding: 7px 14px; font-size: 12.5px; cursor:pointer; font-family: inherit; }
-  .qr-chip b{ color: var(--green); margin-left: 4px; font-family:'IBM Plex Mono',monospace; }
-  .qr-chip:hover{ border-color: var(--green); }
+  
+  
+  
+  
+  
+  
   .asset-more{ margin-top: 10px; }
   .asset-more > summary{ font-size: 13px; }
-  .st-idx{ background: rgba(242,180,65,0.18); color: #F5CF7A; }
+  
 
   /* ---- step 4 allocation ---- */
   .s4-top{ font-size: 14px; color: var(--ink); }
@@ -2228,8 +2042,8 @@
   .s4-add .sym-wrap{ flex: 1; min-width: 220px; }
   .s4-values{ margin-top: 14px; }
 
-  .sec-box{ margin-top: 14px; }
-  .sec-box > summary{ font-size: 12.5px; }
+  
+  
 
   .place-main{ flex:1; font-size: 13px; color: var(--ink); overflow:hidden; }
   .place-main small{ display:block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
@@ -2238,6 +2052,18 @@
   .loc-btn{ margin-left: 6px; border: 1px solid rgba(255,255,255,0.18); background: transparent; color: var(--teal); border-radius: 999px;
     padding: 2px 10px; font-size: 11px; cursor: pointer; font-family: inherit; }
   .loc-btn:hover{ border-color: var(--teal); }
+
+  .cat-tile.st-bad{ border-color: rgba(229,72,77,0.45) !important; }
+  .cat-tile.st-ok{ border-color: rgba(47,191,113,0.35) !important; }
+  .st-idx{ background: rgba(242,180,65,0.18); color: #F5CF7A; }
+
+  .place-chips{ display:flex; flex-wrap: wrap; gap: 6px; align-items:center; margin: -2px 0 12px; }
+  .pc-title{ font-size: 11.5px; color: var(--muted); font-weight: 700; }
+  .pc-chip{ display:inline-flex; align-items:center; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; overflow:hidden; background: var(--nested-bg); }
+  .pc-chip button{ background:none; border:none; color: var(--ink); font-size: 12px; padding: 5px 10px; cursor:pointer; font-family: inherit; }
+  .pc-chip button:hover{ background: rgba(47,191,113,0.12); }
+  .pc-chip .pc-to{ color: var(--teal); border-left: 1px solid rgba(255,255,255,0.1); }
+  .pc-chip .pc-x{ color: var(--muted); padding: 5px 8px; }
 </style>
 </head>
 <body data-theme="dark">
@@ -2436,8 +2262,9 @@
           </div></div></div>
       <div class="fuel-card tool-collapsible collapsed" id="secFuel">
     <h2>🚗 คำนวณค่าน้ำมันไป-กลับ</h2>
-    <p class="sub">พิมพ์ชื่อสถานที่ต้นทาง-ปลายทางแล้วเลือกจากรายการ ระบบหาระยะทางขับรถให้เอง (แผนที่ OpenStreetMap ฟรี ไม่ต้องใช้ key) แล้วคิดค่าน้ำมันต่อเดือนให้</p>
+    <p class="sub">พิมพ์ชื่อสถานที่แล้วเลือกจากรายการ — ถ้าหาไม่เจอ (เช่นโรงงาน/ออฟฟิศ) เปิดที่นั้นใน Google Maps แล้วก๊อปลิงก์มาวางในช่องได้เลย ระบบหาระยะทางขับรถและจำสถานที่ไว้ให้ ครั้งหน้ากดเลือกได้ทันที</p>
     <p class="hint" id="routeStatus" style="margin:0 0 10px;"></p>
+    <div class="place-chips" id="placeChips"></div>
 
     <div class="fuel-maps-row">
       <div class="field">
@@ -2446,7 +2273,7 @@
       </div>
       <div class="field">
         <label>🏁 ไป <span class="hint">(ที่อยู่/สถานที่)</span> <button type="button" class="loc-btn" onclick="useMyLocation('fuelDest')">📡 ใช้ตำแหน่งตอนนี้</button></label>
-        <input type="text" id="fuelDest" placeholder="พิมพ์ชื่อสถานที่ เช่น DSV บางนา, สีลม">
+        <input type="text" id="fuelDest" placeholder="พิมพ์ชื่อสถานที่ หรือวางลิงก์ Google Maps">
       </div>
       <button type="button" class="use-btn" style="width:auto;padding:10px 16px;background:var(--gold);" onclick="openInMaps()">🗺️ ดูเส้นทางใน Google Maps</button>
     </div>
@@ -2932,15 +2759,7 @@
         <button type="button" class="fetch-btn" onclick="pickFromSearchText()">ดู</button>
       </div>
       <div id="assetPick"></div>
-      <details class="nw-details sec-box" id="secBox">
-        <summary>🔑 เชื่อมข้อมูลกองทุนไทยจาก ก.ล.ต. (ค้นได้ทุกกอง + กราฟ NAV จริง) — ไม่บังคับ</summary>
-        <p class="hint" style="margin:8px 0;">ใส่ API key ของ ก.ล.ต. (ฟรี) — key เก็บในเบราว์เซอร์นี้เท่านั้น ไม่ได้อยู่ในไฟล์เว็บ</p>
-        <div class="as-row">
-          <input type="password" id="secKey" placeholder="วาง Primary key / Subscription key ที่นี่">
-          <button type="button" class="fetch-btn" onclick="saveSecKey()">บันทึก + ทดสอบ</button>
-        </div>
-        <p class="hint" id="secStatus" style="margin-top:8px;"></p>
-      </details>
+      
     </div>
     
 
@@ -3092,22 +2911,9 @@ function themeVar(name){
   return getComputedStyle(document.body).getPropertyValue(name).trim();
 }
 
-function applyTheme(mode){
-  document.body.setAttribute('data-theme', mode);
-  const btn = document.getElementById('themeToggleBtn');
-  if (btn) btn.textContent = mode === 'dark' ? '☀️ ธีมสว่าง' : '🌙 ธีมมืด';
-  try{ localStorage.setItem(THEME_KEY, mode); }catch(e){ /* ignore */ }
-  // colors baked into the SVG charts on the last draw don't update on their
-  // own when CSS variables change, so re-run both chart draws against the
-  // new theme's colors.
-  if (typeof calc === 'function') calc();
-  if (typeof applyChartRange === 'function') applyChartRange();
-}
 
-function toggleTheme(){
-  const current = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-  applyTheme(current === 'dark' ? 'light' : 'dark');
-}
+
+
 
 // Dark dashboard theme is now fixed (light theme toggle removed).
 function initTheme(){
@@ -3177,7 +2983,7 @@ function clearAllToolData(){
   const ok = confirm('ล้างข้อมูลที่กรอกไว้ทั้งหมดของเครื่องมือนี้ในเบราว์เซอร์นี้ (งบรายเดือน, เป้าหมาย, ประวัติที่บันทึกไว้, API key ที่จำไว้)?\n\nเบราว์เซอร์/เครื่องอื่นไม่โดนกระทบ เพราะข้อมูลเก็บแยกเป็นของแต่ละเบราว์เซอร์อยู่แล้ว — กดแล้วกู้คืนไม่ได้');
   if (!ok) return;
   try{
-    const exactKeys = ['avApiKey', 'secApiKey', 'dcaGoalsV1', 'dcaBudgetHistoryV1', 'dcaCashLogV1', 'dcaLastBackupV1', 'dcaHoldingsV1'];
+    const exactKeys = ['avApiKey', 'secApiKey', 'dcaGoalsV1', 'dcaBudgetHistoryV1', 'dcaCashLogV1', 'dcaLastBackupV1', 'dcaHoldingsV1', 'dcaPlacesV1'];
     const prefixes = ['avCache_', 'avCandles3_', 'avOverview_'];
     Object.keys(localStorage).forEach(k => {
       if (exactKeys.indexOf(k) !== -1 || prefixes.some(p => k.indexOf(p) === 0)){
@@ -3560,13 +3366,6 @@ function fillLedger(yearly){
 
 /* ============ ASSET PICKER ============ */
 
-// the old three tabs are now collapsible sections — "switching" just opens one
-function switchAssetTab(tab){
-  const id = tab === 'global' ? 'viewGlobal' : tab === 'funds' ? 'viewFunds' : 'viewThai';
-  const d = document.getElementById(id);
-  if (d) d.open = true;
-  if (tab === 'funds') renderFundTable();
-}
 
 function applyRate(pct, vol){
   document.getElementById('rate').value = pct;
@@ -3581,555 +3380,65 @@ function applyRate(pct, vol){
   document.getElementById('rate').closest('.field').scrollIntoView({behavior:'smooth', block:'center'});
 }
 
-const THAI_PRESETS = [
-  {
-    name: 'SET Index (หุ้นไทยภาพรวม)',
-    desc: 'เฉลี่ย 10 ปีล่าสุด (2559-2568) ราคาปิดดัชนี ไม่รวมปันผล ผันผวนสูง ตลาดไทยแทบไม่โตในรอบ 10 ปีที่ผ่านมา',
-    rate: 0,
-    risk: 'high'
-  },
-  {
-    name: 'SET Index (ระยะยาว 15 ปี)',
-    desc: 'เฉลี่ย 15 ปี (2553-2568) ราคาปิดดัชนี ไม่รวมปันผล ภาพยาวขึ้นดีกว่ารอบ 10 ปีหลัง',
-    rate: 5.0,
-    risk: 'high'
-  },
-  {
-    name: 'พันธบัตรรัฐบาลไทย 10 ปี',
-    desc: 'อัตราผลตอบแทนปัจจุบัน (ก.ย. 2026) ความเสี่ยงต่ำ เหมาะเป็นสัดส่วนกันชนของพอร์ต',
-    rate: 2.3,
-    risk: 'low'
-  },
-  {
-    name: 'ทองคำแท่ง (บาททองคำ, บาทไทย)',
-    desc: 'เฉลี่ย ~10 ปี ราคาทองในประเทศ (บาทไทย) พุ่งแรงช่วงหลัง ผันผวนปานกลาง ป้องกันเงินเฟ้อได้ดี',
-    rate: 7.5,
-    risk: 'mid'
-  },
-  {
-    name: 'เงินฝากประจำ/ออมทรัพย์ดอกเบี้ยสูง',
-    desc: 'อัตราดอกเบี้ยทั่วไปของธนาคารพาณิชย์ไทยในปัจจุบัน ความเสี่ยงต่ำสุด สภาพคล่องสูง',
-    rate: 1.3,
-    risk: 'low'
-  }
-];
 
-function renderThaiPresets(){
-  const grid = document.getElementById('thaiPresetGrid');
-  if (!grid) return;
-  const maxRate = Math.max(...THAI_PRESETS.map(p => p.rate), 1);
-  const riskLv = { low:1, mid:2, high:3 };
-  grid.innerHTML = THAI_PRESETS.map(p => `
-    <div class="preset-card">
-      <div class="pname">${p.name}</div>
-      <div class="pviz">
-        <div class="pviz-row"><span>ผลตอบแทน</span><div class="pbar"><i style="width:${Math.max(3, p.rate / maxRate * 100)}%"></i></div></div>
-        <div class="pviz-row"><span>ความเสี่ยง</span><div class="prisk r${riskLv[p.risk] || 2}"><i></i><i></i><i></i></div></div>
-      </div>
-      <div class="pdesc clamp2" title="${String(p.desc).replace(/"/g,'&quot;')}">${p.desc}</div>
-      <div class="prow">
-        <span class="prate">${p.rate}%<span style="font-size:11px;color:var(--muted);font-weight:600;">/ปี</span></span>
-        <span class="risk-tag risk-${p.risk}">${p.risk==='low'?'เสี่ยงต่ำ':p.risk==='mid'?'เสี่ยงปานกลาง':'เสี่ยงสูง'}</span>
-      </div>
-      <button class="use-btn" onclick="applyRate(${p.rate})">ใช้ค่านี้</button>
-    </div>
-  `).join('');
-}
-renderThaiPresets();
+
+
+
 
 /* ---- Global live fetch (Alpha Vantage) ---- */
 
-function loadAvKey(){
-  try{
-    const saved = localStorage.getItem('avApiKey');
-    const el = document.getElementById('avKey');
-    if (saved && el) el.value = saved;
-  }catch(e){}
-}
-loadAvKey();
 
-async function fetchGlobalStock(){
-  const keyInput = document.getElementById('avKey').value.trim();
-  const ticker = document.getElementById('avTicker').value.trim().toUpperCase();
-  const yearsBack = parseInt(document.getElementById('avYears').value, 10);
-  const resultBox = document.getElementById('fetchResult');
-  const btn = document.getElementById('fetchBtn');
 
-  if (!keyInput){
-    showFetchError('กรุณาใส่ Alpha Vantage API Key ก่อน (ดูลิงก์ด้านบนเพื่อขอฟรี)');
-    return;
-  }
-  if (!ticker){
-    showFetchError('กรุณาใส่ชื่อ Ticker เช่น VOO, AAPL, MSFT');
-    return;
-  }
 
-  try{ localStorage.setItem('avApiKey', keyInput); }catch(e){}
 
-  // check cache first (valid 1 day)
-  const cacheKey = 'avCache_' + ticker + '_' + yearsBack;
-  try{
-    const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-    if (cached && (Date.now() - cached.ts) < 24*60*60*1000){
-      showFetchSuccess(ticker, cached.cagr, cached.vol, cached.yearsUsed, cached.months, true);
-      fetchCandles(false, ticker, keyInput);
-      return;
-    }
-  }catch(e){}
 
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>กำลังดึงข้อมูล...';
-  resultBox.className = 'fetch-result show';
-  resultBox.innerHTML = '<div class="fr-title">กำลังเชื่อมต่อ Alpha Vantage...</div>';
 
-  try{
-    const url = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(keyInput)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('เครือข่ายผิดพลาด (HTTP ' + res.status + ')');
-    const data = await res.json();
 
-    if (data['Note']) throw new Error('ถึงขีดจำกัดการเรียก API แล้ว (free tier: 25 ครั้ง/วัน, 5 ครั้ง/นาที) ลองใหม่ภายหลัง');
-    if (data['Information']) throw new Error('API Key ไม่ถูกต้อง หรือถึงขีดจำกัดการใช้งานแล้ว: ' + data['Information']);
-    if (data['Error Message']) throw new Error('ไม่พบ Ticker "' + ticker + '" กรุณาตรวจสอบสัญลักษณ์หุ้นอีกครั้ง');
 
-    const series = data['Monthly Adjusted Time Series'];
-    if (!series) throw new Error('ไม่ได้รับข้อมูลย้อนหลังจาก API กรุณาลองใหม่');
 
-    const dates = Object.keys(series).sort(); // ascending
-    let sliceDates = dates;
-    if (yearsBack > 0){
-      const cutoff = dates.length - (yearsBack*12 + 1);
-      sliceDates = dates.slice(Math.max(0, cutoff));
-    }
-    if (sliceDates.length < 13) throw new Error('ข้อมูลย้อนหลังไม่พอสำหรับคำนวณ (มีน้อยกว่า 1 ปี)');
 
-    const closes = sliceDates.map(d => parseFloat(series[d]['5. adjusted close']));
-    const monthsUsed = closes.length - 1;
-    const yearsUsed = monthsUsed / 12;
-
-    const cagr = (Math.pow(closes[closes.length-1] / closes[0], 1/yearsUsed) - 1) * 100;
-
-    // monthly log returns -> annualized volatility
-    const monthlyReturns = [];
-    for (let i=1;i<closes.length;i++){
-      monthlyReturns.push(Math.log(closes[i]/closes[i-1]));
-    }
-    const mean = monthlyReturns.reduce((a,b)=>a+b,0)/monthlyReturns.length;
-    const variance = monthlyReturns.reduce((a,b)=>a+Math.pow(b-mean,2),0)/monthlyReturns.length;
-    const monthlyStd = Math.sqrt(variance);
-    const annualVol = monthlyStd * Math.sqrt(12) * 100;
-
-    try{
-      localStorage.setItem(cacheKey, JSON.stringify({ts: Date.now(), cagr, vol: annualVol, yearsUsed, months: monthsUsed}));
-    }catch(e){}
-
-    showFetchSuccess(ticker, cagr, annualVol, yearsUsed, monthsUsed, false);
-    fetchCandles(false, ticker, keyInput);
-
-  }catch(err){
-    showFetchError(err.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล กรุณาลองใหม่');
-  }finally{
-    btn.disabled = false;
-    btn.textContent = 'ดึงข้อมูลจริง';
-  }
-}
-
-let lastFetchedCAGR = null;
-let lastFetchedTicker = null;
-let lastFetchedVol = null;
-
-function showFetchSuccess(ticker, cagr, vol, yearsUsed, months, fromCache){
-  lastFetchedCAGR = cagr;
-  lastFetchedTicker = ticker;
-  lastFetchedVol = vol;
-  setTimeout(() => { if (document.getElementById('tvGlobalBox')) setChartSource(chartSource); }, 50);
-  const resultBox = document.getElementById('fetchResult');
-  resultBox.className = 'fetch-result show';
-  resultBox.innerHTML = `
-    <div class="fr-title">${ticker} — ข้อมูลย้อนหลัง ${yearsUsed.toFixed(1)} ปี ${fromCache ? '(จากแคช)' : ''}</div>
-    <div class="fr-stats">
-      <div>
-        <div class="fr-stat-label">CAGR (ผลตอบแทนทบต้นเฉลี่ย/ปี)</div>
-        <div class="fr-stat-val">${cagr.toFixed(2)}%</div>
-      </div>
-      <div>
-        <div class="fr-stat-label">ความผันผวนรายปี (Volatility)</div>
-        <div class="fr-stat-val">${vol.toFixed(2)}%</div>
-      </div>
-    </div>
-    <button class="use-btn" style="width:auto;padding:8px 20px;" onclick="applyRate(${cagr.toFixed(2)}, ${vol.toFixed(2)})">ใช้ค่านี้ในการคำนวณ (พร้อมกรอบดี/แย่)</button>
-    <p class="fr-note">คำนวณจากราคาปิดปรับปันผลแล้วรายเดือนของ Alpha Vantage · ผลตอบแทนในอดีตไม่ได้การันตีผลตอบแทนในอนาคต ไม่ใช่คำแนะนำให้ซื้อขาย</p>
-  `;
-}
 
 updateHorizonHint();
 
-function showFetchError(msg){
-  const resultBox = document.getElementById('fetchResult');
-  resultBox.className = 'fetch-result show error';
-  resultBox.innerHTML = `<div class="fr-title">ดึงข้อมูลไม่สำเร็จ</div><div class="fr-stat-val" style="font-size:14px;">${msg}</div>`;
-}
+
 
 /* ---- Stock quote chart (area chart, real daily closes, Google-Finance-style) ---- */
 
-function fmtUSD(n){
-  const sign = n < 0 ? "-" : "";
-  n = Math.abs(n);
-  return sign + "$" + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-}
 
-function tickerColor(ticker){
-  let hash = 0;
-  for (let i = 0; i < ticker.length; i++) hash = (hash * 31 + ticker.charCodeAt(i)) % 360;
-  return `hsl(${hash}, 42%, 38%)`;
-}
 
-const RANGE_LIST = ['1D','5D','1M','6M','YTD','1Y','5Y','10Y','ALL'];
-let lastCandleTicker = null;
-let lastCandleKey = null;
-let candleDaily = [];   // compact daily bars — free tier, last ~100 trading days
-let candleWeekly = [];  // full weekly history — free tier, no outputsize limit
-let chartRange = '1Y';
 
-function parseAVSeries(obj, key){
-  const series = obj[key];
-  if (!series) return [];
-  const dates = Object.keys(series).sort(); // ascending
-  return dates.map(d => ({
-    date: d,
-    open: parseFloat(series[d]['1. open']),
-    high: parseFloat(series[d]['2. high']),
-    low: parseFloat(series[d]['3. low']),
-    close: parseFloat(series[d]['4. close'])
-  }));
-}
 
-function avApiErrorMsg(data, ticker){
-  if (!data) return 'เครือข่ายผิดพลาด';
-  if (data['Note']) return 'ถึงขีดจำกัดการเรียก API แล้ว (25 ครั้ง/วัน) ลองใหม่ภายหลัง';
-  if (data['Information']) return data['Information']; // e.g. premium-only param, bad key, etc — shown verbatim, never guessed
-  if (data['Error Message']) return 'ไม่พบ Ticker "' + ticker + '"';
-  return null;
-}
 
-async function fetchCandles(forceRefresh, tickerArg, keyArg){
-  const ticker = (tickerArg || lastCandleTicker || document.getElementById('avTicker').value.trim().toUpperCase());
-  const keyInput = (keyArg || lastCandleKey || document.getElementById('avKey').value.trim());
-  if (!ticker || !keyInput) return;
-  lastCandleTicker = ticker;
-  lastCandleKey = keyInput;
 
-  const card = document.getElementById('candleCard');
-  const asOfEl = document.getElementById('candleAsOf');
-  const refreshBtn = document.getElementById('candleRefreshBtn');
-  card.style.display = 'block';
 
-  const cacheKey = 'avCandles3_' + ticker;
-  if (!forceRefresh){
-    try{
-      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-      // daily/weekly bars only change once a day after market close — cache valid until next calendar day
-      const cachedDay = cached ? new Date(cached.ts).toDateString() : null;
-      if (cached && cachedDay === new Date().toDateString() && ((cached.daily||[]).length || (cached.weekly||[]).length)){
-        candleDaily = cached.daily || [];
-        candleWeekly = cached.weekly || [];
-        renderStockHeader(ticker, candleDaily.length ? candleDaily : candleWeekly);
-        applyChartRange();
-        asOfEl.textContent = `รายวัน ${candleDaily.length} วัน + รายสัปดาห์ ${candleWeekly.length} สัปดาห์ · ดึงจากแคช · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน`;
-        fetchOverview(ticker, keyInput);
-        return;
-      }
-    }catch(e){}
-  }
+   // compact daily bars — free tier, last ~100 trading days
+  // full weekly history — free tier, no outputsize limit
 
-  refreshBtn.disabled = true;
-  refreshBtn.textContent = 'กำลังโหลด...';
-  asOfEl.textContent = 'กำลังดึงราคาล่าสุด...';
 
-  try{
-    // TIME_SERIES_DAILY (outputsize=compact, last ~100 trading days) covers the short ranges (1D/5D/1M)
-    // TIME_SERIES_WEEKLY always returns full history with no outputsize param, and stays on the free tier
-    // (outputsize=full on the DAILY endpoint is premium-only — confirmed by Alpha Vantage's own error message,
-    // so we deliberately don't request it) — covers the longer ranges (6M/YTD/1Y/5Y/10Y/All)
-    const dailyUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodeURIComponent(ticker)}&outputsize=compact&apikey=${encodeURIComponent(keyInput)}`;
-    const weeklyUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(keyInput)}`;
 
-    const [dailyRes, weeklyRes] = await Promise.all([fetch(dailyUrl), fetch(weeklyUrl)]);
-    const dailyData = dailyRes.ok ? await dailyRes.json() : null;
-    const weeklyData = weeklyRes.ok ? await weeklyRes.json() : null;
 
-    const dailyErr = avApiErrorMsg(dailyData, ticker);
-    const weeklyErr = avApiErrorMsg(weeklyData, ticker);
 
-    const daily = dailyErr ? [] : parseAVSeries(dailyData, 'Time Series (Daily)');
-    let weekly = weeklyErr ? [] : parseAVSeries(weeklyData, 'Weekly Time Series');
-    weekly = weekly.slice(-1150); // cap at ~22 years, plenty for the 10Y/All tabs
 
-    if (daily.length === 0 && weekly.length === 0){
-      throw new Error(dailyErr || weeklyErr || 'ไม่ได้รับข้อมูลราคา');
-    }
 
-    candleDaily = daily;
-    candleWeekly = weekly;
 
-    try{ localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), daily, weekly })); }catch(e){}
 
-    renderStockHeader(ticker, daily.length ? daily : weekly);
-    applyChartRange();
 
-    const notes = [];
-    if (daily.length) notes.push(`รายวัน ${daily.length} วัน`);
-    if (weekly.length) notes.push(`รายสัปดาห์ ${weekly.length} สัปดาห์ (ตั้งแต่ ${weekly[0].date})`);
-    if (dailyErr && weekly.length) notes.push('⚠ ดึงรายวันไม่ได้ (' + dailyErr + ') — ใช้รายสัปดาห์แทนสำหรับช่วงสั้น');
-    if (weeklyErr && daily.length) notes.push('⚠ ดึงรายสัปดาห์ไม่ได้ (' + weeklyErr + ') — ช่วงยาวจะไม่ครบ');
-    asOfEl.textContent = notes.join(' · ') + ' · ไม่ใช่ real-time ระหว่างวัน อัปเดตหลังตลาดสหรัฐฯ ปิดแต่ละวัน';
-    fetchOverview(ticker, keyInput);
 
-  }catch(err){
-    asOfEl.textContent = '⚠ ดึงกราฟไม่สำเร็จ: ' + (err.message || 'ลองใหม่ภายหลัง');
-  }finally{
-    refreshBtn.disabled = false;
-    refreshBtn.textContent = '🔄 รีเฟรช';
-  }
-}
 
-function renderStockHeader(ticker, bars){
-  const badge = document.getElementById('stockBadge');
-  badge.textContent = ticker.slice(0, 2);
-  badge.style.background = tickerColor(ticker);
-  document.getElementById('stockTicker').textContent = ticker;
 
-  const last = bars[bars.length - 1];
-  const prev = bars.length > 1 ? bars[bars.length - 2] : null;
-  document.getElementById('stockPrice').textContent = fmtUSD(last.close);
 
-  const chEl = document.getElementById('stockChange');
-  if (prev){
-    const chg = last.close - prev.close;
-    const pct = (chg / prev.close) * 100;
-    const up = chg >= 0;
-    chEl.className = 'stock-change ' + (up ? 'up' : 'down');
-    chEl.textContent = `${up ? '+' : ''}${fmtUSD(chg)} (${up ? '+' : ''}${pct.toFixed(2)}%) · ${last.date}`;
-  } else {
-    chEl.className = 'stock-change';
-    chEl.textContent = last.date;
-  }
-}
 
-function fetchOverview(ticker, keyInput){
-  const cacheKey = 'avOverview_' + ticker;
-  try{
-    const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-    if (cached && (Date.now() - cached.ts) < 30*24*60*60*1000){
-      applyOverview(cached.name, cached.exchange);
-      return;
-    }
-  }catch(e){}
 
-  // best-effort decoration only — never blocks or errors out the chart above,
-  // and silently does nothing if the ticker is an ETF (Alpha Vantage's free
-  // OVERVIEW endpoint usually returns no data for those) rather than guess a name
-  fetch(`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(keyInput)}`)
-    .then(res => res.ok ? res.json() : null)
-    .then(data => {
-      if (!data || !data['Name']) return;
-      const name = data['Name'];
-      const exchange = data['Exchange'] || '';
-      try{ localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), name, exchange })); }catch(e){}
-      applyOverview(name, exchange);
-    })
-    .catch(() => {});
-}
 
-function applyOverview(name, exchange){
-  const nameEl = document.getElementById('stockName');
-  if (!nameEl) return;
-  nameEl.textContent = exchange ? `${name} · ${exchange}` : name;
-}
 
-// picks which free-tier series (daily-compact or weekly-full) best serves a given
-// range, falling back to whichever one actually has data
-function sourceForRange(range){
-  const hasDaily = candleDaily && candleDaily.length >= 2;
-  const hasWeekly = candleWeekly && candleWeekly.length >= 2;
-  if (range === '1D' || range === '5D'){
-    if (hasDaily) return candleDaily;
-    if (hasWeekly) return candleWeekly;
-    return [];
-  }
-  if (range === '1M'){
-    if (hasDaily && candleDaily.length >= 5) return candleDaily;
-    if (hasWeekly) return candleWeekly;
-    return hasDaily ? candleDaily : [];
-  }
-  // 6M / YTD / 1Y / 5Y / 10Y / ALL — long ranges need the full weekly history
-  if (hasWeekly) return candleWeekly;
-  return hasDaily ? candleDaily : [];
-}
 
-function sliceByRange(range){
-  const bars = sourceForRange(range);
-  const n = bars.length;
-  if (n === 0) return bars;
-  if (range === '1D') return bars.slice(Math.max(0, n - 2));
-  if (range === '5D') return bars.slice(Math.max(0, n - 6));
-  if (range === 'ALL') return bars;
 
-  const lastDate = new Date(bars[n - 1].date + 'T00:00:00');
-  let cutoff = new Date(lastDate);
-  if (range === '1M') cutoff.setMonth(cutoff.getMonth() - 1);
-  else if (range === '6M') cutoff.setMonth(cutoff.getMonth() - 6);
-  else if (range === 'YTD') cutoff = new Date(lastDate.getFullYear(), 0, 1);
-  else if (range === '1Y') cutoff.setFullYear(cutoff.getFullYear() - 1);
-  else if (range === '5Y') cutoff.setFullYear(cutoff.getFullYear() - 5);
-  else if (range === '10Y') cutoff.setFullYear(cutoff.getFullYear() - 10);
 
-  const cutoffStr = cutoff.toISOString().slice(0, 10);
-  let idx = bars.findIndex(b => b.date >= cutoffStr);
-  if (idx === -1) idx = n - 1;
-  idx = Math.max(0, idx - 1); // keep one bar before the cutoff as the % baseline
-  return bars.slice(idx);
-}
 
-function computeReturnForRange(range){
-  const sliced = sliceByRange(range);
-  if (sliced.length < 2) return null;
-  const first = sliced[0].close, last = sliced[sliced.length - 1].close;
-  if (!first) return null;
-  return (last / first - 1) * 100;
-}
 
-function setChartRange(range){
-  chartRange = range;
-  applyChartRange();
-}
 
-function applyChartRange(){
-  const hasDaily = candleDaily && candleDaily.length >= 2;
-  const hasWeekly = candleWeekly && candleWeekly.length >= 2;
-  if (!hasDaily && !hasWeekly) return;
-  let sliced = sliceByRange(chartRange);
-  if (sliced.length < 2){
-    const fallback = sourceForRange(chartRange);
-    sliced = fallback.slice(-2);
-  }
-  if (sliced.length < 2) return;
-  drawAreaChart(sliced);
-  updateRangeTabs();
-}
 
-function updateRangeTabs(){
-  RANGE_LIST.forEach(r => {
-    const btn = document.querySelector('.range-tab[data-range="' + r + '"]');
-    if (btn) btn.classList.toggle('active', r === chartRange);
-    const el = document.getElementById('rtReturn_' + r);
-    if (!el) return;
-    const ret = computeReturnForRange(r);
-    if (ret === null){
-      el.textContent = '';
-      el.className = 'rt-return';
-    } else {
-      el.textContent = (ret >= 0 ? '+' : '') + ret.toFixed(1) + '%';
-      el.className = 'rt-return ' + (ret >= 0 ? 'up' : 'down');
-    }
-  });
-}
 
-function drawAreaChart(bars){
-  const svg = document.getElementById('candleChart');
-  svg.innerHTML = '';
-  const W = 600, H = 260;
-  const padL = 48, padR = 10, padT = 14, padB = 20;
-  const plotW = W - padL - padR;
-  const plotH = H - padT - padB;
-  const n = bars.length;
-  const ns = "http://www.w3.org/2000/svg";
-  if (n < 2) return;
-
-  const closes = bars.map(b => b.close);
-  const maxP = Math.max(...closes);
-  const minP = Math.min(...closes);
-  const pad = (maxP - minP) * 0.08 || maxP * 0.05;
-  const top = maxP + pad, bottom = minP - pad;
-
-  function y(v){ return padT + plotH * (1 - (v - bottom) / (top - bottom)); }
-  function x(i){ return padL + plotW * i / (n - 1); }
-
-  const up = closes[closes.length - 1] >= closes[0];
-  const lineColor = up ? themeVar('--green') : themeVar('--red');
-  const fillId = 'areaFill_' + Math.random().toString(36).slice(2, 9);
-
-  const defs = document.createElementNS(ns, 'defs');
-  const grad = document.createElementNS(ns, 'linearGradient');
-  grad.setAttribute('id', fillId);
-  grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0');
-  grad.setAttribute('x2', '0'); grad.setAttribute('y2', '1');
-  const stop1 = document.createElementNS(ns, 'stop');
-  stop1.setAttribute('offset', '0%'); stop1.setAttribute('stop-color', lineColor); stop1.setAttribute('stop-opacity', '0.25');
-  const stop2 = document.createElementNS(ns, 'stop');
-  stop2.setAttribute('offset', '100%'); stop2.setAttribute('stop-color', lineColor); stop2.setAttribute('stop-opacity', '0.02');
-  grad.appendChild(stop1); grad.appendChild(stop2);
-  defs.appendChild(grad);
-  svg.appendChild(defs);
-
-  // gridlines + y labels (top / mid / bottom only — minimal look)
-  [0, 0.5, 1].forEach(frac => {
-    const val = bottom + (top - bottom) * frac;
-    const yy = y(val);
-    const line = document.createElementNS(ns, 'line');
-    line.setAttribute('x1', padL); line.setAttribute('x2', W - padR);
-    line.setAttribute('y1', yy); line.setAttribute('y2', yy);
-    line.setAttribute('stroke', themeVar('--paper-line'));
-    line.setAttribute('stroke-width', '1');
-    if (frac === 0.5) line.setAttribute('stroke-dasharray', '3,3');
-    svg.appendChild(line);
-
-    const label = document.createElementNS(ns, 'text');
-    label.setAttribute('x', padL - 6);
-    label.setAttribute('y', yy + 3);
-    label.setAttribute('text-anchor', 'end');
-    label.setAttribute('font-size', '9');
-    label.setAttribute('fill', themeVar('--muted'));
-    label.textContent = val.toFixed(val < 10 ? 2 : (val < 200 ? 1 : 0));
-    svg.appendChild(label);
-  });
-
-  let linePath = '';
-  bars.forEach((b, i) => {
-    const cmd = i === 0 ? 'M' : 'L';
-    linePath += `${cmd}${x(i).toFixed(2)},${y(b.close).toFixed(2)} `;
-  });
-  linePath = linePath.trim();
-
-  const baseY = (padT + plotH).toFixed(2);
-  const areaPath = `${linePath} L${x(n - 1).toFixed(2)},${baseY} L${x(0).toFixed(2)},${baseY} Z`;
-
-  const areaEl = document.createElementNS(ns, 'path');
-  areaEl.setAttribute('d', areaPath);
-  areaEl.setAttribute('fill', `url(#${fillId})`);
-  areaEl.setAttribute('stroke', 'none');
-  svg.appendChild(areaEl);
-
-  const lineEl = document.createElementNS(ns, 'path');
-  lineEl.setAttribute('d', linePath);
-  lineEl.setAttribute('fill', 'none');
-  lineEl.setAttribute('stroke', lineColor);
-  lineEl.setAttribute('stroke-width', '1.75');
-  lineEl.setAttribute('stroke-linejoin', 'round');
-  lineEl.setAttribute('stroke-linecap', 'round');
-  svg.appendChild(lineEl);
-
-  [0, n - 1].forEach(i => {
-    const label = document.createElementNS(ns, 'text');
-    label.setAttribute('x', x(i));
-    label.setAttribute('y', H - 5);
-    label.setAttribute('text-anchor', i === 0 ? 'start' : 'end');
-    label.setAttribute('font-size', '9');
-    label.setAttribute('fill', themeVar('--muted'));
-    label.textContent = bars[i].date;
-    svg.appendChild(label);
-  });
-}
 
 /* ---- Thai S&P500 feeder funds ---- */
 
@@ -4213,14 +3522,7 @@ const THAI_SPX_FUNDS = [
   }
 ];
 
-function useLastFetchedCAGR(){
-  if (lastFetchedCAGR === null){
-    alert('ยังไม่เคยดึงข้อมูลจริงจากแท็บ "หุ้นต่างประเทศ" เลย — ลองไปดึง ticker เช่น VOO หรือ SPY ก่อน');
-    return;
-  }
-  document.getElementById('spxAssumed').value = lastFetchedCAGR.toFixed(2);
-  renderFundTable();
-}
+
 
 function renderFundTable(){
   const assumed = parseFloat(document.getElementById('spxAssumed').value) || 0;
@@ -4288,7 +3590,7 @@ function getBudgetTotal(containerId){
   return total;
 }
 
-function toggleBudget(){ /* budget card no longer collapses — kept for old callers */ }
+
 
 // old two-tab budget card → now the "เดือนนี้" steps (2 = expenses, 3 = what's left)
 function switchBudgetTab(tab){
@@ -4670,18 +3972,28 @@ function attachPlacePicker(input){
       lastQ = q;
       list.innerHTML = '<div class="sym-note">กำลังค้นหา...</div>';
       list.classList.add('open');
+      // a Google Maps link pasted from the browser's address bar
+      const gm = parseGoogleMapsUrl(q);
+      if (gm){
+        if (gm.short){
+          list.innerHTML = '<div class="sym-note">ลิงก์แบบสั้น (maps.app.goo.gl) อ่านพิกัดไม่ได้ — เปิดลิงก์นั้นในเบราว์เซอร์คอม แล้วก๊อป URL ยาวจากช่องที่อยู่ด้านบนมาวางแทน</div>';
+          return;
+        }
+        pickPoint(input, gm.lat, gm.lon, gm.name || `พิกัด ${gm.lat.toFixed(4)}, ${gm.lon.toFixed(4)}`);
+        close();
+        return;
+      }
       // pasted coordinates (Google Maps: long-press a spot → copy "13.70, 100.60")
       const cm = q.match(/^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$/);
       if (cm){
-        routePts[input.id] = { lat: +cm[1], lon: +cm[2], name: `พิกัด ${(+cm[1]).toFixed(4)}, ${(+cm[2]).toFixed(4)}` };
+        pickPoint(input, +cm[1], +cm[2], `พิกัด ${(+cm[1]).toFixed(4)}, ${(+cm[2]).toFixed(4)}`, true);
         close();
-        calcRouteDistance();
         return;
       }
       try{
         const feats = await searchPlaces(q);
         if (input.value.trim() !== lastQ) return;
-        if (!feats.length){ list.innerHTML = `<div class="sym-note">ไม่เจอ "${escHtml(q)}" ในแผนที่ฟรี — ลองพิมพ์ชื่อถนน/ซอย/ห้างใกล้ๆ แทน (เช่น "สุขุมวิท 115", "เมกา บางนา")<br>หรือเปิด Google Maps กดค้างที่จุดนั้น → คัดลอกพิกัด (เช่น 13.60, 100.61) แล้ววางในช่องนี้</div>`; return; }
+        if (!feats.length){ list.innerHTML = `<div class="sym-note">ไม่เจอ "${escHtml(q)}" ในแผนที่ฟรี — ลองพิมพ์ชื่อถนน/ซอย/ห้างใกล้ๆ แทน (เช่น "สุขุมวิท 115", "เมกา บางนา")<br>หรือเปิดสถานที่นั้นใน <b>Google Maps บนคอม</b> แล้วก๊อป <b>URL จากช่องที่อยู่ด้านบน</b> มาวางในช่องนี้ได้เลย (หรือกดค้างที่จุด → คัดลอกพิกัด)</div>`; return; }
         list.innerHTML = feats.map((f, i) => { const l = placeLabel(f);
           return `<button type="button" class="sym-item" data-i="${i}"><span class="sym-code">📍</span><span class="place-main">${escHtml(l.main)}<small>${escHtml(l.sub)}</small></span></button>`; }).join('');
         list.querySelectorAll('.sym-item').forEach(b => b.addEventListener('mousedown', ev => {
@@ -4689,9 +4001,8 @@ function attachPlacePicker(input){
           const f = feats[+b.dataset.i];
           const l = placeLabel(f);
           input.value = l.main + (l.sub ? ', ' + l.sub.split(', ')[0] : '');
-          routePts[input.id] = { lon: f.geometry.coordinates[0], lat: f.geometry.coordinates[1], name: l.main };
+          pickPoint(input, f.geometry.coordinates[1], f.geometry.coordinates[0], l.main, true, input.value);
           close();
-          calcRouteDistance();
         }));
       }catch(e){
         list.innerHTML = '<div class="sym-note">ค้นหาสถานที่ไม่ได้ตอนนี้ (ไม่มีเน็ต หรือบริการแผนที่ฟรีไม่ตอบ) — ใส่ระยะทาง กม. เองด้านล่างได้</div>';
@@ -4705,9 +4016,59 @@ function attachPlacePicker(input){
   });
 }
 
+
+// "https://www.google.com/maps/place/Topre+(Thailand)+Co.,+Ltd./@13.53,100.93,17z/data=...!3d13.5312!4d100.9345"
+function parseGoogleMapsUrl(text){
+  const t = String(text || '').trim();
+  if (!/google\.[a-z.]+\/maps|maps\.google\.|maps\.app\.goo\.gl|goo\.gl\/maps/i.test(t)) return null;
+  if (/maps\.app\.goo\.gl|goo\.gl\/maps/i.test(t)) return { short: true };
+  let m = t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || t.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || t.match(/[?&](?:q|query|ll)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+  if (!m) return null;
+  const nm = t.match(/\/place\/([^/@?]+)/);
+  let name = '';
+  try{ name = nm ? decodeURIComponent(nm[1].replace(/\+/g, ' ')) : ''; }catch(e){ name = ''; }
+  return { lat: +m[1], lon: +m[2], name };
+}
+// saved places (home, work...) so each place only has to be found once
+const PLACES_KEY = 'dcaPlacesV1';
+function loadPlaces(){ try{ return JSON.parse(localStorage.getItem(PLACES_KEY) || '[]'); }catch(e){ return []; } }
+function savePlace(name, lat, lon){
+  if (!name) return;
+  const list = loadPlaces().filter(p => p.name !== name && !(Math.abs(p.lat - lat) < 1e-4 && Math.abs(p.lon - lon) < 1e-4));
+  list.unshift({ name, lat, lon });
+  try{ localStorage.setItem(PLACES_KEY, JSON.stringify(list.slice(0, 8))); }catch(e){}
+  renderPlaceChips();
+}
+function forgetPlace(i){
+  const list = loadPlaces(); list.splice(i, 1);
+  try{ localStorage.setItem(PLACES_KEY, JSON.stringify(list)); }catch(e){}
+  renderPlaceChips();
+}
+function pickPoint(input, lat, lon, name, remember, shownText){
+  routePts[input.id] = { lat, lon, name };
+  input.value = shownText || name;
+  if (remember !== false) savePlace(name, lat, lon);
+  calcRouteDistance();
+}
+function usePlaceChip(i, which){
+  const p = loadPlaces()[i];
+  if (!p) return;
+  const target = which || (!routePts.fuelOrigin ? 'fuelOrigin' : 'fuelDest');
+  pickPoint(document.getElementById(target), p.lat, p.lon, p.name, false);
+}
+function renderPlaceChips(){
+  const box = document.getElementById('placeChips');
+  if (!box) return;
+  const list = loadPlaces();
+  box.innerHTML = list.length ? `<span class="pc-title">📌 ที่เคยใช้:</span>` + list.map((p, i) =>
+    `<span class="pc-chip"><button type="button" onclick="usePlaceChip(${i},'fuelOrigin')" title="ใช้เป็นต้นทาง">${escHtml(p.name.length > 28 ? p.name.slice(0, 27) + '…' : p.name)}</button><button type="button" class="pc-to" onclick="usePlaceChip(${i},'fuelDest')" title="ใช้เป็นปลายทาง">→ไป</button><button type="button" class="pc-x" onclick="forgetPlace(${i})" title="ลบ">✕</button></span>`
+  ).join('') : '';
+}
+
 // Photon matches names word by word, so "IDEO 115" misses "Ideo Mobi Sukhumvit 115".
 // Try the full text first, then looser variants, and merge what comes back.
 async function searchPlaces(q){
+  q = q.trim();
   const base = 'https://photon.komoot.io/api/?limit=8&lat=13.75&lon=100.52&bbox=97.3,5.6,105.7,20.5&q=';
   const seen = new Set(), out = [];
   const add = feats => (feats || []).forEach(f => {
@@ -4718,6 +4079,27 @@ async function searchPlaces(q){
   const get = async text => { try{ const j = await (await fetch(base + encodeURIComponent(text))).json(); return j.features || []; }catch(e){ throw e; } };
   add(await get(q));
   if (out.length >= 3) return out;
+  // transit prefixes: "bts puchao" → search the station name itself
+  const tr = q.match(/^(bts|mrt|arl|brt|สถานี)\s*(.+)$/i);
+  if (tr){
+    const name = tr[2].trim();
+    for (const v of [name, name + ' station', 'สถานี' + name]){
+      if (out.length >= 5) break;
+      add(await get(v));
+    }
+    if (out.length) return out;
+    q = name;
+  }
+  // romanized Thai typed without spaces ("puchao" vs "Pu Chao"): try a few split points
+  if (!out.length && /^[a-z]{5,}$/i.test(q)){
+    const cuts = [2, 3, 4, q.length - 4, q.length - 3].filter((c, i, arr) => c >= 2 && c <= q.length - 2 && arr.indexOf(c) === i);
+    for (const c of cuts){
+      const left = q.slice(0, c).toLowerCase(), right = q.slice(c).toLowerCase();
+      const feats = await get(left + ' ' + right);
+      add(feats.filter(f => { const t = JSON.stringify(f.properties || {}).toLowerCase(); return t.indexOf(left) !== -1 && t.indexOf(right) !== -1; }));
+      if (out.length) return out;
+    }
+  }
   const words = q.split(/\s+/).filter(Boolean);
   const variants = [];
   if (words.length > 1){
@@ -4771,6 +4153,7 @@ async function calcRouteDistance(){
   }
 }
 attachPlacePicker(document.getElementById('fuelOrigin'));
+renderPlaceChips();
 attachPlacePicker(document.getElementById('fuelDest'));
 
 function openInMaps(){
@@ -6103,7 +5486,7 @@ function applyBudgetState(state){
 const LAST_BACKUP_KEY = 'dcaLastBackupV1';
 
 /* ---- Monthly check-in: portfolio value + actual invested + save, all in the top banner ---- */
-let checkinOpen = false;
+
 function updateSaveReminder(){
   const box = document.getElementById('saveReminder');
   if (!box) return;
@@ -6332,7 +5715,6 @@ function renderStep4(){
     <details class="nw-details s4-values"><summary>📱 อัปเดตมูลค่าล่าสุดจากแอป (ไม่บังคับ — ไม่กรอกก็ได้ ระบบบวกเงินที่ลงเพิ่มให้เอง)</summary>
       <div class="ci-prices">${HOLD.items.map(h => `<label class="ci-price"><span>${HTYPES[h.type].icon} ${escHtml(h.symbol)} <small>${h.mode === 'amount' ? 'มูลค่าตอนนี้ (บาท)' : 'ราคา/หน่วย (' + hCcy(h) + ')'}</small></span>
         <input type="number" min="0" step="any" data-hid="${h.id}" value="${h.price || 0}" oninput="onStep4Price(this)"></label>`).join('')}</div>
-      ${HOLD.items.some(h => h.projId) ? `<button type="button" class="sr-btn ghost" style="margin-top:10px;" onclick="refreshFundNavs()">🔄 ดึง NAV ล่าสุดจาก ก.ล.ต.</button>` : ''}
     </details>
     <input type="hidden" id="ciActual" value="${total}">
     <div class="step4-total">ยอดพอร์ตหลังบันทึก ≈ <b id="step4Total">${fmtMoney(portfolioNow + estimateAdd())}</b></div>`;
@@ -6380,7 +5762,6 @@ function addAssetFromStep4(it, amt){
   } else {
     const type = it.t === 'th' ? 'th' : it.t === 'us' ? 'us' : it.t === 'fund' ? 'fund' : 'other';
     const h = { id: uid(), type, symbol: it.s, mode: 'amount', units: 1, avgCost: 0, price: 0, hist: {} };
-    if (it.projId){ h.projId = it.projId; h.classId = it.classId || ''; }
     HOLD.items.push(h);
     saveHoldings();
     step4Draft.amounts[h.id] = amt;
@@ -6475,10 +5856,7 @@ function renderStep5(){
     ${justSaved === mk ? `<div class="save-done">✅ บันทึกแล้ว! ดูกราฟย้อนหลังได้ที่ <a href="#" onclick="showTab('history');return false;">แท็บย้อนหลัง</a> · <a href="#" onclick="exportBackup();return false;">⬇️ สำรองข้อมูล</a> ไว้ด้วยก็ดี</div>` : ''}`;
 }
 
-function saveThisMonthNow(){
-  document.getElementById('budgetMonth').value = todayMonthStr();
-  saveBudgetMonth();
-}
+
 
 /* ---- History charts: portfolio actual vs plan, monthly savings ---- */
 function renderHistoryCharts(){
@@ -6662,7 +6040,7 @@ function toggleTip(btn){
 /* ---- Backup file: export / import this tool's own saved data ---- */
 // the API key is deliberately NOT included — the backup file might get
 // shared or uploaded somewhere, and the key isn't something to carry around.
-const BACKUP_KEYS = ['dcaBudgetHistoryV1', 'dcaGoalsV1', 'dcaCashLogV1', 'dcaHoldingsV1'];
+const BACKUP_KEYS = ['dcaBudgetHistoryV1', 'dcaGoalsV1', 'dcaCashLogV1', 'dcaHoldingsV1', 'dcaPlacesV1'];
 function exportBackup(){
   const data = {};
   try{ BACKUP_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) data[k] = v; }); }catch(e){}
@@ -6930,7 +6308,6 @@ function addHolding(){
       return;
     }
     const h0 = { id: uid(), type, symbol, mode: 'amount', units: 1, avgCost: invested, price: 0, hist: {} };
-    const pj = document.getElementById('haSymbol').dataset.projId; if (pj) h0.projId = pj;
     setHoldPrice(h0, valueRaw === '' ? invested : (parseFloat(valueRaw) || 0));
     HOLD.items.push(h0);
     saveHoldings();
@@ -7154,31 +6531,8 @@ function mountTV(box, sym, height){
   });
   box.querySelector('.tradingview-widget-container').appendChild(sc);
 }
-function showQuickTV(){
-  const raw = document.getElementById('tvSymbol').value.trim();
-  const box = document.getElementById('tvQuickBox');
-  if (!raw){ box.innerHTML = '<p class="hint">ใส่ชื่อย่อหุ้นก่อน เช่น META หรือ SET:SCB</p>'; return; }
-  mountTV(box, tvSymbolOf(raw, 'us'), 420);
-}
-// TradingView / Alpha Vantage switch inside the fetched-stock card
-var chartSource = 'tv';
-function setChartSource(src){
-  chartSource = src;
-  const tvBox = document.getElementById('tvGlobalBox');
-  const svg = document.getElementById('candleChart');
-  const tabs = document.getElementById('rangeTabs');
-  document.getElementById('srcTV').classList.toggle('active', src === 'tv');
-  document.getElementById('srcAV').classList.toggle('active', src === 'av');
-  const showTV = src === 'tv';
-  tvBox.style.display = showTV ? '' : 'none';
-  svg.style.display = showTV ? 'none' : '';
-  if (tabs) tabs.style.display = showTV ? 'none' : '';
-  if (showTV && lastFetchedTicker && tvBox.dataset.sym !== lastFetchedTicker){
-    tvBox.dataset.sym = lastFetchedTicker;
-    mountTV(tvBox, tvSymbolOf(lastFetchedTicker, 'us'), 380);
-  }
-  if (!showTV && typeof applyChartRange === 'function') applyChartRange();
-}
+
+
 
 function renderHoldChart(h, box){
   if (h.type === 'th' || h.type === 'us'){
@@ -7463,7 +6817,6 @@ var SYMBOLS = [
   ['AMD','AMD','us'],['TSM','TSMC (ADR)','us']
 ].map(a => ({ s: a[0], n: a[1], t: a[2] }));
 
-var symPickerTimer = null;
 function attachSymbolPicker(input, opts){
   if (!input || input.dataset.picker) return;
   input.dataset.picker = '1';
@@ -7500,33 +6853,6 @@ function attachSymbolPicker(input, opts){
       .filter(x => x.s.toLowerCase().indexOf(q) !== -1 || x.n.toLowerCase().indexOf(q) !== -1)
       .sort((a, b) => (a.s.toLowerCase().indexOf(q) === 0 ? -1 : 0) - (b.s.toLowerCase().indexOf(q) === 0 ? -1 : 0));
     render(hits, hits.length ? 'ไม่เจอที่ต้องการ? พิมพ์ชื่อย่อจากแอปได้เลย' : '');
-    // live Thai-fund search through the SEC API when a key is saved
-    if (q.length >= 2 && types.indexOf('fund') !== -1 && secKey()){
-      clearTimeout(input._secT);
-      input._secT = setTimeout(async () => {
-        try{
-          const extra = (await secSearchFunds(q)).filter(m => m.s && !hits.some(h => h.s.toLowerCase() === m.s.toLowerCase()));
-          if (extra.length && document.activeElement === input && input.value.trim().toLowerCase() === q && Date.now() - (input._justPicked || 0) > 1500){ hits.push(...extra); render(hits, 'รวมกองทุนจาก ก.ล.ต. แล้ว'); }
-        }catch(e){ /* blocked / bad key — built-in list still works */ }
-      }, 400);
-    }
-    // live US search through Alpha Vantage when a key is saved
-    if (q.length >= 2 && types.indexOf('us') !== -1){
-      clearTimeout(symPickerTimer);
-      symPickerTimer = setTimeout(async () => {
-        let key = '';
-        try{ key = localStorage.getItem('avApiKey') || (document.getElementById('avKey') || {}).value || ''; }catch(e){}
-        if (!key) return;
-        try{
-          const r = await fetch(`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(q)}&apikey=${encodeURIComponent(key)}`);
-          const j = await r.json();
-          const extra = (j.bestMatches || []).filter(m => (m['4. region'] || '').indexOf('United States') !== -1)
-            .map(m => ({ s: m['1. symbol'], n: m['2. name'], t: 'us' }))
-            .filter(m => !hits.some(h => h.s === m.s));
-          if (extra.length && document.activeElement === input && input.value.trim().toLowerCase() === q && Date.now() - (input._justPicked || 0) > 1500) render(hits.concat(extra), 'รวมผลค้นหาจาก Alpha Vantage แล้ว');
-        }catch(e){ /* offline or quota — the built-in list still works */ }
-      }, 450);
-    }
   };
   input.addEventListener('input', search);
   input.addEventListener('focus', search);
@@ -7545,126 +6871,18 @@ function attachSymbolPicker(input, opts){
    Optional. With the user's own key (kept only in localStorage) we can search
    every Thai fund and draw its real daily NAV. If the browser blocks the call
    (CORS) or the key is wrong, everything falls back to the built-in list. */
-var SEC_BASE = 'https://api.sec.or.th';
-function secKey(){ try{ return localStorage.getItem('secApiKey') || ''; }catch(e){ return ''; } }
-async function secGet(path, params){
-  const key = secKey();
-  if (!key) throw new Error('no-key');
-  const qs = new URLSearchParams(params || {}).toString();
-  const r = await fetch(`${SEC_BASE}${path}${qs ? '?' + qs : ''}`, { headers: { 'Ocp-Apim-Subscription-Key': key } });
-  if (r.status === 401 || r.status === 403) throw new Error('key');
-  if (!r.ok) throw new Error('http ' + r.status);
-  return r.json();
-}
-function secErrText(e){
-  const m = String(e && e.message || e);
-  if (m === 'key') return 'key ไม่ถูกต้อง หรือยังไม่ได้กด Subscribe กลุ่ม API กองทุน';
-  if (m === 'no-key') return 'ยังไม่ได้ใส่ key';
-  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'เบราว์เซอร์บล็อกการเชื่อมต่อ (ก.ล.ต. อาจไม่อนุญาตให้เว็บอื่นเรียกตรงๆ) หรือไม่มีเน็ต';
-  return m;
-}
-async function saveSecKey(){
-  const v = (document.getElementById('secKey').value || '').trim();
-  const st = document.getElementById('secStatus');
-  try{ if (v) localStorage.setItem('secApiKey', v); else localStorage.removeItem('secApiKey'); }catch(e){}
-  if (!v){ st.textContent = 'ลบ key แล้ว'; return; }
-  st.textContent = 'กำลังทดสอบ...'; st.style.color = 'var(--muted)';
-  try{
-    const j = await secGet('/v2/fund/general-info/profiles', { project_info: 'K-US500X', page_size: 3 });
-    const n = (j.items || []).length;
-    st.textContent = `✅ เชื่อมต่อได้ — ค้นกองทุนไทยในช่องค้นหาได้ทุกกองแล้ว (ทดสอบค้น "K-US500X" เจอ ${n} รายการ)`;
-    st.style.color = 'var(--green)';
-  }catch(e){
-    st.textContent = '❌ ใช้ไม่ได้: ' + secErrText(e);
-    st.style.color = 'var(--red)';
-  }
-}
-async function secSearchFunds(q){
-  const j = await secGet('/v2/fund/general-info/profiles', { project_info: q, page_size: 20 });
-  return (j.items || []).filter(x => !x.cancel_date).map(x => ({
-    s: x.proj_abbr_name || x.proj_name_en, n: (x.proj_name_th || x.proj_name_en || '') + (x.comp_name_th ? ' · ' + x.comp_name_th.replace(/^บริษัทหลักทรัพย์จัดการกองทุน\s*/,'บลจ.').replace(/\s*จำกัด.*$/,'') : ''),
-    t: 'fund', projId: x.proj_id
-  }));
-}
-async function secFindProjId(item){
-  if (item.projId) return item.projId;
-  const tries = [item.s, item.s.replace(/\(.*\)$/, ''), item.s.split('-').slice(0, 2).join('-')];
-  for (const q of tries){
-    if (!q) continue;
-    const hits = await secSearchFunds(q);
-    const exact = hits.find(h => h.s && h.s.toLowerCase() === q.toLowerCase()) || hits[0];
-    if (exact) return exact.projId;
-  }
-  return null;
-}
-async function secNavSeries(projId, days){
-  const end = new Date(), start = new Date(Date.now() - (days || 365) * 86400000);
-  const f = d => d.toISOString().slice(0, 10);
-  let cursor = '', rows = [], pages = 0;
-  do{
-    const params = { proj_id: projId, start_nav_date: f(start), end_nav_date: f(end), page_size: 100 };
-    if (cursor) params.next_cursor = cursor;
-    const j = await secGet('/v2/fund/daily-info/nav', params);
-    rows = rows.concat(j.items || []);
-    cursor = j.next_cursor || '';
-    pages++;
-  } while (cursor && pages < 8);
-  return rows;
-}
-function pickClass(rows, wanted){
-  const byClass = {};
-  rows.forEach(r => { const c = r.fund_class_name || '-'; (byClass[c] = byClass[c] || []).push(r); });
-  const names = Object.keys(byClass);
-  const w = (wanted || '').toLowerCase();
-  const match = names.find(n => n !== '-' && w.indexOf(n.toLowerCase()) !== -1) || names.sort((a, b) => byClass[b].length - byClass[a].length)[0];
-  return { name: match, rows: (byClass[match] || []).sort((a, b) => a.nav_date.localeCompare(b.nav_date)) };
-}
-async function drawFundNav(item, box, noteEl){
-  box.innerHTML = '<p class="hint">กำลังดึง NAV จาก ก.ล.ต. ...</p>';
-  try{
-    const projId = await secFindProjId(item);
-    if (!projId) throw new Error('ไม่พบกองทุนนี้ในฐานข้อมูล ก.ล.ต.');
-    item.projId = projId;
-    const rows = await secNavSeries(projId, 365);
-    if (!rows.length) throw new Error('ไม่มีข้อมูล NAV ช่วง 1 ปีที่ผ่านมา');
-    const cls = pickClass(rows, item.s);
-    const pts = cls.rows.filter(r => r.last_val > 0);
-    const step = Math.max(1, Math.floor(pts.length / 60));
-    const sampled = pts.filter((_, i) => i % step === 0 || i === pts.length - 1);
-    const TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-    const labels = sampled.map(r => { const [y, m, d] = r.nav_date.split('-').map(Number); return `${d} ${TH[m-1]}`; });
-    const first = pts[0].last_val, last = pts[pts.length - 1].last_val;
-    const ret = (last / first - 1) * 100;
-    if (noteEl) noteEl.innerHTML = `✅ NAV จริงจาก ก.ล.ต. · ชนิดหน่วย <b>${escHtml(cls.name)}</b> · ล่าสุด <b>${last.toFixed(4)}</b> บาท/หน่วย (${pts[pts.length - 1].nav_date}) · 1 ปีที่ผ่านมา <b style="color:${ret >= 0 ? 'var(--green)' : 'var(--red)'}">${ret >= 0 ? '+' : ''}${ret.toFixed(2)}%</b>`;
-    box.innerHTML = `<div class="hist-chart" style="margin-top:6px;">${svgLineChart(labels, [{ values: sampled.map(r => r.last_val), color: 'var(--teal)', fill: true, noDots: true }])}</div>`;
-    item.lastNav = last;
-    return true;
-  }catch(e){
-    box.innerHTML = '';
-    if (noteEl) noteEl.innerHTML += `<br>⚠️ ดึง NAV จาก ก.ล.ต. ไม่ได้: ${escHtml(secErrText(e))}`;
-    return false;
-  }
-}
-async function refreshFundNavs(){
-  const funds = HOLD.items.filter(h => h.type === 'fund');
-  let n = 0;
-  for (const h of funds){
-    try{
-      const projId = await secFindProjId({ s: h.symbol, projId: h.projId });
-      if (!projId) continue;
-      h.projId = projId;
-      const rows = await secNavSeries(projId, 10);
-      const cls = pickClass(rows, h.symbol);
-      const lastRow = cls.rows[cls.rows.length - 1];
-      if (!lastRow) continue;
-      h.lastNav = lastRow.last_val;
-      if (h.mode !== 'amount'){ setHoldPrice(h, lastRow.last_val); h.valMonth = document.getElementById('budgetMonth').value || todayMonthStr(); n++; }
-    }catch(e){ alertLike('ดึง NAV ไม่ได้: ' + secErrText(e)); return; }
-  }
-  saveHoldings(); renderHoldings(); renderStep4();
-  alertLike(n ? `อัปเดตราคา NAV ล่าสุดแล้ว ${n} กองทุน ✓` : 'กองทุนแบบ "กรอกง่าย" ต้องใส่มูลค่าเอง (NAV ใช้ได้กับแบบใส่จำนวนหน่วย)');
-}
-(function initSecKey(){ const el = document.getElementById('secKey'); if (el && secKey()) el.value = secKey(); })();
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ================= ASSET SEARCH (one box for stocks, funds, ETFs) ================= */
 // fold the S&P500 fund fee table into the search list so those funds show their fee
@@ -7713,8 +6931,8 @@ function showAssetPick(item){
   let chartSym = null, chartNote = '';
   if (item.t === 'th' || item.t === 'us') chartSym = tvSymbolOf(item.s, item.t);
   else if (item.t === 'idx') chartSym = 'GLD';
-  else if (und){ chartSym = und.sym; chartNote = `📌 กองทุนไทยไม่มีกราฟใน TradingView — นี่คือกราฟ <b>${und.label}</b> ที่กองทุนนี้ลงทุนตาม ใช้ดูทิศทางตลาด (ไม่ใช่ NAV ของกองทุนเอง — ใส่ key ของ ก.ล.ต. ด้านล่างเพื่อดูกราฟ NAV จริง)`; }
-  else chartNote = '📌 กองทุนไทยไม่มีกราฟใน TradingView — ใส่ key ของ ก.ล.ต. ด้านล่างเพื่อดูกราฟ NAV จริง หรือดูในแอป บลจ.';
+  else if (und){ chartSym = und.sym; chartNote = `📌 กองทุนไทยไม่มีกราฟใน TradingView — นี่คือกราฟ <b>${und.label}</b> ที่กองทุนนี้ลงทุนตาม ใช้ดูทิศทางตลาด (ไม่ใช่ NAV ของกองทุนเอง ดู NAV จริงในแอป บลจ.)`; }
+  else chartNote = '📌 กองทุนไทยไม่มีกราฟใน TradingView — ดูกราฟ NAV ได้ในแอปหรือเว็บของ บลจ. ที่ซื้อ';
   box.innerHTML = `
     <div class="ap-card">
       <div class="ap-head">
@@ -7734,13 +6952,6 @@ function showAssetPick(item){
         </div>
       </div>
     </div>`;
-  if (item.t === 'fund' && secKey()){
-    const noteEl = box.querySelector('.ap-note');
-    drawFundNav(item, document.getElementById('apChart'), noteEl).then(ok => {
-      if (!ok && chartSym) mountTV(document.getElementById('apChart'), chartSym, 400);
-    });
-    return;
-  }
   if (chartSym) mountTV(document.getElementById('apChart'), chartSym, 400);
 }
 function pickFromSearchText(){
@@ -7762,26 +6973,12 @@ function addPickToPortfolio(){
   const sel = document.getElementById('haType');
   if (sel) sel.value = lastPick.t === 'fund' ? 'fund' : lastPick.t === 'th' ? 'th' : lastPick.t === 'us' ? 'us' : 'other';
   const sym = document.getElementById('haSymbol');
-  if (sym){ sym.value = lastPick.s; sym.dataset.projId = lastPick.projId || ''; }
+  if (sym) sym.value = lastPick.s;
   const next = document.getElementById('haInvested');
   jumpToField(next || sym);
 }
-function calcRealCagr(){
-  if (!lastPick) return;
-  const d = document.getElementById('viewGlobal');
-  if (d) d.open = true;
-  document.getElementById('avTicker').value = lastPick.s;
-  const key = document.getElementById('avKey');
-  if (!key.value){ jumpToField(key); return; }
-  fetchGlobalStock();
-  jumpToField(document.getElementById('fetchResult'));
-}
-function renderQuickRates(){
-  const box = document.getElementById('quickRateChips');
-  if (!box || typeof THAI_PRESETS === 'undefined') return;
-  box.innerHTML = THAI_PRESETS.map(p => `<button type="button" class="qr-chip" onclick="applyRate(${p.rate})" title="${escHtml(p.desc)}">${escHtml(p.name)} <b>${p.rate}%</b></button>`).join('')
-    + `<button type="button" class="qr-chip" onclick="applyRate(10)" title="ค่าอ้างอิงยาวๆ ที่มักใช้กันสำหรับหุ้นสหรัฐฯ ภาพรวม">หุ้นสหรัฐฯ S&amp;P 500 ระยะยาว <b>10%</b></button>`;
-}
+
+
 
 function initSymbolPickers(){
   attachSymbolPicker(document.getElementById('haSymbol'), { onPick: it => {
@@ -7791,8 +6988,6 @@ function initSymbolPickers(){
     if (msg){ msg.textContent = `เลือก ${it.s} — ${it.n}`; msg.style.color = 'var(--muted)'; }
   }});
   attachSymbolPicker(document.getElementById('assetSearch'), { onPick: it => showAssetPick(it) });
-  renderQuickRates();
-  attachSymbolPicker(document.getElementById('avTicker'), { types: ['us'] });
 }
 initSymbolPickers();
 
