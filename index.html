@@ -757,7 +757,7 @@ footer{border-top:1px solid var(--line);padding:34px 0 40px}
       <a href="#education">Education</a>
       <a href="#contact">Contact</a>
       <a href="#about">About</a>
-      <a class="gh" href="https://github.com/nawapolklinthup-jpg" target="_blank" rel="noopener">GitHub ↗</a>
+      <a class="gh" href="https://github.com/nawapolklinthung-jpg" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
     <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
@@ -775,7 +775,7 @@ footer{border-top:1px solid var(--line);padding:34px 0 40px}
         <p class="hero-desc">A small workshop of things I build in my spare time — turning little ideas into things you can actually click and use. No genius background, just someone who likes finding the next door to open.</p>
         <div class="hero-cta">
           <a href="#projects" class="btn btn-primary">View projects →</a>
-          <a href="https://github.com/nawapolklinthup-jpg" target="_blank" rel="noopener" class="btn btn-ghost">GitHub ↗</a>
+          <a href="https://github.com/nawapolklinthung-jpg" target="_blank" rel="noopener" class="btn btn-ghost">GitHub ↗</a>
         </div>
 
         <div class="idw-wrap">
@@ -1536,7 +1536,7 @@ footer{border-top:1px solid var(--line);padding:34px 0 40px}
       </div>
       <div class="foot-links">
         <a href="#top">Back to top</a>
-        <a href="https://github.com/nawapolklinthup-jpg" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/nawapolklinthung-jpg" target="_blank" rel="noopener">GitHub</a>
       </div>
     </div>
     <div class="foot-note">© 2026 Sonesolow · built line by line, one gate at a time · <span class="visit-counter">👀 <span id="visitCount">···</span> visits</span></div>
@@ -2582,5 +2582,192 @@ window.addEventListener('resize',()=>{
   requestAnimationFrame(frame);
 })();
 </script>
+<style>
+/* ===== easter eggs ===== */
+.tva-term{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(5,4,2,.72);backdrop-filter:blur(3px)}
+.tva-term.open{display:flex}
+.tva-term-box{width:min(760px,94vw);height:min(460px,78vh);display:flex;flex-direction:column;background:#0b0905;border:1px solid #ff9d1f;border-radius:10px;
+  box-shadow:0 0 0 1px rgba(255,157,31,.25),0 0 40px rgba(255,157,31,.25);font-family:"IBM Plex Mono",ui-monospace,monospace;color:#ffb347;overflow:hidden}
+.tva-term-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#1a1208;border-bottom:1px solid rgba(255,157,31,.35);font-size:11px;letter-spacing:.12em}
+.tva-term-bar button{background:none;border:1px solid rgba(255,157,31,.5);color:#ffb347;border-radius:6px;cursor:pointer;font:inherit;padding:2px 8px}
+.tva-term-out{flex:1;overflow-y:auto;padding:12px 14px;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.tva-term-out .c{color:#fff}.tva-term-out .d{color:#8a6a3c}.tva-term-out .e{color:#ff5d5d}.tva-term-out a{color:#ffd28a}
+.tva-term-in{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid rgba(255,157,31,.25)}
+.tva-term-in span{color:#ff9d1f;white-space:nowrap;font-size:13px}
+.tva-term-in input{flex:1;background:none;border:none;outline:none;color:#fff;font:inherit;font-size:14px;caret-color:#ff9d1f}
+.tva-term-fab{position:fixed;left:14px;bottom:14px;z-index:8000;width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,157,31,.55);
+  background:rgba(15,11,5,.85);color:#ff9d1f;font:700 13px "IBM Plex Mono",monospace;cursor:pointer;box-shadow:0 0 14px rgba(255,157,31,.25)}
+.tva-term-fab:hover{background:#ff9d1f;color:#140d04}
+.tva-prune{position:fixed;inset:0;z-index:9500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:radial-gradient(circle,rgba(255,120,20,.35),rgba(10,5,0,.95));color:#ffcf8a;font-family:"IBM Plex Mono",monospace;text-align:center;
+  animation:pruneFlash .18s steps(2) 4}
+.tva-prune b{font-size:clamp(22px,5vw,46px);letter-spacing:.08em;color:#ff9d1f;text-shadow:0 0 20px rgba(255,157,31,.8)}
+.tva-prune .n{font-size:clamp(60px,14vw,140px);color:#fff;text-shadow:0 0 30px #ff9d1f}
+@keyframes pruneFlash{50%{background:rgba(255,157,31,.85)}}
+body.tva-pruning .wrap, body.tva-pruning main, body.tva-pruning section{animation:pruneGlitch .7s steps(7) 1}
+@keyframes pruneGlitch{0%{transform:translate(0);filter:none}20%{transform:translate(-8px,3px);filter:hue-rotate(40deg) saturate(3)}
+  40%{transform:translate(6px,-4px);clip-path:inset(10% 0 30% 0)}60%{transform:translate(-4px,2px);filter:invert(.15)}80%{transform:translate(3px,0);clip-path:inset(40% 0 5% 0)}100%{transform:none;filter:none;clip-path:none}}
+.tva-trail{position:fixed;inset:0;pointer-events:none;z-index:8500}
+@media (pointer:fine){ html.tva-cursor, html.tva-cursor body{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cpath d='M3 2 L22 12 L13 14 L9 23 Z' fill='%23ff9d1f' stroke='%23140d04' stroke-width='1.6' stroke-linejoin='round'/%3E%3Ccircle cx='3' cy='2' r='1.4' fill='%23fff'/%3E%3C/svg%3E") 3 2, auto}
+  html.tva-cursor a, html.tva-cursor button, html.tva-cursor [onclick]{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cpath d='M3 2 L22 12 L13 14 L9 23 Z' fill='%23fff' stroke='%23ff9d1f' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E") 3 2, pointer} }
+.tva-photo-frame{cursor:pointer}
+.tva-photo-frame.variant img{animation:variantGlitch .35s steps(3) infinite;filter:hue-rotate(160deg) saturate(2.2) contrast(1.3)}
+@keyframes variantGlitch{0%{transform:translate(0)}33%{transform:translate(-4px,2px) skewX(3deg)}66%{transform:translate(3px,-2px)}100%{transform:translate(0)}}
+.variant-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);z-index:5;padding:8px 14px;border:3px double #ff5d5d;color:#ff5d5d;
+  background:rgba(15,5,5,.8);font:700 13px/1.2 "IBM Plex Mono",monospace;letter-spacing:.1em;text-align:center;white-space:nowrap;pointer-events:none}
+</style>
+<script>
+/* ===== easter eggs: live TVA readouts, arrival + age, terminal, Konami prune, cursor trail, variant photo ===== */
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 1. TVA readouts keep "scanning" */
+  var live = [].slice.call(document.querySelectorAll('.idw-metaline b, .idw-footer span, .tva-topline span, .idw-code-sub, .tva-footer span, .tva-side'))
+    .filter(function(el){ return el.children.length === 0 && /\d{3}/.test(el.textContent) && !/OCT|20\d\d$/.test(el.textContent); });
+  function scramble(el){
+    var t = el.textContent, idx = [];
+    for (var i = 0; i < t.length; i++) if (/\d/.test(t[i])) idx.push(i);
+    if (!idx.length) return;
+    var k = idx[Math.floor(Math.random() * idx.length)];
+    el.textContent = t.slice(0, k) + Math.floor(Math.random() * 10) + t.slice(k + 1);
+  }
+  if (live.length) setInterval(function(){ live.forEach(function(el){ if (Math.random() < .45) scramble(el); }); }, reduce ? 1500 : 160);
+
+  /* 2. Topre arrival + real age */
+  var TOPRE = new Date('2026-10-01T00:00:00+07:00').getTime();
+  function lifeStatus(){
+    if (Date.now() >= TOPRE){
+      var tag = document.querySelector('.idw-status-tag'); if (tag) tag.innerHTML = '<i></i> ARRIVED · ON DUTY';
+      var lab = document.querySelector('.idw-dest-label'); if (lab) lab.textContent = 'CURRENT POST';
+      [].forEach.call(document.querySelectorAll('.idw-page-status .idw-metaline'), function(m){ if (/STATUS/.test(m.textContent)) m.innerHTML = 'STATUS: <b>ACTIVE</b>'; });
+    }
+    [].forEach.call(document.querySelectorAll('.idw-mission-row'), function(r){
+      if (!/AGE/.test(r.textContent)) return;
+      var b = r.querySelector('b'), now = new Date(), age = now.getFullYear() - 2001;
+      if (now.getMonth() < 0 || (now.getMonth() === 0 && now.getDate() < 15)) age--;
+      if (b) b.textContent = age;
+    });
+  }
+  lifeStatus(); setInterval(lifeStatus, 60000);
+
+  /* 3. terminal */
+  var term = document.createElement('div');
+  term.className = 'tva-term';
+  term.innerHTML = '<div class="tva-term-box" role="dialog" aria-label="TVA terminal"><div class="tva-term-bar"><span>TVA://TEMPAD — VARIANT N.23</span><button type="button" data-x>ESC</button></div>' +
+    '<div class="tva-term-out"></div><label class="tva-term-in"><span>variant@tva:~$</span><input type="text" autocomplete="off" spellcheck="false" aria-label="command"></label></div>';
+  document.body.appendChild(term);
+  var fab = document.createElement('button');
+  fab.type = 'button'; fab.className = 'tva-term-fab'; fab.textContent = '>_'; fab.title = 'Open terminal (press ` )';
+  document.body.appendChild(fab);
+  var out = term.querySelector('.tva-term-out'), inp = term.querySelector('input'), hist = [], hi = 0, booted = false;
+  function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;' }[c]; }); }
+  function print(html, cls){ var d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; out.appendChild(d); out.scrollTop = out.scrollHeight; }
+  function years(){ return ((Date.now() - Date.UTC(2023, 8, 10, 17)) / (365.2425 * 864e5)).toFixed(2); }
+  var CMDS = {
+    help: function(){ return 'available commands:\n  <span class="c">whoami</span>      who is this variant\n  <span class="c">experience</span>  timeline of posts\n  <span class="c">skills</span>      what I actually do\n  <span class="c">projects</span>    things I built\n  <span class="c">topre</span>       next destination\n  <span class="c">contact</span>     reach me\n  <span class="c">clear</span>       wipe the screen\n  <span class="c">exit</span>        close\n<span class="d">(there may be a few hidden ones)</span>'; },
+    whoami: function(){ return 'Nawapol "Sone" Klinthup — variant N.23\nLogistics engineer. ' + years() + ' years in the timeline.\nDay job: warehouse, transport and client accounts.\nNight job: turning small ideas into things you can click.'; },
+    experience: function(){ return '[' + (Date.now() >= TOPRE ? '  ' : '->') + '] DSV Solutions — Mondelez · Kärcher · Meta\n[' + (Date.now() >= TOPRE ? '->' : '  ') + '] Topre (Thailand) — from 01 Oct 2026\n[  ] Amita Technology — internship, May–Oct 2022\n[  ] Bangkok Can Manufacturing — internship, 2018\n[  ] B.Eng. Logistics Engineering — SWU, 2019–2023'; },
+    skills: function(){ return 'warehouse ops · inbound / outbound · cycle count & audit\nFIFO · B2B transfers · export containers\nenterprise device fulfillment · smart lockers · EOL returns\nERP / WMS · Excel automation · small web tools'; },
+    projects: function(){ return '<a href="dca-compound-calculator.html">dca-compound-calculator</a>  savings passbook + DCA planner\n<a href="toeic-practice-test.html">toeic-practice-test</a>      TOEIC practice terminal\n<span class="d">next door: not open yet</span>'; },
+    topre: function(){ var d = TOPRE - Date.now(); if (d <= 0) return 'ARRIVED. Topre (Thailand) Co., Ltd. — on duty.'; var dd = Math.floor(d / 864e5), hh = Math.floor(d % 864e5 / 36e5), mm = Math.floor(d % 36e5 / 6e4); return 'DESTINATION LOCKED: Topre (Thailand) Co., Ltd.\nT-minus ' + dd + 'd ' + hh + 'h ' + mm + 'm'; },
+    contact: function(){ return 'email    <a href="mailto:nawapolklinthup@gmail.com">nawapolklinthup@gmail.com</a>\nlinkedin <a href="https://www.linkedin.com/in/nawapol-klinthup" target="_blank" rel="noopener">in/nawapol-klinthup</a>'; },
+    sudo: function(){ return '<span class="e">permission denied: variants do not get root access.</span>'; },
+    prune: function(){ close(); setTimeout(prune, 250); return ''; },
+    loki: function(){ return 'glorious purpose detected. logging incident #' + Math.floor(Math.random() * 9e5 + 1e5) + '.'; },
+    coffee: function(){ return '☕ brewing... timeline stability +3%'; },
+    date: function(){ return new Date().toString(); },
+    ls: function(){ return 'experience/  projects/  skills.txt  secrets/'; },
+    'cat secrets': function(){ return '<span class="e">ACCESS DENIED — nice try, variant.</span>'; }
+  };
+  function run(raw){
+    var cmd = raw.trim().toLowerCase().replace(/\s+/g, ' ');
+    print('<span class="d">variant@tva:~$</span> <span class="c">' + esc(raw) + '</span>');
+    if (!cmd) return;
+    if (cmd === 'clear' || cmd === 'cls'){ out.innerHTML = ''; return; }
+    if (cmd === 'exit' || cmd === 'quit'){ close(); return; }
+    var f = CMDS[cmd];
+    if (f){ var r = f(); if (r) print(r); }
+    else print('<span class="e">command not found: ' + esc(cmd) + '</span> — type <span class="c">help</span>');
+  }
+  function open(){
+    term.classList.add('open');
+    if (!booted){ booted = true; print('TVA TEMPAD v23 · session opened ' + new Date().toLocaleString('en-GB'), 'd'); print('type <span class="c">help</span> to list commands'); }
+    inp.focus();
+  }
+  function close(){ term.classList.remove('open'); inp.value = ''; inp.blur(); }
+  fab.addEventListener('click', open);
+  term.addEventListener('click', function(e){ if (e.target === term || e.target.hasAttribute('data-x')) close(); });
+  inp.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){ hist.push(inp.value); hi = hist.length; run(inp.value); inp.value = ''; }
+    else if (e.key === 'ArrowUp'){ if (hi > 0){ hi--; inp.value = hist[hi]; } e.preventDefault(); }
+    else if (e.key === 'ArrowDown'){ if (hi < hist.length){ hi++; inp.value = hist[hi] || ''; } e.preventDefault(); }
+    else if (e.key === 'Escape') close();
+  });
+
+  /* 4. Konami → prune */
+  var KONAMI = ['arrowup','arrowup','arrowdown','arrowdown','arrowleft','arrowright','arrowleft','arrowright','b','a'], kpos = 0, pruning = false;
+  function prune(){
+    if (pruning) return; pruning = true;
+    var ov = document.createElement('div');
+    ov.className = 'tva-prune';
+    ov.innerHTML = '<b>⚠ VARIANT DETECTED</b><div>NEXUS EVENT · SUBJECT N.23</div><div class="n">3</div><div>PRUNING IN PROGRESS</div>';
+    document.body.appendChild(ov);
+    var n = ov.querySelector('.n'), c = 3;
+    var t = setInterval(function(){
+      c--;
+      if (c > 0){ n.textContent = c; return; }
+      clearInterval(t);
+      n.textContent = '✕';
+      document.body.classList.add('tva-pruning');
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      setTimeout(function(){ ov.remove(); document.body.classList.remove('tva-pruning'); pruning = false; }, 900);
+    }, 700);
+  }
+  document.addEventListener('keydown', function(e){
+    var tgt = e.target, typing = tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA' || tgt.isContentEditable);
+    if (!typing && (e.key === '`' || e.key === '~')){ e.preventDefault(); term.classList.contains('open') ? close() : open(); return; }
+    if (typing) return;
+    var k = (e.key || '').toLowerCase();
+    if (k === KONAMI[kpos]){ kpos++; if (kpos === KONAMI.length){ kpos = 0; prune(); } }
+    else kpos = (k === KONAMI[0]) ? 1 : 0;
+  });
+
+  /* 5. TVA cursor + time-trail (mouse only) */
+  if (window.matchMedia('(pointer:fine)').matches && !reduce){
+    document.documentElement.classList.add('tva-cursor');
+    var cv = document.createElement('canvas'); cv.className = 'tva-trail'; document.body.appendChild(cv);
+    var cx = cv.getContext('2d'), pts = [], running = false, dpr = Math.min(2, window.devicePixelRatio || 1);
+    function size(){ cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+    size(); addEventListener('resize', size);
+    addEventListener('mousemove', function(e){ pts.push({ x: e.clientX, y: e.clientY, t: performance.now() }); if (!running){ running = true; requestAnimationFrame(draw); } }, { passive: true });
+    function draw(now){
+      cx.clearRect(0, 0, innerWidth, innerHeight);
+      while (pts.length && now - pts[0].t > 650) pts.shift();
+      cx.shadowColor = 'rgba(255,157,31,.85)'; cx.shadowBlur = 10;
+      for (var i = 1; i < pts.length; i++){
+        var a = 1 - (now - pts[i].t) / 650;
+        cx.strokeStyle = 'rgba(255,' + Math.round(120 + 60 * a) + ',31,' + (a * .75).toFixed(3) + ')';
+        cx.lineWidth = 1 + a * 4.5; cx.lineCap = 'round';
+        cx.beginPath(); cx.moveTo(pts[i - 1].x, pts[i - 1].y); cx.lineTo(pts[i].x, pts[i].y); cx.stroke();
+      }
+      if (pts.length) requestAnimationFrame(draw); else { running = false; cx.clearRect(0, 0, innerWidth, innerHeight); }
+    }
+  }
+
+  /* 6. click the ID photo 5 times → variant */
+  var frame = document.querySelector('.tva-photo-frame'), clicks = [], vt = null;
+  if (frame) frame.addEventListener('click', function(){
+    var now = Date.now(); clicks = clicks.filter(function(t){ return now - t < 2500; }); clicks.push(now);
+    if (clicks.length < 5 || frame.classList.contains('variant')) return;
+    clicks = [];
+    frame.classList.add('variant');
+    var badge = document.createElement('div'); badge.className = 'variant-badge'; badge.innerHTML = 'NEXUS EVENT<br>CONTAINED';
+    frame.appendChild(badge);
+    clearTimeout(vt);
+    vt = setTimeout(function(){ frame.classList.remove('variant'); badge.remove(); }, 3500);
+  });
+})();
+</script>
+
 </body>
 </html>
