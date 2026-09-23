@@ -2234,6 +2234,10 @@
   .place-main{ flex:1; font-size: 13px; color: var(--ink); overflow:hidden; }
   .place-main small{ display:block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
   .fuel-maps-row .sym-wrap{ width: 100%; }
+
+  .loc-btn{ margin-left: 6px; border: 1px solid rgba(255,255,255,0.18); background: transparent; color: var(--teal); border-radius: 999px;
+    padding: 2px 10px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .loc-btn:hover{ border-color: var(--teal); }
 </style>
 </head>
 <body data-theme="dark">
@@ -2437,11 +2441,11 @@
 
     <div class="fuel-maps-row">
       <div class="field">
-        <label>📍 จาก <span class="hint">(ที่อยู่/สถานที่)</span></label>
+        <label>📍 จาก <span class="hint">(ที่อยู่/สถานที่)</span> <button type="button" class="loc-btn" onclick="useMyLocation('fuelOrigin')">📡 ใช้ตำแหน่งตอนนี้</button></label>
         <input type="text" id="fuelOrigin" placeholder="พิมพ์ชื่อสถานที่ เช่น Ideo, เซ็นทรัลลาดพร้าว">
       </div>
       <div class="field">
-        <label>🏁 ไป <span class="hint">(ที่อยู่/สถานที่)</span></label>
+        <label>🏁 ไป <span class="hint">(ที่อยู่/สถานที่)</span> <button type="button" class="loc-btn" onclick="useMyLocation('fuelDest')">📡 ใช้ตำแหน่งตอนนี้</button></label>
         <input type="text" id="fuelDest" placeholder="พิมพ์ชื่อสถานที่ เช่น DSV บางนา, สีลม">
       </div>
       <button type="button" class="use-btn" style="width:auto;padding:10px 16px;background:var(--gold);" onclick="openInMaps()">🗺️ ดูเส้นทางใน Google Maps</button>
@@ -4666,12 +4670,18 @@ function attachPlacePicker(input){
       lastQ = q;
       list.innerHTML = '<div class="sym-note">กำลังค้นหา...</div>';
       list.classList.add('open');
+      // pasted coordinates (Google Maps: long-press a spot → copy "13.70, 100.60")
+      const cm = q.match(/^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$/);
+      if (cm){
+        routePts[input.id] = { lat: +cm[1], lon: +cm[2], name: `พิกัด ${(+cm[1]).toFixed(4)}, ${(+cm[2]).toFixed(4)}` };
+        close();
+        calcRouteDistance();
+        return;
+      }
       try{
-        const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=8&lat=13.75&lon=100.52&bbox=97.3,5.6,105.7,20.5`;
-        const j = await (await fetch(url)).json();
+        const feats = await searchPlaces(q);
         if (input.value.trim() !== lastQ) return;
-        const feats = (j.features || []).filter(f => f.geometry && f.geometry.coordinates);
-        if (!feats.length){ list.innerHTML = '<div class="sym-note">ไม่เจอสถานที่นี้ — ลองพิมพ์ชื่อเขต/ถนน หรือใส่ระยะทาง กม. เองด้านล่าง</div>'; return; }
+        if (!feats.length){ list.innerHTML = `<div class="sym-note">ไม่เจอ "${escHtml(q)}" ในแผนที่ฟรี — ลองพิมพ์ชื่อถนน/ซอย/ห้างใกล้ๆ แทน (เช่น "สุขุมวิท 115", "เมกา บางนา")<br>หรือเปิด Google Maps กดค้างที่จุดนั้น → คัดลอกพิกัด (เช่น 13.60, 100.61) แล้ววางในช่องนี้</div>`; return; }
         list.innerHTML = feats.map((f, i) => { const l = placeLabel(f);
           return `<button type="button" class="sym-item" data-i="${i}"><span class="sym-code">📍</span><span class="place-main">${escHtml(l.main)}<small>${escHtml(l.sub)}</small></span></button>`; }).join('');
         list.querySelectorAll('.sym-item').forEach(b => b.addEventListener('mousedown', ev => {
@@ -4694,6 +4704,49 @@ function attachPlacePicker(input){
     if (ev.key === 'Enter'){ const first = list.querySelector('.sym-item'); if (first){ ev.preventDefault(); first.dispatchEvent(new Event('mousedown')); } }
   });
 }
+
+// Photon matches names word by word, so "IDEO 115" misses "Ideo Mobi Sukhumvit 115".
+// Try the full text first, then looser variants, and merge what comes back.
+async function searchPlaces(q){
+  const base = 'https://photon.komoot.io/api/?limit=8&lat=13.75&lon=100.52&bbox=97.3,5.6,105.7,20.5&q=';
+  const seen = new Set(), out = [];
+  const add = feats => (feats || []).forEach(f => {
+    if (!f.geometry || !f.geometry.coordinates) return;
+    const k = f.geometry.coordinates.map(x => x.toFixed(4)).join(',');
+    if (!seen.has(k)){ seen.add(k); out.push(f); }
+  });
+  const get = async text => { try{ const j = await (await fetch(base + encodeURIComponent(text))).json(); return j.features || []; }catch(e){ throw e; } };
+  add(await get(q));
+  if (out.length >= 3) return out;
+  const words = q.split(/\s+/).filter(Boolean);
+  const variants = [];
+  if (words.length > 1){
+    const nonNum = words.filter(w => !/^\d+$/.test(w)).join(' ');
+    const nums = words.filter(w => /^\d+$/.test(w));
+    if (nums.length) variants.push(`${nonNum} sukhumvit ${nums.join(' ')}`, `${nonNum} ${nums.map(n => 'สุขุมวิท ' + n).join(' ')}`);
+    if (nonNum && nonNum !== q) variants.push(nonNum);
+  }
+  for (const v of variants){
+    if (out.length >= 8) break;
+    const feats = await get(v);
+    // keep loose matches only if they still contain the main word the user typed
+    const key = (words.find(w => !/^\d+$/.test(w)) || '').toLowerCase();
+    add(feats.filter(f => !key || JSON.stringify(f.properties || {}).toLowerCase().indexOf(key) !== -1));
+  }
+  return out;
+}
+function useMyLocation(inputId){
+  const st = document.getElementById('routeStatus');
+  if (!navigator.geolocation){ st.textContent = 'เบราว์เซอร์นี้ไม่รองรับการหาตำแหน่ง'; return; }
+  st.textContent = '📡 กำลังหาตำแหน่งปัจจุบัน... (เบราว์เซอร์จะถามขออนุญาต)'; st.style.color = 'var(--muted)';
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude: lat, longitude: lon } = pos.coords;
+    routePts[inputId] = { lat, lon, name: 'ตำแหน่งปัจจุบัน' };
+    document.getElementById(inputId).value = `📍 ตำแหน่งปัจจุบัน (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+    calcRouteDistance();
+  }, () => { st.textContent = 'ไม่ได้รับอนุญาตให้ใช้ตำแหน่ง — พิมพ์ชื่อสถานที่แทนได้'; st.style.color = 'var(--gold)'; }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
 async function calcRouteDistance(){
   const a = routePts.fuelOrigin, b = routePts.fuelDest;
   const st = document.getElementById('routeStatus');

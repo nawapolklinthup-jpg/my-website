@@ -1,6 +1,6 @@
 /* Service worker for the DCA passbook — offline-first for its own files.
    Bump CACHE when you deploy a new version of the page. */
-const CACHE = 'dca-passbook-v6';
+const CACHE = 'dca-passbook-v7';
 const ASSETS = [
   './dca-compound-calculator.html',
   './manifest.webmanifest',
