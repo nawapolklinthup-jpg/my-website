@@ -2598,6 +2598,12 @@ window.addEventListener('resize',()=>{
 .tva-term-fab{position:fixed;left:14px;bottom:14px;z-index:8000;width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,157,31,.55);
   background:rgba(15,11,5,.85);color:#ff9d1f;font:700 13px "IBM Plex Mono",monospace;cursor:pointer;box-shadow:0 0 14px rgba(255,157,31,.25)}
 .tva-term-fab:hover{background:#ff9d1f;color:#140d04}
+.tva-hint{position:fixed;left:62px;bottom:14px;z-index:8000;max-width:min(300px,calc(100vw - 80px));padding:9px 12px;border-radius:10px;text-align:left;
+  border:1px solid rgba(255,157,31,.55);background:rgba(15,11,5,.94);color:#ffcf8a;font:12px/1.45 "IBM Plex Mono",monospace;cursor:pointer;
+  box-shadow:0 0 18px rgba(255,157,31,.25);opacity:0;transform:translateX(-8px);pointer-events:none;transition:opacity .35s,transform .35s}
+.tva-hint.show{opacity:1;transform:none;pointer-events:auto}
+.tva-hint b{color:#ff9d1f}.tva-hint small{color:#8a6a3c;font-size:10.5px}
+.tva-hint kbd{display:inline-block;min-width:18px;padding:0 4px;margin:0 1px;border:1px solid rgba(255,157,31,.6);border-radius:4px;color:#fff;font:inherit;text-align:center}
 .tva-prune{position:fixed;inset:0;z-index:9500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
   background:radial-gradient(circle,rgba(255,120,20,.35),rgba(10,5,0,.95));color:#ffcf8a;font-family:"IBM Plex Mono",monospace;text-align:center;
   animation:pruneFlash .18s steps(2) 4}
@@ -2607,7 +2613,6 @@ window.addEventListener('resize',()=>{
 body.tva-pruning .wrap, body.tva-pruning main, body.tva-pruning section{animation:pruneGlitch .7s steps(7) 1}
 @keyframes pruneGlitch{0%{transform:translate(0);filter:none}20%{transform:translate(-8px,3px);filter:hue-rotate(40deg) saturate(3)}
   40%{transform:translate(6px,-4px);clip-path:inset(10% 0 30% 0)}60%{transform:translate(-4px,2px);filter:invert(.15)}80%{transform:translate(3px,0);clip-path:inset(40% 0 5% 0)}100%{transform:none;filter:none;clip-path:none}}
-.tva-trail{position:fixed;inset:0;pointer-events:none;z-index:8500}
 @media (pointer:fine){ html.tva-cursor, html.tva-cursor body{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cpath d='M3 2 L22 12 L13 14 L9 23 Z' fill='%23ff9d1f' stroke='%23140d04' stroke-width='1.6' stroke-linejoin='round'/%3E%3Ccircle cx='3' cy='2' r='1.4' fill='%23fff'/%3E%3C/svg%3E") 3 2, auto}
   html.tva-cursor a, html.tva-cursor button, html.tva-cursor [onclick]{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cpath d='M3 2 L22 12 L13 14 L9 23 Z' fill='%23fff' stroke='%23ff9d1f' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E") 3 2, pointer} }
 .tva-photo-frame{cursor:pointer}
@@ -2705,7 +2710,7 @@ body.tva-pruning .wrap, body.tva-pruning main, body.tva-pruning section{animatio
   });
 
   /* 4. Konami → prune */
-  var KONAMI = ['arrowup','arrowup','arrowdown','arrowdown','arrowleft','arrowright','arrowleft','arrowright','b','a'], kpos = 0, pruning = false;
+  var KONAMI = ['arrowup','arrowdown','arrowleft','arrowright'], kpos = 0, pruning = false;
   function prune(){
     if (pruning) return; pruning = true;
     var ov = document.createElement('div');
@@ -2732,27 +2737,50 @@ body.tva-pruning .wrap, body.tva-pruning main, body.tva-pruning section{animatio
     else kpos = (k === KONAMI[0]) ? 1 : 0;
   });
 
-  /* 5. TVA cursor + time-trail (mouse only) */
-  if (window.matchMedia('(pointer:fine)').matches && !reduce){
-    document.documentElement.classList.add('tva-cursor');
-    var cv = document.createElement('canvas'); cv.className = 'tva-trail'; document.body.appendChild(cv);
-    var cx = cv.getContext('2d'), pts = [], running = false, dpr = Math.min(2, window.devicePixelRatio || 1);
-    function size(){ cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0); }
-    size(); addEventListener('resize', size);
-    addEventListener('mousemove', function(e){ pts.push({ x: e.clientX, y: e.clientY, t: performance.now() }); if (!running){ running = true; requestAnimationFrame(draw); } }, { passive: true });
-    function draw(now){
-      cx.clearRect(0, 0, innerWidth, innerHeight);
-      while (pts.length && now - pts[0].t > 650) pts.shift();
-      cx.shadowColor = 'rgba(255,157,31,.85)'; cx.shadowBlur = 10;
-      for (var i = 1; i < pts.length; i++){
-        var a = 1 - (now - pts[i].t) / 650;
-        cx.strokeStyle = 'rgba(255,' + Math.round(120 + 60 * a) + ',31,' + (a * .75).toFixed(3) + ')';
-        cx.lineWidth = 1 + a * 4.5; cx.lineCap = 'round';
-        cx.beginPath(); cx.moveTo(pts[i - 1].x, pts[i - 1].y); cx.lineTo(pts[i].x, pts[i].y); cx.stroke();
+  /* 4b. phones: shake to prune (iOS needs one tap to allow motion) */
+  var isTouch = window.matchMedia('(pointer:coarse)').matches, motionOn = false;
+  function startShake(){
+    if (motionOn) return; motionOn = true;
+    var last = null, hits = [], cool = 0;
+    window.addEventListener('devicemotion', function(e){
+      var g = e.accelerationIncludingGravity; if (!g || g.x === null) return;
+      if (last){
+        var d = Math.abs(g.x - last.x) + Math.abs(g.y - last.y) + Math.abs(g.z - last.z), now = Date.now();
+        if (d > 28){ hits = hits.filter(function(t){ return now - t < 1000; }); hits.push(now);
+          if (hits.length >= 3 && now > cool){ hits = []; cool = now + 5000; prune(); } }
       }
-      if (pts.length) requestAnimationFrame(draw); else { running = false; cx.clearRect(0, 0, innerWidth, innerHeight); }
-    }
+      last = { x: g.x, y: g.y, z: g.z };
+    });
   }
+  function askMotion(){
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function'){
+      DeviceMotionEvent.requestPermission().then(function(r){ if (r === 'granted') startShake(); }).catch(function(){});
+    } else startShake();
+  }
+  if (isTouch && !(typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function')) startShake();
+
+  /* hint bubble next to the >_ button: once per visit, a few seconds after the page settles */
+  var hint = document.createElement('button');
+  hint.type = 'button'; hint.className = 'tva-hint';
+  hint.innerHTML = isTouch
+    ? '📳 <b>Psst…</b> shake your phone<br><small>tap here if nothing happens · or tap &gt;_</small>'
+    : '🕹️ <b>Psst…</b> press <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd><br><small>or <kbd>`</kbd> for the terminal</small>';
+  document.body.appendChild(hint);
+  hint.addEventListener('click', function(){
+    hideHint();
+    if (isTouch) askMotion();
+    prune();
+  });
+  function hideHint(){ hint.classList.remove('show'); }
+  var seen = false; try { seen = sessionStorage.getItem('tvaHint') === '1'; } catch(e){}
+  if (!seen){
+    setTimeout(function(){ hint.classList.add('show'); try { sessionStorage.setItem('tvaHint', '1'); } catch(e){} setTimeout(hideHint, 9000); }, 7000);
+  }
+  fab.addEventListener('mouseenter', function(){ if (!isTouch) hint.classList.add('show'); });
+  fab.addEventListener('mouseleave', function(){ setTimeout(hideHint, 1200); });
+
+  /* 5. TVA arrow cursor (mouse only) */
+  if (window.matchMedia('(pointer:fine)').matches) document.documentElement.classList.add('tva-cursor');
 
   /* 6. click the ID photo 5 times → variant */
   var frame = document.querySelector('.tva-photo-frame'), clicks = [], vt = null;
